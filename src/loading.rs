@@ -1,6 +1,4 @@
-use std::{
-    borrow::Cow,
-};
+use std::borrow::Cow;
 
 use gray_matter::{engine::YAML, Matter, Pod};
 use serde::{de::DeserializeOwned, Deserialize};
@@ -86,8 +84,7 @@ pub enum LoadContentError {
 }
 
 #[derive(thiserror::Error, Debug)]
-pub enum TransformContentError {
-}
+pub enum TransformContentError {}
 
 impl<M> Document<M>
 where
@@ -188,4 +185,3 @@ impl Content {
         }
     }
 }
-

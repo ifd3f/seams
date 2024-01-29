@@ -1,5 +1,4 @@
 mod metadata;
-mod date_slug;
 mod loading;
 
 fn main() {

@@ -7,7 +7,8 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.79"
-chrono = "0.4.33"
+chrono = { version = "0.4.33", features = ["serde"] }
+frunk = "0.4.2"
 gray_matter = "0.2.6"
 html-escape = "0.2.13"
 serde = { version = "1.0.196", features = ["derive"] }
