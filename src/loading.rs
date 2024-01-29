@@ -1,5 +1,6 @@
 use std::borrow::Cow;
 
+use futures::{stream::FuturesUnordered, StreamExt};
 use gray_matter::{engine::YAML, Matter, Pod};
 use serde::{de::DeserializeOwned, Deserialize};
 use tracing::trace;
@@ -109,7 +110,7 @@ pub enum ContentLoadError {
 /// Recursively load all documents in directory.
 fn load_docs_in_dir<M: DeserializeOwned>(
     path: VfsPath,
-) -> Result<impl Iterator<Item = Result<Document<M>, DocumentLoadError>>, VfsError> {
+) -> Result<impl Iterator<Item = Result<Document<M>, (VfsPath, DocumentLoadError)>>, VfsError> {
     Ok(path.walk_dir()?.filter_map(|p| {
         let Ok(p) = p else { return None };
 
@@ -124,11 +125,27 @@ fn load_docs_in_dir<M: DeserializeOwned>(
     }))
 }
 
-pub fn fully_load_docdir<M: DeserializeOwned>(
+/// Recursively load all the documents in a directory and their contents.
+pub async fn fully_load_docdir<M: DeserializeOwned>(
     path: VfsPath,
-) -> Result<impl Iterator<Item = Result<FullyLoadedDocument<M>, LoadError>>, VfsError> {
+) -> Result<Vec<Result<FullyLoadedDocument<M>, (VfsPath, LoadError)>>, VfsError> {
     let docs = load_docs_in_dir(path)?;
-    Ok(docs.map(|d| d?.fully_load()))
+
+    let futures = docs
+        .map(|d| async move {
+            let d = match d {
+                Ok(d) => d,
+                Err((p, e)) => return Err((p, e.into())),
+            };
+            let content_path = d.content.path();
+            match d.fully_load_content().await {
+                Ok(fld) => Ok(fld),
+                Err(e) => Err((content_path, e)),
+            }
+        })
+        .collect::<FuturesUnordered<_>>();
+
+    Ok(futures.collect::<Vec<_>>().await)
 }
 
 pub struct FullyLoadedDocument<M> {
@@ -189,9 +206,10 @@ where
         }
     }
 
-    pub fn fully_load(self) -> Result<FullyLoadedDocument<M>, LoadError> {
+    pub async fn fully_load_content(self) -> Result<FullyLoadedDocument<M>, LoadError> {
         let content = self.content.load()?.into_owned();
-        let transformed = content.transform()?;
+        let transformed = content.transform().await?;
+
         Ok(FullyLoadedDocument {
             document: self,
             content,
@@ -223,7 +241,7 @@ impl ContentSource {
     pub fn load(&self) -> Result<Cow<'_, Content>, ContentLoadError> {
         use ContentLoadError::*;
         match self {
-            ContentSource::Embedded(raw) => Ok(Cow::Borrowed(raw)),
+            ContentSource::Embedded(c) => Ok(Cow::Borrowed(c)),
             ContentSource::FileRef(path) => {
                 let Some(ext) = path.extension() else {
                     return Err(UnknownExtension("".into()));
@@ -244,10 +262,17 @@ impl ContentSource {
             }
         }
     }
+
+    fn path(&self) -> VfsPath {
+        match self {
+            ContentSource::Embedded(c) => c.path.clone(),
+            ContentSource::FileRef(p) => p.clone(),
+        }
+    }
 }
 
 impl Content {
-    pub fn transform(&self) -> Result<TransformedContent, ContentTransformError> {
+    pub async fn transform(&self) -> Result<TransformedContent, ContentTransformError> {
         match self.content_type {
             ContentType::Plaintext => Ok(TransformedContent {
                 html: format!("<pre>{}</pre>", html_escape::encode_text(&self.raw)),

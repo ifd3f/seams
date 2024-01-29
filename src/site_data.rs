@@ -1,10 +1,13 @@
-use std::{collections::HashMap, fmt::Display};
 use itertools::Itertools;
+use std::{collections::HashMap, fmt::Display};
 
-use serde::de::DeserializeOwned;
+
 use vfs::{VfsError, VfsPath};
 
-use crate::{loading::{fully_load_docdir, Content, Document, FullyLoadedDocument, LoadError}, metadata::{Post, Project}};
+use crate::{
+    loading::{fully_load_docdir, FullyLoadedDocument, LoadError},
+    metadata::{Post, Project},
+};
 
 pub struct SiteData {
     pub posts: Vec<FullyLoadedDocument<Post>>,
@@ -20,7 +23,7 @@ pub struct SiteIndex {
 
 #[derive(Debug)]
 pub struct SiteDataUserErrors {
-    pub load_errors: Vec<(VfsPath, LoadError)>
+    pub load_errors: Vec<(VfsPath, LoadError)>,
 }
 
 impl Display for SiteDataUserErrors {
@@ -38,7 +41,7 @@ pub enum SiteDataLoadError {
     Vfs(#[from] VfsError),
 
     #[error("User errors occurred: {0}")]
-    UserError(SiteDataUserErrors)
+    UserError(SiteDataUserErrors),
 }
 
 impl From<SiteDataUserErrors> for SiteDataLoadError {
@@ -49,18 +52,23 @@ impl From<SiteDataUserErrors> for SiteDataLoadError {
 
 impl SiteData {
     pub async fn load(path: VfsPath) -> Result<SiteData, SiteDataLoadError> {
-        let (posts, post_failures):(Vec<_>, Vec<_>) = fully_load_docdir(path.join("blog")?)?.partition_result();
-        let (projects, project_failures):(Vec<_>, Vec<_>) = fully_load_docdir(path.join("projects")?)?.partition_result();
+        let (posts, projects) = tokio::join!(
+            fully_load_docdir(path.join("blog")?),
+            fully_load_docdir(path.join("projects")?)
+        );
+
+        let (posts, post_failures): (Vec<_>, Vec<_>) = posts?.into_iter().partition_result();
+        let (projects, project_failures): (Vec<_>, Vec<_>) =
+            projects?.into_iter().partition_result();
 
         let mut load_errors = vec![];
-        load_errors .extend(post_failures);
-        load_errors .extend(project_failures);
+        load_errors.extend(post_failures);
+        load_errors.extend(project_failures);
 
-        if !failures.is_empty() {
+        if !load_errors.is_empty() {
             return Err(SiteDataUserErrors { load_errors })?;
         }
 
         Ok(Self { posts, projects })
     }
 }
-

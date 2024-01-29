@@ -8,7 +8,7 @@ use crate::site_data::SiteData;
 
 pub fn reload_on_build(
     path: impl AsRef<Path>,
-    sdtx: watch::Sender<SiteData>,
+    _sdtx: watch::Sender<SiteData>,
 ) -> anyhow::Result<impl Watcher> {
     let mut watcher = notify::recommended_watcher(|ev| match ev {
         Ok(_ev) => {

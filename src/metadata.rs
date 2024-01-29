@@ -70,7 +70,7 @@ pub struct Project {
     pub tags: Vec<String>,
 
     /// Dates associated with the project.
-    pub date: ProjectDates
+    pub date: ProjectDates,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
