@@ -7,15 +7,28 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.79"
+axum = { version = "0.7.4", features = ["ws", "tokio"] }
+axum-macros = "0.4.1"
 chrono = { version = "0.4.33", features = ["serde"] }
+clap = { version = "4.4.18", features = ["derive"] }
 frunk = "0.4.2"
+futures = "0.3.30"
 gray_matter = "0.2.6"
 html-escape = "0.2.13"
+notify = { version = "6.1.1", default-features = false, features = ["macos_kqueue"] }
+open = "5.0.1"
 serde = { version = "1.0.196", features = ["derive"] }
 serde_json = "1.0.112"
 serde_yaml = "0.9.30"
+tera = "1.19.1"
 thiserror = "1.0.56"
+tokio = "1.35.1"
+tokio-tungstenite = "0.21.0"
 toml = "0.8.8"
+tower = "0.4.13"
+tower-http = { version = "0.5.1", features = ["trace"] }
+tracing = "0.1.40"
+tungstenite = "0.21.0"
 vfs = "0.10.0"
 
 [dev-dependencies]
