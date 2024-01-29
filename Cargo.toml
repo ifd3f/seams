@@ -17,3 +17,7 @@ serde_yaml = "0.9.30"
 thiserror = "1.0.56"
 toml = "0.8.8"
 vfs = "0.10.0"
+
+[dev-dependencies]
+assert_matches = "1.5.0"
+rstest = "0.18.2"

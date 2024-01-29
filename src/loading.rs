@@ -7,9 +7,9 @@ use vfs::{VfsError, VfsPath};
 /// A document that has metadata and a piece of content associated with it.
 #[derive(Clone, Debug)]
 pub struct Document<M> {
-    path: VfsPath,
-    meta: M,
-    content: ContentSource,
+    pub path: VfsPath,
+    pub meta: M,
+    pub content: ContentSource,
 }
 
 /// Content represented by raw backing data and a ContentType.
@@ -183,5 +183,70 @@ impl Content {
                 assets: vec![],
             }),
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use assert_matches::*;
+    use rstest::*;
+    use vfs::{PhysicalFS, VfsPath};
+
+    #[derive(Deserialize)]
+    struct Meta {
+        field: String,
+    }
+
+    #[fixture]
+    fn test_data() -> VfsPath {
+        VfsPath::new(PhysicalFS::new("test_data"))
+    }
+
+    #[rstest]
+    fn load_embedded_md(test_data: VfsPath) -> anyhow::Result<()> {
+        let doc = Document::<Meta>::load(test_data.join("example_document.md")?)?;
+        let content = doc.content.load()?;
+
+        assert_eq!(doc.meta.field, "value");
+        assert_matches!(doc.content, ContentSource::Embedded(_));
+        assert!(
+            content
+                .raw
+                .contains("Hello this is an example document bye"),
+            "content.raw = {:?}",
+            content.raw
+        );
+
+        Ok(())
+    }
+
+    #[rstest]
+    fn load_separated_yml(test_data: VfsPath) -> anyhow::Result<()> {
+        let doc = Document::<Meta>::load(test_data.join("my_yaml_doc.txt.yml")?)?;
+        let content = doc.content.load()?;
+
+        assert_eq!(doc.meta.field, "plain text");
+        assert_matches!(doc.content, ContentSource::FileRef(_));
+        assert!(
+            content.raw.contains("i'm quite content"),
+            "content.raw = {:?}",
+            content.raw
+        );
+
+        Ok(())
+    }
+
+    #[rstest]
+    fn fails_to_load_yaml_without_associated_content(test_data: VfsPath) -> anyhow::Result<()> {
+        let doc = Document::<Meta>::load(
+            test_data.join("nonexamples/yaml_without_associated_content.html.yml")?,
+        )?;
+        let content_result = doc.content.load();
+
+        assert_matches!(doc.content, ContentSource::FileRef(_));
+        assert_matches!(content_result, Err(_));
+
+        Ok(())
     }
 }
