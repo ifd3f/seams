@@ -56,7 +56,7 @@ pub struct Author {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct Projects {
+pub struct Project {
     /// Title of the project.
     pub title: Option<String>,
 
@@ -68,6 +68,9 @@ pub struct Projects {
 
     /// Tags associated with the post.
     pub tags: Vec<String>,
+
+    /// Dates associated with the project.
+    pub date: ProjectDates
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]

@@ -2,12 +2,16 @@ use std::borrow::Cow;
 
 use gray_matter::{engine::YAML, Matter, Pod};
 use serde::{de::DeserializeOwned, Deserialize};
+use tracing::trace;
 use vfs::{VfsError, VfsPath};
 
 /// A document that has metadata and a piece of content associated with it.
 #[derive(Clone, Debug)]
 pub struct Document<M> {
+    /// Path the document is at.
     pub path: VfsPath,
+
+    /// Metadata associated with the document.
     pub meta: M,
     pub content: ContentSource,
 }
@@ -17,8 +21,14 @@ pub struct Document<M> {
 /// Content is something that can be transformed into HTML based on its type.
 #[derive(Clone, Debug)]
 pub struct Content {
-    content_type: ContentType,
-    raw: String,
+    /// The file that this content came from
+    pub path: VfsPath,
+
+    /// Type to interpret the content as.
+    pub content_type: ContentType,
+
+    /// Raw data of the content.
+    pub raw: String,
 }
 
 /// Where the content is relative to the meta file.
@@ -49,7 +59,20 @@ pub enum ContentType {
     // Jupyter,
 }
 
-/// Content that is not a document.
+/// Top-level errors.
+#[derive(thiserror::Error, Debug)]
+pub enum LoadError {
+    #[error("Error during document load phase: {0}")]
+    DocumentLoad(#[from] DocumentLoadError),
+
+    #[error("Error during content load phase: {0}")]
+    ContentLoad(#[from] ContentLoadError),
+
+    #[error("Error during content transform phase: {0}")]
+    ContentTransform(#[from] ContentTransformError),
+}
+
+/// Errors regarding the document load phase.
 #[derive(thiserror::Error, Debug)]
 pub enum DocumentLoadError {
     #[error("Failed to parse document: {0}")]
@@ -75,7 +98,7 @@ pub enum DocumentLoadError {
 }
 
 #[derive(thiserror::Error, Debug)]
-pub enum LoadContentError {
+pub enum ContentLoadError {
     #[error("Unrecognized file extension {0:?}")]
     UnknownExtension(String),
 
@@ -83,14 +106,47 @@ pub enum LoadContentError {
     FsError(#[from] VfsError),
 }
 
+/// Recursively load all documents in directory.
+fn load_docs_in_dir<M: DeserializeOwned>(
+    path: VfsPath,
+) -> Result<impl Iterator<Item = Result<Document<M>, DocumentLoadError>>, VfsError> {
+    Ok(path.walk_dir()?.filter_map(|p| {
+        let Ok(p) = p else { return None };
+
+        match Document::load(p.clone()) {
+            Ok(d) => Some(Ok(d)),
+            Err(DocumentLoadError::UnrecognizedExtension(e)) => {
+                trace!("skipping document due to unrecognized extension {e}");
+                None
+            }
+            Err(e) => Some(Err((p, e))),
+        }
+    }))
+}
+
+pub fn fully_load_docdir<M: DeserializeOwned>(
+    path: VfsPath,
+) -> Result<impl Iterator<Item = Result<FullyLoadedDocument<M>, LoadError>>, VfsError> {
+    let docs = load_docs_in_dir(path)?;
+    Ok(docs.map(|d| d?.fully_load()))
+}
+
+pub struct FullyLoadedDocument<M> {
+    pub document: Document<M>,
+    pub content: Content,
+    pub transformed: TransformedContent,
+}
+
 #[derive(thiserror::Error, Debug)]
-pub enum TransformContentError {}
+pub enum ContentTransformError {}
 
 impl<M> Document<M>
 where
     M: DeserializeOwned,
 {
     /// Load a [Document] from the given path.
+    ///
+    /// Does not load content.
     pub fn load(path: VfsPath) -> Result<Self, DocumentLoadError> {
         use DocumentLoadError::*;
         let (noext, ext) = split_extension(path.as_str());
@@ -107,11 +163,12 @@ where
                 let meta: M = frontmatter.deserialize()?;
 
                 Ok(Self {
-                    path,
+                    path: path.clone(),
                     meta,
                     content: ContentSource::Embedded(Content {
                         content_type: ContentType::Markdown,
                         raw: entity.content,
+                        path,
                     }),
                 })
             }
@@ -131,6 +188,21 @@ where
             e => Err(UnrecognizedExtension(e.into())),
         }
     }
+
+    pub fn fully_load(self) -> Result<FullyLoadedDocument<M>, LoadError> {
+        let content = self.content.load()?.into_owned();
+        let transformed = content.transform()?;
+        Ok(FullyLoadedDocument {
+            document: self,
+            content,
+            transformed,
+        })
+    }
+
+    /// The root directory to consider assets from.
+    pub fn asset_root(&self) -> VfsPath {
+        self.path.parent()
+    }
 }
 
 /// Split a filename's last file extension off, returning both.
@@ -148,8 +220,8 @@ fn split_extension(pathname: &str) -> (&str, &str) {
 }
 
 impl ContentSource {
-    pub fn load(&self) -> Result<Cow<'_, Content>, LoadContentError> {
-        use LoadContentError::*;
+    pub fn load(&self) -> Result<Cow<'_, Content>, ContentLoadError> {
+        use ContentLoadError::*;
         match self {
             ContentSource::Embedded(raw) => Ok(Cow::Borrowed(raw)),
             ContentSource::FileRef(path) => {
@@ -164,14 +236,18 @@ impl ContentSource {
                     e => return Err(UnknownExtension(e.into())),
                 };
 
-                Ok(Cow::Owned(Content { content_type, raw }))
+                Ok(Cow::Owned(Content {
+                    content_type,
+                    raw,
+                    path: path.clone(),
+                }))
             }
         }
     }
 }
 
 impl Content {
-    pub fn transform(&self) -> Result<TransformedContent, TransformContentError> {
+    pub fn transform(&self) -> Result<TransformedContent, ContentTransformError> {
         match self.content_type {
             ContentType::Plaintext => Ok(TransformedContent {
                 html: format!("<pre>{}</pre>", html_escape::encode_text(&self.raw)),
