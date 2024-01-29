@@ -1,7 +1,6 @@
 use itertools::Itertools;
 use std::{collections::HashMap, fmt::Display};
 
-
 use vfs::{VfsError, VfsPath};
 
 use crate::{

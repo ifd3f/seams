@@ -1,10 +1,7 @@
 use std::net::SocketAddr;
 
 use axum::{
-    extract::{
-        ws::{Message},
-        ConnectInfo, State, WebSocketUpgrade,
-    },
+    extract::{ws::Message, ConnectInfo, State, WebSocketUpgrade},
     response::IntoResponse,
     routing::get,
     Router,
