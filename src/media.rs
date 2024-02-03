@@ -1,24 +1,25 @@
+use std::{borrow::Cow, io::Read};
+
 use async_trait::async_trait;
+use futures::AsyncRead;
 use mime::Mime;
-use sha2::Sha256;
-use tokio::io::AsyncRead;
+use sha2::{digest::crypto_common::KeyInit, Sha256};
 use vfs::{
-    async_vfs::{AsyncFileSystem, AsyncVfsPath},
-    AltrootFS,
+    async_vfs::{AsyncFileSystem, AsyncVfsPath}, AltrootFS, VfsPath
 };
 
 /// Some place that can receive media.
-#[async_trait]
 pub trait MediaRegistry {
     /// Register a piece of media to be uploaded, and returns a URL to where it should be
     /// when uploaded.
     ///
     /// This function does not have to upload media immediately. Requests may be batched
     /// later for more efficient upload.
-    async fn upload(&self, media: impl Uploadable) -> anyhow::Result<String>;
+    fn upload(&self, media: dyn Uploadable) -> anyhow::Result<String>;
 }
 
 /// Something that can be uploaded to a [MediaRegistry].
+#[async_trait]
 pub trait Uploadable {
     /// Filename associated with this file, if any.
     fn filename(&self) -> Option<String>;
@@ -26,11 +27,12 @@ pub trait Uploadable {
     /// Media type be associated with this file, if any.
     fn mimetype(&self) -> Option<Mime>;
 
-    /// Open the file for reading.
-    fn open(&mut self) -> Box<dyn AsyncRead>;
+    /// The full content of this file.
+    async fn body(&mut self) -> anyhow::Result<Cow<'_, [u8]>>;
 }
 
-impl Uploadable for AsyncVfsPath {
+#[async_trait]
+impl Uploadable for VfsPath {
     fn filename(&self) -> Option<String> {
         Some(self.filename())
     }
@@ -39,8 +41,10 @@ impl Uploadable for AsyncVfsPath {
         mime_guess::from_path(self.filename()).first()
     }
 
-    fn open(&mut self) -> Box<dyn AsyncRead + '_> {
-        self.open_file()
+    async fn body(&mut self) -> anyhow::Result<Cow<'_, [u8]>> {
+        let mut buf = vec![];
+        self.open_file()?.read_to_end(&mut buf);
+        Ok(Cow::Owned(buf))
     }
 }
 
@@ -52,6 +56,7 @@ pub struct InMemoryUploadable<'a> {
     pub data: &'a [u8],
 }
 
+#[async_trait]
 impl Uploadable for InMemoryUploadable<'_> {
     fn filename(&self) -> Option<String> {
         self.filename
@@ -61,19 +66,19 @@ impl Uploadable for InMemoryUploadable<'_> {
         self.mimetype
     }
 
-    fn open(&mut self) -> Box<dyn AsyncRead + '_> {
-        Box::new(self.data)
+    async fn body(&mut self) -> anyhow::Result<Cow<'_, [u8]>> {
+        Ok(Cow::Borrowed(self.data))
     }
 }
 
 /// Upload from a file.
-#[derive(Default)]
 pub struct FileUploadable {
     pub filename: Option<String>,
     pub mimetype: Option<Mime>,
-    pub path: AsyncVfsPath,
+    pub path: VfsPath,
 }
 
+#[async_trait]
 impl Uploadable for FileUploadable {
     fn filename(&self) -> Option<String> {
         self.filename
@@ -83,8 +88,8 @@ impl Uploadable for FileUploadable {
         self.mimetype
     }
 
-    fn open(&mut self) -> Box<dyn AsyncRead + '_> {
-        self.path.open_file()
+    async fn body(&mut self) -> anyhow::Result<Cow<'_, [u8]>> {
+        self.path.body().await
     }
 }
 
@@ -106,7 +111,7 @@ impl VfsMediaRegistry {
     /// Arguments:
     /// - `prefix`: URL prefix for every uploaded file
     /// - `backing`: root directory for storing uploaded files
-    pub fn new(prefix: String, backing: AsyncVfsPath) -> Self {
+    pub fn new(prefix: String, backing: VfsPath) -> Self {
         Self {
             prefix,
             storage_root: AltrootFS::new(backing),
@@ -125,12 +130,11 @@ impl MediaRegistry for VfsMediaRegistry {
     async fn upload(&self, media: impl Uploadable) -> anyhow::Result<String> {
         let filename = media.filename();
         let mimetype = media.mimetype();
-
-        let data = vec![];
-        media.open().read_to_end(&mut data).await?;
+        let body= media.body().await?;
+        let body = body.as_ref();
 
         let hasher = Sha256::new();
-        hasher.update(data);
+        hasher.update(body);
         let hash = hasher.finalize();
         let b16 = base16::encode_lower(&hash);
 
@@ -138,14 +142,14 @@ impl MediaRegistry for VfsMediaRegistry {
             Some(n) => format!("{}/{}", b16, n),
             None => b16,
         };
-        let storage_path = AsyncVfsPath::new(self.storage_root).join(&path)?;
+        let storage_path = VfsPath::new(self.storage_root).join(&path)?;
         storage_path.parent().create_dir_all()?;
-        storage_path.create_file().await?.write_all(data);
+        storage_path.create_file()?.write_all(data);
 
         let fu = FileUploadable {
             filename,
             mimetype,
-            path,
+            path: storage_path,
         };
 
         self.files.lock().unwrap().push(fu);

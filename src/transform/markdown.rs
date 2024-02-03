@@ -2,7 +2,7 @@ use comrak::{
     nodes::{AstNode, NodeCodeBlock, NodeHtmlBlock, NodeValue},
     parse_document, Arena,
 };
-use vfs::{VfsError, VfsPath};
+use vfs::{VfsPath};
 
 use crate::{loading::TransformedContent, media::MediaRegistry};
 
@@ -19,8 +19,8 @@ pub async fn transform_markdown(
 
     let mut root = parse_document(&mut arena, &raw, &md_options);
 
-    apply_graphviz(&mut root).await?;
-    apply_images(content_root, media, &mut root).await?;
+    apply_graphviz(root).await?;
+    // apply_images(content_root, media, &mut root).await?;
 
     /*
     let images = arena
@@ -45,6 +45,7 @@ pub async fn transform_markdown(
     todo!()
 }
 
+/*
 /// Transform links in images into what they should be.
 pub async fn apply_images(
     content_root: VfsPath,
@@ -58,19 +59,20 @@ pub async fn apply_images(
         }
     } else {
         for n in node.children() {
-            apply_images(content_root, media, node).await?;
+            // apply_images(content_root, media, node).await?;
         }
     }
 
     Ok(())
 }
+*/
 
-pub async fn apply_graphviz<'a>(node: &'a mut AstNode<'a>) -> Result<(), GraphvizError> {
-    let literal = match &node.value {
+pub async fn apply_graphviz<'a>(node: &'a AstNode<'a>) -> Result<(), GraphvizError> {
+    let literal = match node.data.borrow_mut() {
         NodeValue::CodeBlock(NodeCodeBlock { info, literal, .. }) if info == "dot" => literal,
         _ => {
             for n in &mut node.child {
-                apply_graphviz(n);
+              //  apply_graphviz(n);
                 return Ok(());
             }
         }
