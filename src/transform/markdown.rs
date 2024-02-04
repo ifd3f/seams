@@ -1,13 +1,10 @@
-use std::cell::RefCell;
+use std::{cell::RefCell, io::BufWriter};
 
 use comrak::{
-    nodes::{Ast, AstNode, NodeHtmlBlock, NodeValue, Sourcepos},
-    parse_document, Arena,
+    format_html, format_html_with_plugins, nodes::{Ast, AstNode, NodeHtmlBlock, NodeValue, Sourcepos}, parse_document, Arena
 };
 use futures::{stream::FuturesUnordered, StreamExt, TryFutureExt};
 use vfs::VfsError;
-
-use crate::loading::TransformedContent;
 
 use super::{
     common::TransformContext,
@@ -15,23 +12,23 @@ use super::{
 };
 
 /// Transform markdown into HTML. May be computationally expensive.
-pub async fn transform_markdown(
-    ctx: &TransformContext,
-    raw: String,
-) -> Result<TransformedContent, Vec<MarkdownError>> {
+pub async fn transform_markdown<'a>(
+    ctx: &'a TransformContext<'a>,
+    raw: &'a str,
+) -> Result<String, MarkdownErrors> {
     let mut arena = Arena::new();
     let md_options = comrak::Options::default();
 
-    let root = parse_document(&mut arena, &raw, &md_options);
+    let root = parse_document(&mut arena, raw, &md_options);
 
-    let mut errors = vec![];
+    let mut errors = MarkdownErrors::default();
 
     if let Err(es) = apply_graphviz(root).await {
-        errors.extend(es)
+        errors.0.extend(es.0)
     }
 
     if let Err(es) = relink_images(ctx, root) {
-        errors.extend(es)
+        errors.0.extend(es.0)
     }
 
     /*
@@ -54,15 +51,17 @@ pub async fn transform_markdown(
             _ => None,
         });
         */
-    todo!()
+    let mut bw = BufWriter::new(Vec::new());
+    format_html(root, &md_options, &mut bw).unwrap();
+    Ok(String::from_utf8(bw.into_inner().unwrap()).unwrap())
 }
 
 /// Transform links in images into what they should be, and upload them.
 pub fn relink_images<'a>(
     ctx: &'a TransformContext,
     root: &'a AstNode<'a>,
-) -> Result<(), Vec<MarkdownError>> {
-    let mut errors = vec![];
+) -> Result<(), MarkdownErrors> {
+    let mut errors = MarkdownErrors::default();
 
     for n in root.descendants() {
         let mut ast = n.data.borrow_mut();
@@ -77,21 +76,21 @@ pub fn relink_images<'a>(
                     Ok(())
                 };
                 if let Err(e) = f() {
-                    errors.push(MarkdownError::new(ast.sourcepos, e))
+                    errors.0.push(MarkdownError::new(ast.sourcepos, e))
                 }
             }
             _ => (),
         };
     }
 
-    if !errors.is_empty() {
+    if !errors.0.is_empty() {
         return Err(errors);
     }
 
     Ok(())
 }
 
-pub async fn apply_graphviz<'a>(root: &'a AstNode<'a>) -> Result<(), Vec<MarkdownError>> {
+pub async fn apply_graphviz<'a>(root: &'a AstNode<'a>) -> Result<(), MarkdownErrors> {
     let mut jobs = FuturesUnordered::new();
     for n in root.descendants() {
         let cell = &n.data;
@@ -120,18 +119,24 @@ pub async fn apply_graphviz<'a>(root: &'a AstNode<'a>) -> Result<(), Vec<Markdow
         );
     }
 
-    let mut errors = vec![];
+    let mut errors = MarkdownErrors::default();
     while let Some(r) = jobs.next().await {
         if let Err(e) = r {
-            errors.push(e)
+            errors.0.push(e)
         }
     }
 
-    if errors.is_empty() {
+    if errors.0.is_empty() {
         return Err(errors);
     }
 
     Ok(())
+}
+
+#[derive(Default, Debug)]
+pub struct MarkdownErrors(pub Vec<MarkdownError>);
+
+impl std::error::Error for MarkdownErrors {
 }
 
 #[derive(thiserror::Error, Debug)]
@@ -143,6 +148,15 @@ pub struct MarkdownError {
 impl MarkdownError {
     pub fn new(pos: Sourcepos, kind: MarkdownErrorKind) -> Self {
         Self { pos, kind }
+    }
+}
+
+impl std::fmt::Display for MarkdownErrors {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for e in &self.0 {
+            writeln!(f, "{e}")?;
+        }
+        Ok(())
     }
 }
 

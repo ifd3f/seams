@@ -1,4 +1,7 @@
 use clap::Parser;
+use media::MediaRegistry;
+use site_data::SiteData;
+use vfs::{PhysicalFS, VfsPath};
 
 mod cli;
 mod loading;
@@ -8,11 +11,13 @@ mod site_data;
 mod transform;
 mod watch;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let args = cli::TopLevel::parse();
 
     match args.command {
-        cli::Subcommand::Build(_) => todo!(),
+        cli::Subcommand::Build(b) => {
+        }
         cli::Subcommand::Watch(_) => todo!(),
     }
 }

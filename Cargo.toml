@@ -29,7 +29,7 @@ serde_yaml = "0.9.30"
 sha2 = "0.10.8"
 tera = "1.19.1"
 thiserror = "1.0.56"
-tokio = { version = "1.35.1", features = ["process", "fs", "tracing", "time", "sync", "io-util"] }
+tokio = { version = "1.35.1", features = ["process", "fs", "tracing", "time", "sync", "io-util", "rt-multi-thread"] }
 tokio-tungstenite = "0.21.0"
 toml = "0.8.8"
 tower = "0.4.13"

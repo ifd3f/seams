@@ -6,6 +6,14 @@ use serde::{de::DeserializeOwned, Deserialize};
 use tracing::trace;
 use vfs::{VfsError, VfsPath};
 
+use crate::{
+    media::MediaRegistry,
+    transform::{
+        common::TransformContext,
+        markdown::{transform_markdown, MarkdownError, MarkdownErrors},
+    },
+};
+
 /// A document that has metadata and a piece of content associated with it.
 #[derive(Clone, Debug)]
 pub struct Document<M> {
@@ -46,9 +54,6 @@ pub enum ContentSource {
 pub struct TransformedContent {
     /// The raw HTML.
     pub html: String,
-
-    /// Paths to assets that are associated with this document.
-    pub assets: Vec<VfsPath>,
 }
 
 /// A ContentType supported by this system.
@@ -114,6 +119,10 @@ fn load_docs_in_dir<M: DeserializeOwned>(
     Ok(path.walk_dir()?.filter_map(|p| {
         let Ok(p) = p else { return None };
 
+        if !p.is_file().unwrap() {
+            return None;
+        };
+
         match Document::load(p.clone()) {
             Ok(d) => Some(Ok(d)),
             Err(DocumentLoadError::UnrecognizedExtension(e)) => {
@@ -127,6 +136,7 @@ fn load_docs_in_dir<M: DeserializeOwned>(
 
 /// Recursively load all the documents in a directory and their contents.
 pub async fn fully_load_docdir<M: DeserializeOwned>(
+    media: &MediaRegistry,
     path: VfsPath,
 ) -> Result<Vec<Result<FullyLoadedDocument<M>, (VfsPath, LoadError)>>, VfsError> {
     let docs = load_docs_in_dir(path)?;
@@ -138,7 +148,7 @@ pub async fn fully_load_docdir<M: DeserializeOwned>(
                 Err((p, e)) => return Err((p, e.into())),
             };
             let content_path = d.content.path();
-            match d.fully_load_content().await {
+            match d.fully_load_content(media).await {
                 Ok(fld) => Ok(fld),
                 Err(e) => Err((content_path, e)),
             }
@@ -155,7 +165,10 @@ pub struct FullyLoadedDocument<M> {
 }
 
 #[derive(thiserror::Error, Debug)]
-pub enum ContentTransformError {}
+pub enum ContentTransformError {
+    #[error("error: {0}")]
+    Markdown(#[from] MarkdownErrors),
+}
 
 impl<M> Document<M>
 where
@@ -206,9 +219,9 @@ where
         }
     }
 
-    pub async fn fully_load_content(self) -> Result<FullyLoadedDocument<M>, LoadError> {
+    pub async fn fully_load_content(self, media: &MediaRegistry) -> Result<FullyLoadedDocument<M>, LoadError> {
         let content = self.content.load()?.into_owned();
-        let transformed = content.transform().await?;
+        let transformed = content.transform(media).await?;
 
         Ok(FullyLoadedDocument {
             document: self,
@@ -272,16 +285,27 @@ impl ContentSource {
 }
 
 impl Content {
-    pub async fn transform(&self) -> Result<TransformedContent, ContentTransformError> {
+    pub fn content_root(&self) -> VfsPath {
+        self.path.parent()
+    }
+
+    pub async fn transform(
+        &self,
+        media: &MediaRegistry,
+    ) -> Result<TransformedContent, ContentTransformError> {
         match self.content_type {
             ContentType::Plaintext => Ok(TransformedContent {
                 html: format!("<pre>{}</pre>", html_escape::encode_text(&self.raw)),
-                assets: vec![],
             }),
-            ContentType::Markdown => todo!(),
+            ContentType::Markdown => Ok(TransformedContent {
+                html: transform_markdown(
+                    &TransformContext::new(self.content_root(), media),
+                    &self.raw,
+                )
+                .await?,
+            }),
             ContentType::Html => Ok(TransformedContent {
                 html: self.raw.clone(),
-                assets: vec![],
             }),
         }
     }

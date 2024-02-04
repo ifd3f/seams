@@ -4,8 +4,7 @@ use std::{collections::HashMap, fmt::Display};
 use vfs::{VfsError, VfsPath};
 
 use crate::{
-    loading::{fully_load_docdir, FullyLoadedDocument, LoadError},
-    metadata::{Post, Project},
+    loading::{fully_load_docdir, FullyLoadedDocument, LoadError}, media::MediaRegistry, metadata::{Post, Project}
 };
 
 pub struct SiteData {
@@ -50,10 +49,10 @@ impl From<SiteDataUserErrors> for SiteDataLoadError {
 }
 
 impl SiteData {
-    pub async fn load(path: VfsPath) -> Result<SiteData, SiteDataLoadError> {
+    pub async fn load(path: VfsPath, media: &MediaRegistry) -> Result<SiteData, SiteDataLoadError> {
         let (posts, projects) = tokio::join!(
-            fully_load_docdir(path.join("blog")?),
-            fully_load_docdir(path.join("projects")?)
+            fully_load_docdir(media, path.join("blog")?),
+            fully_load_docdir(media, path.join("projects")?)
         );
 
         let (posts, post_failures): (Vec<_>, Vec<_>) = posts?.into_iter().partition_result();
@@ -69,5 +68,23 @@ impl SiteData {
         }
 
         Ok(Self { posts, projects })
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use vfs::{PhysicalFS, VfsPath};
+
+    use crate::media::MediaRegistry;
+
+    use super::SiteData;
+
+    #[tokio::test]
+    pub async fn loads_example_content_dir_correctly() {
+        let content_path = VfsPath::new(PhysicalFS::new("test_data/contentdir_example"));
+        let out = VfsPath::new(PhysicalFS::new("out"));
+        let media = MediaRegistry::new("https://test".into(), out.join("static").unwrap());
+
+        let sd = SiteData::load(content_path, &media).await.unwrap();
     }
 }

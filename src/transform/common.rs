@@ -2,13 +2,13 @@ use vfs::VfsPath;
 
 use crate::media::MediaRegistry;
 
-pub struct TransformContext {
+pub struct TransformContext<'a> {
     content_root: VfsPath,
-    media: MediaRegistry,
+    media: &'a MediaRegistry,
 }
 
-impl TransformContext {
-    pub fn new(content_root: VfsPath, media: MediaRegistry) -> Self {
+impl<'a> TransformContext<'a> {
+    pub fn new(content_root: VfsPath, media: &'a MediaRegistry) -> Self {
         Self {
             content_root,
             media,
