@@ -219,7 +219,10 @@ where
         }
     }
 
-    pub async fn fully_load_content(self, media: &MediaRegistry) -> Result<FullyLoadedDocument<M>, LoadError> {
+    pub async fn fully_load_content(
+        self,
+        media: &MediaRegistry,
+    ) -> Result<FullyLoadedDocument<M>, LoadError> {
         let content = self.content.load()?.into_owned();
         let transformed = content.transform(media).await?;
 

@@ -16,8 +16,7 @@ async fn main() {
     let args = cli::TopLevel::parse();
 
     match args.command {
-        cli::Subcommand::Build(b) => {
-        }
+        cli::Subcommand::Build(b) => {}
         cli::Subcommand::Watch(_) => todo!(),
     }
 }

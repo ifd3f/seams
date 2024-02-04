@@ -61,6 +61,7 @@ impl MediaRegistry {
     /// - `prefix`: URL prefix for every uploaded file
     /// - `backing`: root directory for storing uploaded files
     pub fn new(url_prefix: String, backing: VfsPath) -> Self {
+        backing.create_dir_all().unwrap();
         Self {
             url_prefix,
             storage_root: VfsPath::new(AltrootFS::new(backing)),

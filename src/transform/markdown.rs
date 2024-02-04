@@ -1,10 +1,15 @@
 use std::{cell::RefCell, io::BufWriter};
 
 use comrak::{
-    format_html, format_html_with_plugins, nodes::{Ast, AstNode, NodeHtmlBlock, NodeValue, Sourcepos}, parse_document, Arena
+    format_html, format_html_with_plugins,
+    nodes::{Ast, AstNode, NodeHtmlBlock, NodeLink, NodeValue, Sourcepos},
+    parse_document, Arena,
 };
 use futures::{stream::FuturesUnordered, StreamExt, TryFutureExt};
+use mime::Mime;
 use vfs::VfsError;
+
+use crate::media::{Media, MediaRegistry};
 
 use super::{
     common::TransformContext,
@@ -17,13 +22,14 @@ pub async fn transform_markdown<'a>(
     raw: &'a str,
 ) -> Result<String, MarkdownErrors> {
     let mut arena = Arena::new();
-    let md_options = comrak::Options::default();
+    let mut md_options = comrak::Options::default();
+    md_options.render.unsafe_ = true;
 
     let root = parse_document(&mut arena, raw, &md_options);
 
     let mut errors = MarkdownErrors::default();
 
-    if let Err(es) = apply_graphviz(root).await {
+    if let Err(es) = apply_graphviz(&ctx.media(), root).await {
         errors.0.extend(es.0)
     }
 
@@ -90,27 +96,43 @@ pub fn relink_images<'a>(
     Ok(())
 }
 
-pub async fn apply_graphviz<'a>(root: &'a AstNode<'a>) -> Result<(), MarkdownErrors> {
+pub async fn apply_graphviz<'a>(
+    media: &'a MediaRegistry,
+    root: &'a AstNode<'a>,
+) -> Result<(), MarkdownErrors> {
     let mut jobs = FuturesUnordered::new();
     for n in root.descendants() {
         let cell = &n.data;
 
-        let (position, literal) = {
+        let (position, literal, info) = {
             let ast = cell.borrow();
             let sourcepos = ast.sourcepos.clone();
-            let literal = match &ast.value {
-                NodeValue::CodeBlock(cb) if cb.info == "dot" => cb.literal.clone(),
+            let (info, literal) = match &ast.value {
+                NodeValue::CodeBlock(cb) => match parse_graphviz_info(&cb.info) {
+                    Some(info) => (info, cb.literal.clone()),
+                    _ => continue,
+                },
                 _ => continue,
             };
-            (sourcepos, literal)
+            (sourcepos, literal, info)
         };
 
         jobs.push(
             async move {
                 let result = transform_graphviz(&literal).await?;
-                let ast = NodeValue::HtmlBlock(NodeHtmlBlock {
-                    block_type: 0,
-                    literal: result,
+                let link = media
+                    .upload_media(Media {
+                        filename: Some("graphviz.svg".into()),
+                        mimetype: Some("image/svg+xml".parse().unwrap()),
+                        body: result.into_bytes(),
+                    })
+                    .unwrap();
+                let ast = NodeValue::Image(NodeLink {
+                    url: link,
+                    title: match info {
+                        GraphvizInfo::Untitled => "Graphviz image".into(),
+                        GraphvizInfo::Titled(title) => title,
+                    },
                 });
                 cell.borrow_mut().value = ast;
                 Ok::<(), GraphvizError>(())
@@ -133,11 +155,25 @@ pub async fn apply_graphviz<'a>(root: &'a AstNode<'a>) -> Result<(), MarkdownErr
     Ok(())
 }
 
+enum GraphvizInfo {
+    Untitled,
+    Titled(String),
+}
+
+fn parse_graphviz_info(infostr: &str) -> Option<GraphvizInfo> {
+    if let Some(title) = infostr.strip_prefix("dot:") {
+        Some(GraphvizInfo::Titled(title.into()))
+    } else if infostr == "dot" {
+        Some(GraphvizInfo::Untitled)
+    } else {
+        None
+    }
+}
+
 #[derive(Default, Debug)]
 pub struct MarkdownErrors(pub Vec<MarkdownError>);
 
-impl std::error::Error for MarkdownErrors {
-}
+impl std::error::Error for MarkdownErrors {}
 
 #[derive(thiserror::Error, Debug)]
 pub struct MarkdownError {

@@ -8,3 +8,4 @@ result
 # Added by cargo
 
 /target
+out
