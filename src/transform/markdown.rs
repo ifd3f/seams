@@ -1,4 +1,4 @@
-use std::{io::BufWriter};
+use std::io::BufWriter;
 
 use comrak::{
     format_html,
