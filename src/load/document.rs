@@ -10,7 +10,7 @@ use crate::{
     media::MediaRegistry,
     transform::{
         common::TransformContext,
-        markdown::{transform_markdown, MarkdownError, MarkdownErrors},
+        markdown::{transform_markdown, MarkdownErrors},
     },
 };
 

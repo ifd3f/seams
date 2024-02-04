@@ -1,12 +1,12 @@
-use std::{cell::RefCell, io::BufWriter};
+use std::{io::BufWriter};
 
 use comrak::{
-    format_html, format_html_with_plugins,
-    nodes::{Ast, AstNode, NodeHtmlBlock, NodeLink, NodeValue, Sourcepos},
+    format_html,
+    nodes::{AstNode, NodeLink, NodeValue, Sourcepos},
     parse_document, Arena,
 };
 use futures::{stream::FuturesUnordered, StreamExt, TryFutureExt};
-use mime::Mime;
+
 use vfs::VfsError;
 
 use crate::media::{Media, MediaRegistry};

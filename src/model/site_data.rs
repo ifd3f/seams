@@ -1,14 +1,14 @@
-use chrono::Datelike;
-use itertools::Itertools;
 use std::{collections::HashMap, fmt::Display};
 
+use itertools::Itertools;
 use vfs::{VfsError, VfsPath};
 
 use crate::{
-    loading::{fully_load_docdir, FullyLoadedDocument, LoadError},
+    load::document::{fully_load_docdir, FullyLoadedDocument, LoadError},
     media::MediaRegistry,
-    metadata::{Post, Project},
 };
+
+use super::metadata::{Post, Project};
 
 pub struct SiteData {
     pub posts: Vec<FullyLoadedDocument<Post>>,
@@ -72,37 +72,6 @@ impl SiteData {
 
         Ok(Self { posts, projects })
     }
-
-    pub fn write_static_site(&self, outdir: VfsPath) -> anyhow::Result<()> {
-        outdir.create_dir_all()?;
-
-        for p in &self.posts {
-            let slugday = p.document.meta.date.published;
-            let postdir = outdir
-                .join(format!(
-                    "{}/{:02}/{:02}/{}/{}",
-                    slugday.year(),
-                    slugday.month(),
-                    slugday.day(),
-                    0usize,
-                    &p.document.meta.slug
-                ))
-                .unwrap();
-            postdir.create_dir_all()?;
-            let mut out = postdir.join("index.html").unwrap().create_file()?;
-            out.write_all(p.transformed.html.as_bytes())?;
-        }
-
-        let projectsdir = outdir.join("projects").unwrap();
-        for p in &self.projects {
-            let projectdir = outdir.join(&p.document.meta.slug)?;
-            projectdir.create_dir_all()?;
-            let mut out = projectdir.join("index.html").unwrap().create_file()?;
-            out.write_all(p.transformed.html.as_bytes())?;
-        }
-
-        Ok(())
-    }
 }
 
 #[cfg(test)]
@@ -116,7 +85,7 @@ mod test {
     use super::SiteData;
 
     #[tokio::test]
-    pub async fn loads_and_writes_example_content_dir_correctly() {
+    pub async fn loads_example_content_dir_correctly() {
         let content_path = VfsPath::new(PhysicalFS::new("test_data/contentdir_example"));
         remove_dir_all("./out").ok();
         create_dir_all("./out").unwrap();
@@ -124,8 +93,6 @@ mod test {
 
         let media = MediaRegistry::new("https://test".into(), out.join("static").unwrap());
 
-        let sd = SiteData::load(content_path, &media).await.unwrap();
-
-        sd.write_static_site(out).unwrap();
+        let _sd = SiteData::load(content_path, &media).await.unwrap();
     }
 }

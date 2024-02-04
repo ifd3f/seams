@@ -10,7 +10,7 @@ use tokio::sync::watch;
 use tower_http::trace::{DefaultMakeSpan, TraceLayer};
 use tracing::info;
 
-use crate::site_data::SiteData;
+use crate::model::site_data::SiteData;
 
 #[derive(Clone)]
 struct SiteDataRx(watch::Receiver<SiteData>);

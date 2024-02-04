@@ -4,7 +4,7 @@ use notify::{RecursiveMode, Watcher};
 use tokio::sync::watch;
 use tracing::error;
 
-use crate::site_data::SiteData;
+use crate::model::site_data::SiteData;
 
 pub fn reload_on_build(
     path: impl AsRef<Path>,
