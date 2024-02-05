@@ -29,7 +29,11 @@ pub async fn build_static_site(
     Ok(())
 }
 
-pub fn write_static_site(sd: &SiteData, _templates: VfsPath, outdir: VfsPath) -> anyhow::Result<()> {
+pub fn write_static_site(
+    sd: &SiteData,
+    _templates: VfsPath,
+    outdir: VfsPath,
+) -> anyhow::Result<()> {
     outdir.create_dir_all()?;
 
     for p in &sd.posts {

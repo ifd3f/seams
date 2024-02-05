@@ -5,7 +5,7 @@ use comrak::{
     nodes::{AstNode, NodeLink, NodeValue, Sourcepos},
     parse_document, Arena,
 };
-use futures::{stream::FuturesUnordered, StreamExt, TryFutureExt};
+use futures::TryFutureExt;
 
 use vfs::VfsError;
 
@@ -100,7 +100,8 @@ pub async fn apply_graphviz<'a>(
     media: &'a MediaRegistry,
     root: &'a AstNode<'a>,
 ) -> Result<(), MarkdownErrors> {
-    let mut jobs = FuturesUnordered::new();
+    let mut errors = MarkdownErrors::default();
+
     for n in root.descendants() {
         let cell = &n.data;
 
@@ -117,34 +118,30 @@ pub async fn apply_graphviz<'a>(
             (sourcepos, literal, info)
         };
 
-        jobs.push(
-            async move {
-                let result = transform_graphviz(&literal).await?;
-                let link = media
-                    .upload_media(Media {
-                        filename: Some("graphviz.svg".into()),
-                        mimetype: Some("image/svg+xml".parse().unwrap()),
-                        body: result.into_bytes(),
-                    })
-                    .unwrap();
-                let ast = NodeValue::Image(NodeLink {
-                    url: link,
-                    title: match info {
-                        GraphvizInfo::Untitled => "Graphviz image".into(),
-                        GraphvizInfo::Titled(title) => title,
-                    },
-                });
-                cell.borrow_mut().value = ast;
-                Ok::<(), GraphvizError>(())
-            }
-            .map_err(move |e| MarkdownError::new(position.clone(), e.into())),
-        );
-    }
+        let result = async move {
+            let result = transform_graphviz(&literal).await?;
+            let link = media
+                .upload_media(Media {
+                    filename: Some("graphviz.svg".into()),
+                    mimetype: Some("image/svg+xml".parse().unwrap()),
+                    body: result.into_bytes(),
+                })
+                .unwrap();
+            let ast = NodeValue::Image(NodeLink {
+                url: link,
+                title: match info {
+                    GraphvizInfo::Untitled => "Graphviz image".into(),
+                    GraphvizInfo::Titled(title) => title,
+                },
+            });
+            cell.borrow_mut().value = ast;
+            Ok::<(), GraphvizError>(())
+        }
+        .map_err(move |e| MarkdownError::new(position.clone(), e.into()))
+        .await;
 
-    let mut errors = MarkdownErrors::default();
-    while let Some(r) = jobs.next().await {
-        if let Err(e) = r {
-            errors.0.push(e)
+        if let Err(e) = result {
+            errors.0.push(e);
         }
     }
 

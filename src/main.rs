@@ -1,9 +1,6 @@
-
-
 use clap::Parser;
-use render::output::{build_static_site};
+use render::output::build_static_site;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
-
 
 mod cli;
 mod load;
@@ -13,12 +10,16 @@ mod render;
 mod transform;
 mod watch;
 
-#[tokio::main]
+#[tokio::main(flavor = "current_thread")]
 async fn main() {
     let args = cli::TopLevel::parse();
     tracing_subscriber::registry()
         .with(tracing_subscriber::fmt::layer())
-        .with(EnvFilter::builder().with_default_directive("info".parse().unwrap()).from_env_lossy())
+        .with(
+            EnvFilter::builder()
+                .with_default_directive("info".parse().unwrap())
+                .from_env_lossy(),
+        )
         .init();
 
     _main(args).await.unwrap();
