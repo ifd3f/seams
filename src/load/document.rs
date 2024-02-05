@@ -81,9 +81,6 @@ pub enum LoadError {
 /// Errors regarding the document load phase.
 #[derive(thiserror::Error, Debug)]
 pub enum DocumentLoadError {
-    #[error("Failed to parse document: {0}")]
-    FailedToParse(String),
-
     #[error("Markdown has no frontmatter")]
     MarkdownHasNoFrontmatter,
 
@@ -103,6 +100,15 @@ pub enum DocumentLoadError {
     ParseTomlError(#[from] toml::de::Error),
 }
 
+impl DocumentLoadError {
+    pub fn is_non_document(&self) -> bool {
+        match self {
+            DocumentLoadError::UnrecognizedExtension(_) => true,
+            _ => false,
+        }
+    }
+}
+
 #[derive(thiserror::Error, Debug)]
 pub enum ContentLoadError {
     #[error("Unrecognized file extension {0:?}")]
@@ -119,14 +125,17 @@ fn load_docs_in_dir<M: DeserializeOwned>(
     Ok(path.walk_dir()?.filter_map(|p| {
         let Ok(p) = p else { return None };
 
+        let span = tracing::debug_span!("load_document", path = p.as_str());
+        let _enter = span.enter();
+
         if !p.is_file().unwrap() {
             return None;
         };
 
         match Document::load(p.clone()) {
             Ok(d) => Some(Ok(d)),
-            Err(DocumentLoadError::UnrecognizedExtension(e)) => {
-                trace!("skipping document due to unrecognized extension {e}");
+            Err(e) if e.is_non_document() => {
+                trace!("skipping non-document file: {e}");
                 None
             }
             Err(e) => Some(Err((p, e))),
@@ -219,6 +228,7 @@ where
         }
     }
 
+    #[tracing::instrument(skip_all, fields(path = self.path.as_str()))]
     pub async fn fully_load_content(
         self,
         media: &MediaRegistry,
@@ -256,6 +266,7 @@ fn split_extension(pathname: &str) -> (&str, &str) {
 impl ContentSource {
     pub fn load(&self) -> Result<Cow<'_, Content>, ContentLoadError> {
         use ContentLoadError::*;
+
         match self {
             ContentSource::Embedded(c) => Ok(Cow::Borrowed(c)),
             ContentSource::FileRef(path) => {
@@ -292,6 +303,7 @@ impl Content {
         self.path.parent()
     }
 
+    #[tracing::instrument(skip_all, fields(ctype = ?self.content_type, path = self.path.as_str()))]
     pub async fn transform(
         &self,
         media: &MediaRegistry,

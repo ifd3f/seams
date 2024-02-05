@@ -1,11 +1,13 @@
 use std::{fs::create_dir_all, path::Path};
 
 use chrono::Datelike;
+use tokio::time::Instant;
 use tracing::info;
 use vfs::{PhysicalFS, VfsPath};
 
 use crate::{media::MediaRegistry, model::site_data::SiteData};
 
+#[tracing::instrument(skip_all)]
 pub async fn build_static_site(
     content: impl AsRef<Path>,
     templates: impl AsRef<Path>,
@@ -18,6 +20,8 @@ pub async fn build_static_site(
         "Building static site"
     );
 
+    let start = Instant::now();
+
     create_dir_all(out.as_ref())?;
     let out = VfsPath::new(PhysicalFS::new(out.as_ref()));
     let content = VfsPath::new(PhysicalFS::new(content.as_ref()));
@@ -26,6 +30,9 @@ pub async fn build_static_site(
     let media = MediaRegistry::new("/static".into(), out.join("static")?);
     let sd = SiteData::load(content, &media).await?;
     write_static_site(&sd, templates, out)?;
+
+    info!(elapsed = ?start.elapsed(), "Completed");
+
     Ok(())
 }
 

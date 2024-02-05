@@ -2,6 +2,7 @@ use std::io::Read;
 
 use mime::Mime;
 use sha2::{Digest, Sha256};
+use tracing::{debug, info};
 use vfs::{AltrootFS, VfsPath};
 
 pub trait Uploadable {
@@ -82,10 +83,13 @@ impl MediaRegistry {
         let hash = hasher.finalize();
         let b16 = base16::encode_lower(&hash);
 
+        debug!(filename = media.filename, size = media.body.len(), sha = %b16, "Adding new media");
+
         let path = match &media.filename {
             Some(n) => format!("{}/{}", b16, n),
             None => b16,
         };
+
         let storage_path = self.storage_root.join(&path)?;
         storage_path.parent().create_dir_all()?;
         storage_path.create_file()?.write_all(&media.body)?;

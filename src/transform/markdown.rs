@@ -17,6 +17,7 @@ use super::{
 };
 
 /// Transform markdown into HTML. May be computationally expensive.
+#[tracing::instrument(skip_all)]
 pub async fn transform_markdown<'a>(
     ctx: &'a TransformContext<'a>,
     raw: &'a str,
@@ -63,6 +64,7 @@ pub async fn transform_markdown<'a>(
 }
 
 /// Transform links in images into what they should be, and upload them.
+#[tracing::instrument(skip_all)]
 pub fn relink_images<'a>(
     ctx: &'a TransformContext,
     root: &'a AstNode<'a>,
@@ -96,6 +98,7 @@ pub fn relink_images<'a>(
     Ok(())
 }
 
+#[tracing::instrument(skip_all)]
 pub async fn apply_graphviz<'a>(
     media: &'a MediaRegistry,
     root: &'a AstNode<'a>,

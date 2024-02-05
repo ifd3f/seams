@@ -27,7 +27,7 @@ pub struct BuildCommand {
     pub out: PathBuf,
 }
 
-/// Serve on a port, while watching and rebuilding the content and templates directories. 
+/// Serve on a port, while watching and rebuilding the content and templates directories.
 ///
 /// Currently unimplemented.
 #[derive(clap::Args)]

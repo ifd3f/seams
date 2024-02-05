@@ -3,7 +3,7 @@ use std::{
     str::Utf8Error,
 };
 
-use tokio::{io::AsyncWriteExt, process::Command};
+use tokio::{io::AsyncWriteExt, process::Command, time::Instant};
 use tracing::trace;
 
 #[derive(thiserror::Error, Debug)]
@@ -18,7 +18,7 @@ pub enum GraphvizError {
     CmdFailed(ExitStatus, String),
 }
 
-#[tracing::instrument]
+#[tracing::instrument(skip_all)]
 pub async fn transform_graphviz(source: &str) -> Result<String, GraphvizError> {
     let mut cmd = Command::new("dot");
     cmd.arg("-Tsvg")
@@ -28,6 +28,7 @@ pub async fn transform_graphviz(source: &str) -> Result<String, GraphvizError> {
         .kill_on_drop(true);
     trace!(?cmd, "executing dot");
 
+    let start = Instant::now();
     let mut proc = cmd.spawn()?;
     trace!(%source, "writing source code");
     let mut stdin = proc.stdin.take().unwrap();
@@ -37,7 +38,8 @@ pub async fn transform_graphviz(source: &str) -> Result<String, GraphvizError> {
     let result = proc.wait_with_output().await?;
 
     let status = result.status;
-    trace!(?status, "command exited");
+
+    trace!(?status, elapsed = ?start.elapsed(), "command exited");
 
     let svg = String::from_utf8(result.stdout).unwrap();
     let log = String::from_utf8_lossy(&result.stderr);
