@@ -8,7 +8,6 @@ mod media;
 mod model;
 mod render;
 mod transform;
-mod watch;
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() {
