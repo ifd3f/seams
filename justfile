@@ -5,7 +5,9 @@ mkstyles:
     mkdir -p out/
     nix build -o result-styles .#styles
     rm -f out/*.css
+    rm -f out/*.css.map
     cp -r result-styles/styles.css out/
+    cp -r result-styles/styles.css.map out/
 
 mkhtml:
     mkdir -p out/
