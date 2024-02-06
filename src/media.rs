@@ -2,7 +2,7 @@ use std::io::Read;
 
 use mime::Mime;
 use sha2::{Digest, Sha256};
-use tracing::{debug, info};
+use tracing::debug;
 use vfs::{AltrootFS, VfsPath};
 
 pub trait Uploadable {

@@ -1,11 +1,12 @@
 use std::{fs::create_dir_all, path::Path};
 
 use chrono::Datelike;
+use maud::Render;
 use tokio::time::Instant;
 use tracing::info;
 use vfs::{PhysicalFS, VfsPath};
 
-use crate::{media::MediaRegistry, model::site_data::SiteData};
+use crate::{media::MediaRegistry, model::site_data::SiteData, templates::Homepage};
 
 #[tracing::instrument(skip_all)]
 pub async fn build_static_site(
@@ -42,6 +43,11 @@ pub fn write_static_site(
     outdir: VfsPath,
 ) -> anyhow::Result<()> {
     outdir.create_dir_all()?;
+
+    outdir
+        .join("index.html")?
+        .create_file()?
+        .write_all((Homepage {}).render().into_string().as_bytes())?;
 
     for p in &sd.posts {
         let slugday = p.document.meta.date.published;

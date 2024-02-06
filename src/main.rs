@@ -7,6 +7,7 @@ mod load;
 mod media;
 mod model;
 mod render;
+mod templates;
 mod transform;
 
 #[tokio::main(flavor = "current_thread")]
