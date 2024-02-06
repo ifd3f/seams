@@ -1,4 +1,4 @@
-use maud::{html, Markup, Render};
+use maud::{html, Markup, Render, DOCTYPE};
 
 #[derive(Debug, Clone)]
 pub struct Base {
@@ -10,10 +10,11 @@ pub struct Base {
 impl Render for Base {
     fn render(&self) -> Markup {
         html! {
+            (DOCTYPE)
             html {
                 head {
                     title { (self.title) }
-                    link rel="stylesheet" type="text/css" href="/style.css";
+                    link rel="stylesheet" type="text/css" href="/styles.css";
                 }
                 body {
                     (self.navbar)
@@ -34,14 +35,14 @@ impl Render for Navbar {
         macro_rules! navbar_item {
             ($item:expr) => {
                 html! {
-                    li .active[self.highlighted == Some($item)] { ($item) }
+                    li .navitem .active[self.highlighted == Some($item)] { ($item) }
                 }
             };
         }
 
         html! {
             nav {
-                ul {
+                ul .navbar {
                     (navbar_item!(NavbarItem::Homepage))
                     (navbar_item!(NavbarItem::Blog))
                     (navbar_item!(NavbarItem::Projects))

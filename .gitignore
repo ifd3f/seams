@@ -1,12 +1,8 @@
 debug/
 target/
 result
+result-styles
 .direnv
 .sass-cache
-
-
-
-# Added by cargo
-
-/target
-out
+out/
+out-html/

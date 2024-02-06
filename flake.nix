@@ -45,7 +45,7 @@
         devShells.default = with pkgs;
           mkShell {
             buildInputs =
-              [ cargo rustc rustfmt pre-commit rustPackages.clippy sass ]
+              [ cargo rustc rustfmt pre-commit rustPackages.clippy sass just ]
               ++ buildPrograms;
             RUST_SRC_PATH = rustPlatform.rustLibSrc;
           };

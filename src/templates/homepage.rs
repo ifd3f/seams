@@ -9,7 +9,7 @@ impl Render for Homepage {
         let base = Base {
             title: "Homepage".into(),
             navbar: Navbar {
-                highlighted: Some(NavbarItem::About),
+                highlighted: Some(NavbarItem::Homepage),
             },
             content: html! {
                 p { "welcome to my site nyaa" }
