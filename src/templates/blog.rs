@@ -18,8 +18,10 @@ pub struct BlogIndexPage<'a> {
 impl Render for BlogIndexPage<'_> {
     fn render(&self) -> Markup {
         let content = html! {
-            @for p in &self.posts {
-                (RenderPost::from(*p).short_item())
+            main .constrained {
+                @for p in &self.posts {
+                    (RenderPost::from(*p).short_item())
+                }
             }
         };
 
@@ -63,7 +65,11 @@ impl<'a> RenderPost<'a> {
         Base {
             title: self.post.meta().title.clone(),
             navbar: NavbarItem::Blog.into(),
-            content: self.page_content(),
+            content: html! {
+                main .longform {
+                    (self.page_content())
+                }
+            },
         }
         .render()
     }

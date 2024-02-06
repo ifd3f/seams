@@ -12,7 +12,9 @@ impl Render for Homepage {
                 highlighted: Some(NavbarItem::Homepage),
             },
             content: html! {
-                p { "welcome to my site nyaa" }
+                main {
+                    p { "welcome to my site nyaa" }
+                }
             },
         };
 
