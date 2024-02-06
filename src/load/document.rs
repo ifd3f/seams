@@ -173,6 +173,16 @@ pub struct FullyLoadedDocument<M> {
     pub transformed: TransformedContent,
 }
 
+impl<M> FullyLoadedDocument<M> {
+    pub fn meta(&self) -> &M {
+        &self.document.meta
+    }
+
+    pub fn html(&self) -> &str {
+        &self.transformed.html
+    }
+}
+
 #[derive(thiserror::Error, Debug)]
 pub enum ContentTransformError {
     #[error("error: {0}")]

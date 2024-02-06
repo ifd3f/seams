@@ -50,16 +50,8 @@ pub fn write_static_site(
         .write_all((Homepage {}).render().into_string().as_bytes())?;
 
     for p in &sd.posts {
-        let slugday = p.document.meta.date.published;
         let postdir = outdir
-            .join(format!(
-                "{}/{:02}/{:02}/{}/{}",
-                slugday.year(),
-                slugday.month(),
-                slugday.day(),
-                0usize,
-                &p.document.meta.slug
-            ))
+            .join(&p.document.meta.href())
             .unwrap();
         postdir.create_dir_all()?;
         let mut out = postdir.join("index.html").unwrap().create_file()?;

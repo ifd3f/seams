@@ -1,4 +1,4 @@
-use chrono::{DateTime, FixedOffset, NaiveDate};
+use chrono::{DateTime, Datelike, FixedOffset, NaiveDate};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -31,6 +31,20 @@ pub struct Post {
 
     /// Author information.
     pub author: Option<Author>,
+}
+
+impl Post {
+    pub fn href(&self) -> String {
+        let slugday = &self.date.published;
+format!(
+                "{}/{:02}/{:02}/{}/{}",
+                slugday.year(),
+                slugday.month(),
+                slugday.day(),
+                0usize,
+                &self.slug
+            )
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
