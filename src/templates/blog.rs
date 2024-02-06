@@ -1,4 +1,3 @@
-use chrono::format::strftime;
 use maud::{html, Markup, PreEscaped, Render};
 
 use crate::{
@@ -42,39 +41,46 @@ pub struct RenderPost<'a> {
 
 impl<'a> RenderPost<'a> {
     pub fn short_item(&self) -> Markup {
-        // TODO: summary
+        // TODO: fill in the summary
         html! {
-            article .post-preview {
-                (self.title(true))
-                (self.tagline())
-                p .date { (self.date()) }
+            nav .post-preview {
+                header {
+                    (self.title(true))
+                    (self.tagline())
+                    p .date { (self.date()) }
+                }
+
+                summary {
+                }
+
+                p .read-more {
+                    a href=(self.post.meta().href()) { "Read more..." }
+                }
             }
         }
     }
 
-    pub fn page(&self) -> Markup {
+    pub fn page_content(&self) -> Markup {
         html! {
             article .post-content {
-                (self.title(false))
-                (self.tagline())
-                p .date { (self.date()) }
+                header {
+                    (self.title(false))
+                    (self.tagline())
+                    p .date { (self.date()) }
+                }
+
                 (PreEscaped(&self.post.transformed.html))
             }
         }
     }
 
-    fn meta(&self) -> &Post {
-        &self.post.document.meta
-    }
-
     fn title(&self, with_href: bool) -> Markup {
-        match (&self.meta().title, with_href) {
-            (None, _) => html! { },
-            (Some(title), true) => 
-                html! {
-                    h1 .title { a href=(self.meta().href()) { (title) } }
-                },
-            (Some(title), false) => html! {
+        let title = &self.post.meta().title;
+        match with_href {
+            true => html! {
+                h1 .title { a href=(self.post.meta().href()) { (title) } }
+            },
+            false => html! {
                 h1 .title { (title) }
             },
         }
@@ -110,9 +116,5 @@ impl<'a> RenderPost<'a> {
                 }
             }
         }
-    }
-
-    fn metadata(&self) -> Markup {
-        html! {}
     }
 }

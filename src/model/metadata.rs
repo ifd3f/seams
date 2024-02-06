@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Post {
     /// Title of the post.
-    pub title: Option<String>,
+    pub title: String,
 
     /// Tagline of the post.
     pub tagline: Option<String>,
