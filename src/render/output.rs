@@ -6,7 +6,11 @@ use tokio::time::Instant;
 use tracing::info;
 use vfs::{PhysicalFS, VfsPath};
 
-use crate::{media::MediaRegistry, model::site_data::SiteData, templates::Homepage};
+use crate::{
+    media::MediaRegistry,
+    model::site_data::SiteData,
+    templates::{BlogIndexPage, Homepage, RenderPost},
+};
 
 #[tracing::instrument(skip_all)]
 pub async fn build_static_site(
@@ -49,13 +53,26 @@ pub fn write_static_site(
         .create_file()?
         .write_all((Homepage {}).render().into_string().as_bytes())?;
 
+    outdir.join("blog")?.create_dir_all()?;
+    outdir.join("blog/index.html")?.create_file()?.write_all(
+        BlogIndexPage {
+            posts: sd.posts.iter().collect(),
+        }
+        .render()
+        .into_string()
+        .as_bytes(),
+    )?;
+
     for p in &sd.posts {
-        let postdir = outdir
-            .join(&p.document.meta.href())
-            .unwrap();
+        let postdir = outdir.join(&p.document.meta.href())?;
         postdir.create_dir_all()?;
-        let mut out = postdir.join("index.html").unwrap().create_file()?;
-        out.write_all(p.transformed.html.as_bytes())?;
+        postdir.join("index.html")?.create_file()?.write_all(
+            RenderPost::from(p)
+                .full_content_page()
+                .render()
+                .into_string()
+                .as_bytes(),
+        )?;
     }
 
     let projectsdir = outdir.join("projects").unwrap();

@@ -1,5 +1,6 @@
 use maud::{html, Markup, Render};
 
+#[derive(Debug, Clone)]
 pub struct Base {
     pub title: String,
     pub navbar: Navbar,
@@ -23,6 +24,7 @@ impl Render for Base {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct Navbar {
     pub highlighted: Option<NavbarItem>,
 }
@@ -50,7 +52,15 @@ impl Render for Navbar {
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
+impl From<NavbarItem> for Navbar {
+    fn from(highlighted: NavbarItem) -> Self {
+        Self {
+            highlighted: Some(highlighted),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NavbarItem {
     Homepage,
     Blog,

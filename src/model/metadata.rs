@@ -36,14 +36,14 @@ pub struct Post {
 impl Post {
     pub fn href(&self) -> String {
         let slugday = &self.date.published;
-format!(
-                "{}/{:02}/{:02}/{}/{}",
-                slugday.year(),
-                slugday.month(),
-                slugday.day(),
-                0usize,
-                &self.slug
-            )
+        format!(
+            "/{}/{:02}/{:02}/{}/{}",
+            slugday.year(),
+            slugday.month(),
+            slugday.day(),
+            0usize,
+            &self.slug
+        )
     }
 }
 

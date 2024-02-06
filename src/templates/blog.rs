@@ -10,30 +10,29 @@ use super::{Base, Navbar, NavbarItem};
 
 type DPost = FullyLoadedDocument<Post>;
 
+#[derive(Clone)]
 pub struct BlogIndexPage<'a> {
-    pub posts: Vec<RenderPost<'a>>,
+    pub posts: Vec<&'a DPost>,
 }
 
 impl Render for BlogIndexPage<'_> {
     fn render(&self) -> Markup {
         let content = html! {
             @for p in &self.posts {
-                (p.short_item())
+                (RenderPost::from(*p).short_item())
             }
         };
 
         Base {
             title: "Blog".into(),
-            navbar: Navbar {
-                highlighted: Some(NavbarItem::Blog),
-            },
+            navbar: NavbarItem::Blog.into(),
             content,
         }
         .render()
     }
 }
 
-#[derive(derive_more::From)]
+#[derive(derive_more::From, Clone)]
 pub struct RenderPost<'a> {
     #[from(forward)]
     post: &'a DPost,
@@ -58,6 +57,15 @@ impl<'a> RenderPost<'a> {
                 }
             }
         }
+    }
+
+    pub fn full_content_page(&self) -> Markup {
+        Base {
+            title: self.post.meta().title.clone(),
+            navbar: NavbarItem::Blog.into(),
+            content: self.page_content(),
+        }
+        .render()
     }
 
     pub fn page_content(&self) -> Markup {
