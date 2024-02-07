@@ -79,7 +79,7 @@ pub enum LoadError {
     ContentTransform(#[from] ContentTransformError),
 
     #[error("Error loading tags: {0}")]
-    TagError(anyhow::Error)
+    TagError(anyhow::Error),
 }
 
 /// Errors regarding the document load phase.

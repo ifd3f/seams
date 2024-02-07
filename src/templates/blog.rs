@@ -1,8 +1,12 @@
 use maud::{html, Markup, PreEscaped, Render};
+use tracing::trace;
 
 use crate::{
     load::document::FullyLoadedDocument,
-    model::{metadata::{Post, PostDates}, site_data::TagMap},
+    model::{
+        metadata::{Post, PostDates},
+        site_data::TagMap,
+    },
     templates::util::{format_dt_html, tag_list},
 };
 
@@ -68,7 +72,7 @@ impl<'a> RenderPost<'a> {
             title: self.post.meta().title.clone(),
             navbar: NavbarItem::Blog.into(),
             content: html! {
-                main .longform {
+                main .container .longform {
                     (self.page_content(tags))
                 }
             },
@@ -82,8 +86,8 @@ impl<'a> RenderPost<'a> {
                 header {
                     (self.title(false))
                     (self.tagline())
-                    (tag_list(tags, &self.post.meta().tags))
                     p .date { (self.date()) }
+                    p { (tag_list(tags, &self.post.meta().tags)) }
                 }
 
                 (PreEscaped(&self.post.transformed.html))

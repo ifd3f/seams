@@ -4,11 +4,17 @@ use itertools::Itertools;
 use vfs::{VfsError, VfsPath};
 
 use crate::{
-    load::{document::{fully_load_docdir, FullyLoadedDocument, LoadError}, settings::load_settings_in_dir},
+    load::{
+        document::{fully_load_docdir, FullyLoadedDocument, LoadError},
+        settings::load_settings_in_dir,
+    },
     media::MediaRegistry,
 };
 
-use super::{metadata::{Post, Project}, tag::{TagSettings, TagSettingsSheet}};
+use super::{
+    metadata::{Post, Project},
+    tag::{TagSettings, TagSettingsSheet},
+};
 
 pub type TagMap = HashMap<String, TagSettings>;
 
@@ -60,16 +66,18 @@ impl SiteData {
             fully_load_docdir(media, path.join("projects")?)
         );
 
-        let (posts, post_failures): (Vec<FullyLoadedDocument<Post>>, Vec<_>) = posts?.into_iter().partition_result();
+        let (posts, post_failures): (Vec<FullyLoadedDocument<Post>>, Vec<_>) =
+            posts?.into_iter().partition_result();
         let (projects, project_failures): (Vec<FullyLoadedDocument<Project>>, Vec<_>) =
             projects?.into_iter().partition_result();
 
         // this prevents move errors, albeit jankily.
         // TODO: get rid of this jank
-        let (tags, tag_failure) = match load_settings_in_dir::<TagSettingsSheet>(path.join("settings")?, "tag") {
-            Ok(r) => (Some(r), None),
-            Err(e) => (None, Some(e))
-        };
+        let (tags, tag_failure) =
+            match load_settings_in_dir::<TagSettingsSheet>(path.join("settings")?, "tag") {
+                Ok(r) => (Some(r), None),
+                Err(e) => (None, Some(e)),
+            };
 
         let mut load_errors = vec![];
         load_errors.extend(post_failures);
@@ -95,7 +103,11 @@ impl SiteData {
         }
         let tags = tags.unwrap().materialize(additional_tags);
 
-        Ok(Self { posts, projects, tags })
+        Ok(Self {
+            posts,
+            projects,
+            tags,
+        })
     }
 
     fn build_index(&self) -> SiteIndex {

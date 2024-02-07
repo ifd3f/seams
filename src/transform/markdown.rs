@@ -1,12 +1,17 @@
 use std::io::BufWriter;
 
 use comrak::{
-    format_html,
+    adapters::SyntaxHighlighterAdapter,
+    format_html, format_html_with_plugins,
     nodes::{AstNode, NodeLink, NodeValue, Sourcepos},
-    parse_document, Arena,
+    parse_document,
+    plugins::syntect::SyntectAdapter,
+    Arena, ExtensionOptions, ParseOptions, Plugins, PluginsBuilder, RenderOptions,
+    RenderPluginsBuilder,
 };
 use futures::TryFutureExt;
 
+use htmlentity::entity::EncodeType;
 use vfs::VfsError;
 
 use crate::media::{Media, MediaRegistry};
@@ -16,6 +21,23 @@ use super::{
     graphviz::{transform_graphviz, GraphvizError},
 };
 
+pub fn make_md_options() -> comrak::Options {
+    let mut md_options = comrak::Options::default();
+    md_options.extension.strikethrough = true;
+    md_options.extension.table = true;
+    md_options.extension.autolink = true;
+    md_options.extension.tasklist = true;
+    md_options.extension.superscript = true;
+    md_options.extension.footnotes = true;
+    md_options.extension.header_ids = Some("header-".into());
+    md_options.parse.smart = true;
+    md_options.render.github_pre_lang = true;
+    md_options.render.width = 80;
+    md_options.render.unsafe_ = true;
+    md_options.render.escape = false;
+    md_options
+}
+
 /// Transform markdown into HTML. May be computationally expensive.
 #[tracing::instrument(skip_all)]
 pub async fn transform_markdown<'a>(
@@ -23,8 +45,19 @@ pub async fn transform_markdown<'a>(
     raw: &'a str,
 ) -> Result<String, MarkdownErrors> {
     let mut arena = Arena::new();
-    let mut md_options = comrak::Options::default();
-    md_options.render.unsafe_ = true;
+
+    let md_options = make_md_options();
+
+    let syntect = SyntectAdapter::new(Some("base16-ocean.dark"));
+    let plugins = PluginsBuilder::default()
+        .render(
+            RenderPluginsBuilder::default()
+                .codefence_syntax_highlighter(Some(&syntect))
+                .build()
+                .unwrap(),
+        )
+        .build()
+        .unwrap();
 
     let root = parse_document(&mut arena, raw, &md_options);
 
@@ -59,8 +92,15 @@ pub async fn transform_markdown<'a>(
         });
         */
     let mut bw = BufWriter::new(Vec::new());
-    format_html(root, &md_options, &mut bw).unwrap();
-    Ok(String::from_utf8(bw.into_inner().unwrap()).unwrap())
+    format_html_with_plugins(root, &md_options, &mut bw, &plugins).unwrap();
+
+    let raw = &bw.into_inner().unwrap();
+    let entity_escaped = htmlentity::entity::encode(
+        &raw,
+        &EncodeType::NamedOrHex,
+        &htmlentity::entity::CharacterSet::NonASCII,
+    );
+    Ok(String::from_utf8(entity_escaped.into_bytes()).unwrap())
 }
 
 /// Transform links in images into what they should be, and upload them.
