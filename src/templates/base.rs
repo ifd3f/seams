@@ -41,12 +41,17 @@ impl Render for Navbar {
         }
 
         html! {
-            nav {
-                ul .navbar {
-                    (navbar_item!(NavbarItem::Homepage))
-                    (navbar_item!(NavbarItem::Blog))
-                    (navbar_item!(NavbarItem::Projects))
-                    (navbar_item!(NavbarItem::About))
+            header .site-heading {
+                h1 .site-title {
+                    a href="/" { "astrid.tech" }
+                }
+
+                nav {
+                    ul .navbar {
+                        (navbar_item!(NavbarItem::Blog))
+                        (navbar_item!(NavbarItem::Projects))
+                        (navbar_item!(NavbarItem::About))
+                    }
                 }
             }
         }
@@ -63,7 +68,6 @@ impl From<NavbarItem> for Navbar {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NavbarItem {
-    Homepage,
     Blog,
     Projects,
     About,
@@ -72,7 +76,6 @@ pub enum NavbarItem {
 impl NavbarItem {
     pub fn href(&self) -> &str {
         match self {
-            NavbarItem::Homepage => "/",
             NavbarItem::Blog => "/blog",
             NavbarItem::Projects => "/projects",
             NavbarItem::About => "/about",
@@ -81,7 +84,6 @@ impl NavbarItem {
 
     pub fn text(&self) -> &str {
         match self {
-            NavbarItem::Homepage => "astrid.tech",
             NavbarItem::Blog => "Blog",
             NavbarItem::Projects => "Projects",
             NavbarItem::About => "About",

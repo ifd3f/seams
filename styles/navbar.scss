@@ -1,8 +1,5 @@
 @import "./variables.scss";
 
-$navbar-bg: $primary-dark;
-$navbar-dropdown-bg: $primary-main;
-
 $active-color: $secondary-light;
 $brand-color: $lightblue;
 $nav-link-color: white;
@@ -15,6 +12,31 @@ body {
     margin: 0px;
 }
 
+.site-heading {
+    background-color: $primary-dark;
+    color: white;
+    padding-top: 10px;
+}
+
+.site-title {
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 32pt;
+    margin-bottom: 10px;
+    margin-top: 0px;
+    margin-left: 10px;
+    margin-right: 10px;
+    color: $lightblue;
+
+    & a {
+        text-decoration: none;
+        color: inherit;
+    }
+    & a:hover {
+        color: $nav-link-hover-color;
+    }
+}
+
 ul.navbar {
     list-style-type: none;
 
@@ -24,8 +46,6 @@ ul.navbar {
 
     padding: 10px;
     padding-left: 10px;
-
-    background-color: $navbar-bg;
 }
 
 li.navitem {
