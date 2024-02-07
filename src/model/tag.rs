@@ -1,10 +1,7 @@
 use std::collections::HashMap;
 
 use frunk::{Monoid, Semigroup};
-use palette::{
-    convert::{TryFromColor, TryIntoColor},
-    Hsl, Srgb,
-};
+use palette::{convert::TryFromColor, Hsl, Srgb};
 use serde::{Deserialize, Serialize};
 
 use crate::random_coloring::{self, ColorProfileExt};

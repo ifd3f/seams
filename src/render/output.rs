@@ -1,6 +1,5 @@
 use std::{fs::create_dir_all, path::Path};
 
-use chrono::Datelike;
 use maud::Render;
 use tokio::time::Instant;
 use tracing::info;

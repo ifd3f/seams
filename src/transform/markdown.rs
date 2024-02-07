@@ -1,13 +1,11 @@
 use std::io::BufWriter;
 
 use comrak::{
-    adapters::SyntaxHighlighterAdapter,
-    format_html, format_html_with_plugins,
+    format_html_with_plugins,
     nodes::{AstNode, NodeLink, NodeValue, Sourcepos},
     parse_document,
     plugins::syntect::SyntectAdapter,
-    Arena, ExtensionOptions, ParseOptions, Plugins, PluginsBuilder, RenderOptions,
-    RenderPluginsBuilder,
+    Arena, PluginsBuilder, RenderPluginsBuilder,
 };
 use futures::TryFutureExt;
 

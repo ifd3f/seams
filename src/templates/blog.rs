@@ -1,5 +1,4 @@
 use maud::{html, Markup, PreEscaped, Render};
-use tracing::trace;
 
 use crate::{
     load::document::FullyLoadedDocument,
