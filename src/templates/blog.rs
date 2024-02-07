@@ -3,10 +3,10 @@ use maud::{html, Markup, PreEscaped, Render};
 use crate::{
     load::document::FullyLoadedDocument,
     model::metadata::{Post, PostDates},
-    templates::util::format_date,
+    templates::util::format_dt_html,
 };
 
-use super::{Base, Navbar, NavbarItem};
+use super::{util::format_dt, Base, NavbarItem};
 
 type DPost = FullyLoadedDocument<Post>;
 
@@ -18,7 +18,7 @@ pub struct BlogIndexPage<'a> {
 impl Render for BlogIndexPage<'_> {
     fn render(&self) -> Markup {
         let content = html! {
-            main .constrained {
+            main .container .blog-root {
                 @for p in &self.posts {
                     (RenderPost::from(*p).short_item())
                 }
@@ -46,9 +46,9 @@ impl<'a> RenderPost<'a> {
         html! {
             nav .post-preview {
                 header {
+                    p { (self.date()) }
                     (self.title(true))
                     (self.tagline())
-                    p .date { (self.date()) }
                 }
 
                 summary {
@@ -111,22 +111,22 @@ impl<'a> RenderPost<'a> {
 
     fn date(&self) -> Markup {
         let PostDates {
-            created: c,
-            published: p,
-            updated: u,
+            created: c_raw,
+            published: p_raw,
+            updated: u_raw,
         } = &self.post.document.meta.date;
-        let (c, p, u) = (format_date(*c), format_date(*p), u.map(format_date));
+        let (c, p, u) = (format_dt(*c_raw), format_dt(*p_raw), u_raw.map(format_dt));
         match u {
             Some(u) => {
                 let alt = format!("created: {c}\npublished: {p}\nlast updated: {u}");
                 html! {
-                    span title=(alt) { (format!("{p}*")) }
+                    span .date title=(alt) { (format_dt_html(*p_raw)) (format!("*")) }
                 }
             }
             None => {
                 let alt = format!("created: {c}\npublished: {p}");
                 html! {
-                    span title=(alt) { (p) }
+                    span .date title=(alt) { (format_dt_html(*p_raw)) }
                 }
             }
         }

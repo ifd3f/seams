@@ -8,11 +8,9 @@ impl Render for Homepage {
     fn render(&self) -> Markup {
         let base = Base {
             title: "Homepage".into(),
-            navbar: Navbar {
-                highlighted: None,
-            },
+            navbar: Navbar { highlighted: None },
             content: html! {
-                main {
+                main .homepage {
                     p { "welcome to my site nyaa" }
                 }
             },

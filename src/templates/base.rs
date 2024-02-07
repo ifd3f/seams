@@ -43,7 +43,7 @@ impl Render for Navbar {
         html! {
             header .site-heading {
                 h1 .site-title {
-                    a href="/" { "astrid.tech" }
+                    a href="/" { "astrid dot tech" }
                 }
 
                 nav {
