@@ -7,6 +7,7 @@ use tracing::trace;
 use vfs::{VfsError, VfsPath};
 
 use crate::{
+    load::util::split_extension,
     media::MediaRegistry,
     transform::{
         common::TransformContext,
@@ -76,6 +77,9 @@ pub enum LoadError {
 
     #[error("Error during content transform phase: {0}")]
     ContentTransform(#[from] ContentTransformError),
+
+    #[error("Error loading tags: {0}")]
+    TagError(anyhow::Error)
 }
 
 /// Errors regarding the document load phase.
@@ -256,20 +260,6 @@ where
     /// The root directory to consider assets from.
     pub fn asset_root(&self) -> VfsPath {
         self.path.parent()
-    }
-}
-
-/// Split a filename's last file extension off, returning both.
-///
-/// ```rust
-/// assert_eq!(split_extension("porn.jpg", ("porn", "jpg")))
-/// assert_eq!(split_extension("/foo/bar/spam.jpg", ("/foo/bar/spam", "jpg")))
-/// assert_eq!(split_extension("no_extension", ("no_extension", "")))
-/// ```
-fn split_extension(pathname: &str) -> (&str, &str) {
-    match pathname.rsplit_once('.') {
-        Some((basename, ext)) => (basename, ext),
-        None => (pathname, ""),
     }
 }
 

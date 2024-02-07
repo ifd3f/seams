@@ -2,8 +2,8 @@ use maud::{html, Markup, PreEscaped, Render};
 
 use crate::{
     load::document::FullyLoadedDocument,
-    model::metadata::{Post, PostDates},
-    templates::util::format_dt_html,
+    model::{metadata::{Post, PostDates}, site_data::TagMap},
+    templates::util::{format_dt_html, tag_list},
 };
 
 use super::{util::format_dt, Base, NavbarItem};
@@ -13,6 +13,7 @@ type DPost = FullyLoadedDocument<Post>;
 #[derive(Clone)]
 pub struct BlogIndexPage<'a> {
     pub posts: Vec<&'a DPost>,
+    pub tags: &'a TagMap,
 }
 
 impl Render for BlogIndexPage<'_> {
@@ -20,7 +21,7 @@ impl Render for BlogIndexPage<'_> {
         let content = html! {
             main .container .blog-root {
                 @for p in &self.posts {
-                    (RenderPost::from(*p).short_item())
+                    (RenderPost::from(*p).short_item(&self.tags))
                 }
             }
         };
@@ -41,7 +42,7 @@ pub struct RenderPost<'a> {
 }
 
 impl<'a> RenderPost<'a> {
-    pub fn short_item(&self) -> Markup {
+    pub fn short_item(&self, tags: &TagMap) -> Markup {
         // TODO: fill in the summary
         html! {
             nav .post-preview {
@@ -49,6 +50,7 @@ impl<'a> RenderPost<'a> {
                     p { (self.date()) }
                     (self.title(true))
                     (self.tagline())
+                    (tag_list(tags, &self.post.meta().tags))
                 }
 
                 summary {
@@ -61,25 +63,26 @@ impl<'a> RenderPost<'a> {
         }
     }
 
-    pub fn full_content_page(&self) -> Markup {
+    pub fn full_content_page(&self, tags: &TagMap) -> Markup {
         Base {
             title: self.post.meta().title.clone(),
             navbar: NavbarItem::Blog.into(),
             content: html! {
                 main .longform {
-                    (self.page_content())
+                    (self.page_content(tags))
                 }
             },
         }
         .render()
     }
 
-    pub fn page_content(&self) -> Markup {
+    pub fn page_content(&self, tags: &TagMap) -> Markup {
         html! {
             article .post-content {
                 header {
                     (self.title(false))
                     (self.tagline())
+                    (tag_list(tags, &self.post.meta().tags))
                     p .date { (self.date()) }
                 }
 

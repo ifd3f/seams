@@ -1,0 +1,13 @@
+.tag {
+    text-decoration: none;
+    margin-right: 0.5em;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 7px;
+    padding-right: 7px;
+    border-radius: 100px;
+}
+
+.tag:hover {
+    text-decoration: underline;
+}

@@ -57,6 +57,7 @@ pub fn write_static_site(
     outdir.join("blog/index.html")?.create_file()?.write_all(
         BlogIndexPage {
             posts: sd.posts.iter().collect(),
+            tags: &sd.tags,
         }
         .render()
         .into_string()
@@ -68,7 +69,7 @@ pub fn write_static_site(
         postdir.create_dir_all()?;
         postdir.join("index.html")?.create_file()?.write_all(
             RenderPost::from(p)
-                .full_content_page()
+                .full_content_page(&sd.tags)
                 .render()
                 .into_string()
                 .as_bytes(),
