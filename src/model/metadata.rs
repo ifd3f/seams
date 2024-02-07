@@ -1,5 +1,7 @@
-use chrono::{DateTime, Datelike, FixedOffset, NaiveDate};
+use chrono::{DateTime, Datelike, FixedOffset, NaiveDate, NaiveTime, Utc};
 use serde::{Deserialize, Serialize};
+
+use crate::date_sort::DateSort;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Post {
@@ -95,9 +97,25 @@ pub struct ProjectDates {
     /// When the project was finished. Leave blank if unfinished.
     pub finished: Option<NaiveDate>,
 
-    /// What value to sort this project by.
-    pub sort_key: Option<NaiveDate>,
+    /// What date to sort this project by.
+    ///
+    /// If not provided, use the avg between start and finished.
+    pub sort_date: Option<NaiveDate>,
 
     /// When this project page was published.
     pub published: Option<DateTime<FixedOffset>>,
+}
+
+impl ProjectDates {
+    pub fn sort_key(&self) -> DateSort {
+        if let Some(sd) = &self.sort_date {
+            return (*sd).into();
+        }
+
+        if let Some(f) = self.finished {
+            return f.into();
+        };
+
+        return DateSort::Now;
+    }
 }

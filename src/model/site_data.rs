@@ -25,10 +25,10 @@ pub struct SiteData {
     pub tags: TagMap,
 }
 
-pub struct SiteIndex {
-    pub slug_to_posts: HashMap<String, ()>,
-    pub projects: Vec<()>,
-    pub tags: Vec<()>,
+#[derive(Default, Clone)]
+pub struct SiteIndex<'a> {
+    pub tag_to_posts: HashMap<&'a str, Vec<&'a FullyLoadedDocument<Post>>>,
+    pub tag_to_projects: HashMap<&'a str, Vec<&'a FullyLoadedDocument<Project>>>,
 }
 
 #[derive(Debug)]
@@ -113,8 +113,27 @@ impl SiteData {
         })
     }
 
-    fn build_index(&self) -> SiteIndex {
-        todo!()
+    pub fn build_index(&self) -> SiteIndex<'_> {
+        let mut out = SiteIndex::default();
+
+        for (t, _) in &self.tags {
+            out.tag_to_posts.insert(t, vec![]);
+            out.tag_to_projects.insert(t, vec![]);
+        }
+
+        for p in &self.posts {
+            for t in &p.meta().tags {
+                out.tag_to_posts.entry(t.as_str()).or_default().push(p);
+            }
+        }
+
+        for p in &self.projects {
+            for t in &p.meta().tags {
+                out.tag_to_projects.entry(t.as_str()).or_default().push(p);
+            }
+        }
+
+        out
     }
 }
 

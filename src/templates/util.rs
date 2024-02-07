@@ -30,8 +30,10 @@ where
     S: AsRef<str>,
 {
     html! {
-        @for t in tags {
-            (tag(&tag_map[t.as_ref()]))
+        ul .tag-list {
+            @for t in tags {
+                li { (tag(&tag_map[t.as_ref()])) }
+            }
         }
     }
 }

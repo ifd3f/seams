@@ -2,13 +2,13 @@ use std::{fs::create_dir_all, path::Path};
 
 use maud::Render;
 use tokio::time::Instant;
-use tracing::info;
+use tracing::{debug, info};
 use vfs::{PhysicalFS, VfsPath};
 
 use crate::{
     media::MediaRegistry,
     model::site_data::SiteData,
-    templates::{BlogIndexPage, Homepage, RenderPost},
+    templates::{BlogIndexPage, Homepage, RenderPost, TagPage},
 };
 
 #[tracing::instrument(skip_all)]
@@ -45,6 +45,8 @@ pub fn write_static_site(
     _templates: VfsPath,
     outdir: VfsPath,
 ) -> anyhow::Result<()> {
+    let index = sd.build_index();
+
     outdir.create_dir_all()?;
 
     outdir
@@ -81,6 +83,22 @@ pub fn write_static_site(
         projectdir.create_dir_all()?;
         let mut out = projectdir.join("index.html").unwrap().create_file()?;
         out.write_all(p.transformed.html.as_bytes())?;
+    }
+
+    for (t, settings) in &sd.tags {
+        debug!(?t, "writing tag");
+
+        let tagdir = outdir.join("t")?.join(&t)?;
+        tagdir.create_dir_all()?;
+        let mut out = tagdir.join("index.html").unwrap().create_file()?;
+        let page = TagPage {
+            slug: &t,
+            settings,
+            posts: index.tag_to_posts[t.as_str()].clone(),
+            projects: index.tag_to_projects[t.as_str()].clone(),
+            all_tags: &sd.tags,
+        };
+        out.write_all(page.render().into_string().as_bytes())?;
     }
 
     Ok(())

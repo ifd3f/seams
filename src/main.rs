@@ -3,6 +3,7 @@ use render::output::build_static_site;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
 mod cli;
+mod date_sort;
 mod load;
 mod media;
 mod model;

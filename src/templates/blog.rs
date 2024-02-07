@@ -21,10 +21,15 @@ pub struct BlogIndexPage<'a> {
 
 impl Render for BlogIndexPage<'_> {
     fn render(&self) -> Markup {
+        let mut posts = self.posts.clone();
+        posts.reverse();
+
         let content = html! {
             main .container .blog-root {
-                @for p in &self.posts {
-                    (RenderPost::from(*p).short_item(&self.tags))
+                h1 { "Blog" }
+
+                @for p in posts {
+                    (RenderPost::from(p).short_item(&self.tags))
                 }
             }
         };

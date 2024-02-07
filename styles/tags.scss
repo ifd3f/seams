@@ -1,3 +1,14 @@
+.tag-list {
+    font-size: smaller;
+
+    list-style-type: none;
+    padding-left: 0px;
+
+    & li {
+        display: inline;
+    }
+}
+
 .tag {
     margin-right: 0.5em;
 
@@ -7,7 +18,6 @@
     padding-right: 7px;
     border-radius: 100px;
 
-    font-size: smaller;
     text-decoration: none;
 }
 
