@@ -1,11 +1,17 @@
 use std::collections::HashMap;
 
 use frunk::{Monoid, Semigroup};
+use palette::{
+    convert::{TryFromColor, TryIntoColor},
+    Hsl, Srgb,
+};
 use serde::{Deserialize, Serialize};
+
+use crate::random_coloring::{self, ColorProfileExt};
 
 pub type Color = String; // TODO change this
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub enum TagStyling {
     /// Style using colors.
     Colors { text: Color, bg: Color },
@@ -15,7 +21,7 @@ pub enum TagStyling {
 }
 
 /// Tag styles, fully materialized.
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct TagSettings {
     /// Name of the tag
     pub title: String,
@@ -26,7 +32,7 @@ pub struct TagSettings {
     pub styling: TagStyling,
 }
 
-#[derive(Serialize, Deserialize, Default, Clone)]
+#[derive(Serialize, Deserialize, Default, Clone, Debug)]
 pub struct TagSettingsDirectiveBody {
     pub title: Option<String>,
     pub text_color: Option<Color>,
@@ -36,17 +42,31 @@ pub struct TagSettingsDirectiveBody {
 
 impl TagSettingsDirectiveBody {
     pub fn materialize(self, tag_slug: &str) -> TagSettings {
+        let bg = self.color.unwrap_or_else(|| {
+            let color = random_coloring::DARK.for_text(tag_slug);
+            format!("rgb({}, {}, {})", color.red, color.green, color.blue)
+        });
+
+        let text = self.text_color.unwrap_or_else(|| {
+            let color = csscolorparser::parse(&bg).unwrap();
+            let rgb = Srgb::new(color.r, color.g, color.b);
+            let hsl = Hsl::try_from_color(rgb).unwrap();
+
+            if hsl.lightness > 0.7 {
+                "black".into()
+            } else {
+                "white".into()
+            }
+        });
+
         let styling = match self.class {
             Some(c) => TagStyling::Class(c),
-            None => TagStyling::Colors {
-                text: self.text_color.unwrap_or("#ffffff".into()),
-                bg: self.color.unwrap_or("#000000".into()),
-            },
+            None => TagStyling::Colors { text, bg },
         };
 
         // TODO color random selection
         TagSettings {
-            title: tag_slug.to_owned(),
+            title: self.title.unwrap_or_else(|| tag_slug.to_owned()),
             href: format!("/t/{tag_slug}"),
             styling,
         }
@@ -71,7 +91,7 @@ impl Monoid for TagSettingsDirectiveBody {
     }
 }
 
-#[derive(Serialize, Deserialize, Default, Clone)]
+#[derive(Serialize, Deserialize, Default, Clone, Debug)]
 pub struct TagSettingsDirective {
     pub tags: Vec<String>,
     pub settings: TagSettingsDirectiveBody,

@@ -1,6 +1,7 @@
 use std::{collections::HashMap, fmt::Display};
 
 use itertools::Itertools;
+use tracing::trace;
 use vfs::{VfsError, VfsPath};
 
 use crate::{
@@ -102,6 +103,8 @@ impl SiteData {
             }
         }
         let tags = tags.unwrap().materialize(additional_tags);
+
+        trace!(?tags, "finished loading");
 
         Ok(Self {
             posts,

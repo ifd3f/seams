@@ -6,6 +6,7 @@ mod cli;
 mod load;
 mod media;
 mod model;
+mod random_coloring;
 mod render;
 mod templates;
 mod transform;

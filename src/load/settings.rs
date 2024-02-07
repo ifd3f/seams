@@ -6,10 +6,12 @@ use vfs::VfsPath;
 use super::util::split_extension;
 
 /// Recursively load all documents in directory.
+#[tracing::instrument(skip_all, fields(path = path.as_str(), ?sub_extension))]
 pub fn load_settings_in_dir<S: DeserializeOwned + Monoid>(
     path: VfsPath,
     sub_extension: &str,
 ) -> anyhow::Result<S> {
+    debug!("loading in dir");
     let mut s = S::empty();
 
     for p in path.walk_dir()? {
@@ -28,6 +30,7 @@ pub fn load_settings_in_dir<S: DeserializeOwned + Monoid>(
         let read: S = match ftype {
             "yml" | "yaml" => {
                 if subtype == sub_extension {
+                    debug!("loading from file");
                     serde_yaml::from_reader(p.open_file()?)?
                 } else {
                     debug!("skipping because it does not have sub_extension {sub_extension}");
