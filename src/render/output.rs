@@ -3,11 +3,11 @@ use std::{fs::create_dir_all, path::Path};
 use maud::Render;
 use tokio::time::Instant;
 use tracing::{debug, info};
-use vfs::{PhysicalFS, VfsPath};
+use vfs::{PhysicalFS, VfsError, VfsPath};
 
 use crate::{
     media::MediaRegistry,
-    model::site_data::SiteData,
+    model::site_data::{SiteData, SiteIndex},
     templates::{BlogIndexPage, Homepage, RenderPost, TagPage},
 };
 
@@ -49,34 +49,23 @@ pub fn write_static_site(
 
     outdir.create_dir_all()?;
 
-    outdir
-        .join("index.html")?
-        .create_file()?
-        .write_all((Homepage {}).render().into_string().as_bytes())?;
+    write_markup(&outdir, Homepage {})?;
 
-    outdir.join("blog")?.create_dir_all()?;
-    outdir.join("blog/index.html")?.create_file()?.write_all(
+    write_markup(
+        &outdir.join("blog")?,
         BlogIndexPage {
             posts: sd.posts.iter().collect(),
             tags: &sd.tags,
-        }
-        .render()
-        .into_string()
-        .as_bytes(),
+        },
     )?;
-
     for p in &sd.posts {
-        let postdir = outdir.join(&p.document.meta.href())?;
-        postdir.create_dir_all()?;
-        postdir.join("index.html")?.create_file()?.write_all(
-            RenderPost::from(p)
-                .full_content_page(&sd.tags)
-                .render()
-                .into_string()
-                .as_bytes(),
+        write_markup(
+            &outdir.join(&p.document.meta.href())?,
+            RenderPost::from(p).full_content_page(&sd.tags),
         )?;
     }
 
+    /*
     let projectsdir = outdir.join("projects").unwrap();
     for p in &sd.projects {
         let projectdir = projectsdir.join(&p.document.meta.slug)?;
@@ -84,22 +73,31 @@ pub fn write_static_site(
         let mut out = projectdir.join("index.html").unwrap().create_file()?;
         out.write_all(p.transformed.html.as_bytes())?;
     }
+    */
 
-    for (t, settings) in &sd.tags {
-        debug!(?t, "writing tag");
+    for (slug, settings) in &sd.tags {
+        debug!(?slug, "writing tag");
 
-        let tagdir = outdir.join("t")?.join(&t)?;
-        tagdir.create_dir_all()?;
-        let mut out = tagdir.join("index.html").unwrap().create_file()?;
-        let page = TagPage {
-            slug: &t,
-            settings,
-            posts: index.tag_to_posts[t.as_str()].clone(),
-            projects: index.tag_to_projects[t.as_str()].clone(),
-            all_tags: &sd.tags,
-        };
-        out.write_all(page.render().into_string().as_bytes())?;
+        write_markup(
+            &outdir.join(format!("t/{slug}"))?,
+            TagPage {
+                slug,
+                settings,
+                posts: index.tag_to_posts[slug.as_str()].clone(),
+                projects: index.tag_to_projects[slug.as_str()].clone(),
+                all_tags: &sd.tags,
+            },
+        )?;
     }
+
+    Ok(())
+}
+
+fn write_markup(path: &VfsPath, r: impl Render) -> Result<(), VfsError> {
+    path.create_dir_all()?;
+    path.join("index.html")?
+        .create_file()?
+        .write_all(r.render().into_string().as_bytes())?;
 
     Ok(())
 }
