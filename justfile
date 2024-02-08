@@ -11,9 +11,11 @@ styles:
     rm -f out/*.css.map
     cp -r result-styles/styles.css out/
     cp -r result-styles/styles.css.map out/
+    chmod +w -R out/
 
 html:
     mkdir -p out/
     cargo run -- build ./test_data/contentdir_example -o out-html
-    cp -r out-html/* out/
+    cp -ar out-html/* out/
+    chmod +w -R out/
 
