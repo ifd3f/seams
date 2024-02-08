@@ -9,6 +9,7 @@ pub struct TopLevel {
 #[derive(clap::Subcommand)]
 pub enum Subcommand {
     Build(BuildCommand),
+    Upload(UploadCommand),
     Watch(WatchCommand),
 }
 
@@ -21,6 +22,19 @@ pub struct BuildCommand {
     /// Output directory
     #[clap(short, long, default_value = "out")]
     pub out: PathBuf,
+}
+
+/// Upload a file to Backblaze.
+///
+/// Environment variables required: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+#[derive(clap::Args)]
+pub struct UploadCommand {
+    /// The file to upload
+    pub src: PathBuf,
+
+    /// The bucket to upload to
+    #[clap(short, long, default_value = "nyaabucket")]
+    pub bucket: String,
 }
 
 /// Serve on a port, while watching and rebuilding the content and templates directories.

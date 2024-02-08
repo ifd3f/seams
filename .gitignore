@@ -2,7 +2,8 @@ debug/
 target/
 result
 result-styles
-.direnv
+.env
 .sass-cache
 out/
 out-html/
+.direnv
