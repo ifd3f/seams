@@ -6,7 +6,6 @@ use crate::model::{
     tag::{TagSettings, TagStyling},
 };
 
-
 pub struct EmDash;
 
 impl Render for EmDash {
@@ -46,21 +45,59 @@ where
     html! {
         span .tag-list {
             @for t in tags {
-                (tag(&tag_map[t.as_ref()])) " "
+                (TagR::new(&tag_map[t.as_ref()])) " "
             }
         }
     }
 }
 
-pub fn tag(tag: &TagSettings) -> Markup {
-    match &tag.styling {
-        TagStyling::Colors { text, bg } => html! {
-            a .tag href=(tag.href) style=(format!("color: {text}; background-color: {bg}")) {
-                (tag.title)
+#[derive(Debug, Clone)]
+pub struct TagR<'a> {
+    settings: &'a TagSettings,
+    link: bool,
+}
+
+impl<'a> TagR<'a> {
+    pub fn new(settings: &'a TagSettings) -> Self {
+        Self {
+            settings,
+            link: true,
+        }
+    }
+
+    pub fn with_link(mut self, link: bool) -> Self {
+        self.link = link;
+        self
+    }
+}
+
+impl Render for TagR<'_> {
+    fn render(&self) -> Markup {
+        macro_rules! style {
+            ($text:expr, $bg:expr) => {
+                format!("color: {}; background-color: {}", $text, $bg)
             }
-        },
-        TagStyling::Class(c) => html! {
-            a .tag href=(tag.href) .(c) { (tag.title) }
-        },
+        }
+
+        let settings = self.settings;
+
+        match (self.link, &settings.styling) {
+            (true, TagStyling::Colors { text, bg }) => html! {
+                a href=(settings.href) style=(style!(text, bg)) .tag {
+                    (settings.title)
+                }
+            },
+            (true, TagStyling::Class(c)) => html! {
+                a href=(settings.href) .(c) .tag { (settings.title) }
+            },
+            (false, TagStyling::Colors { text, bg }) => html! {
+                span style=(style!(text, bg)) .tag {
+                    (settings.title)
+                }
+            },
+            (false, TagStyling::Class(c)) => html! {
+                span .(c) .tag { (settings.title) }
+            },
+        }
     }
 }

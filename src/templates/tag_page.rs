@@ -9,7 +9,7 @@ use crate::{
         site_data::TagMap,
         tag::TagSettings,
     },
-    templates::util,
+    templates::util::{self, TagR},
 };
 
 use super::{Base, Navbar, RenderPost, RenderProject};
@@ -35,7 +35,7 @@ impl TagPage<'_> {
     fn render_item(&self, item: TaggedItem) -> Markup {
         match item {
             TaggedItem::Post(p) => RenderPost::from(p).tile(self.all_tags),
-            TaggedItem::Project(p) => RenderProject::from(p).tile(self.all_tags)
+            TaggedItem::Project(p) => RenderProject::from(p).tile(self.all_tags),
         }
     }
 }
@@ -46,7 +46,7 @@ impl Render for TagPage<'_> {
 
         let content = html! {
             header .container {
-                h1 { "Tag " (util::tag(self.settings)) }
+                h1 { "Tag " (TagR::new(self.settings).with_link(false)) }
             }
 
             main .tile-container {

@@ -7,6 +7,6 @@ mod util;
 
 pub use base::*;
 pub use blog::*;
-pub use project::*;
 pub use homepage::*;
+pub use project::*;
 pub use tag_page::*;
