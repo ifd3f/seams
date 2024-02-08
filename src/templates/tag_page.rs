@@ -9,7 +9,7 @@ use crate::{
         site_data::TagMap,
         tag::TagSettings,
     },
-    templates::util::{self, TagR},
+    templates::util::TagR,
 };
 
 use super::{Base, Navbar, RenderPost, RenderProject};

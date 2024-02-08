@@ -2,7 +2,7 @@ use std::borrow::Cow;
 
 use futures::{stream::FuturesUnordered, StreamExt};
 use gray_matter::{engine::YAML, Matter, Pod};
-use serde::{de::DeserializeOwned, Deserialize};
+use serde::de::DeserializeOwned;
 use tracing::trace;
 use vfs::{VfsError, VfsPath};
 

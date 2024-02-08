@@ -7,7 +7,7 @@ use vfs::{PhysicalFS, VfsError, VfsPath};
 
 use crate::{
     media::MediaRegistry,
-    model::site_data::{SiteData, SiteIndex},
+    model::site_data::SiteData,
     templates::{
         AboutPage, BlogIndexPage, Homepage, ProjectIndexPage, RenderPost, RenderProject, TagPage,
     },

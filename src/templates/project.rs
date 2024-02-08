@@ -6,13 +6,10 @@ use crate::{
         metadata::{Project, ProjectDates},
         site_data::TagMap,
     },
-    templates::util::{format_dt_html, tag_list},
+    templates::util::tag_list,
 };
 
-use super::{
-    util::{format_dt, format_project_date},
-    Base, NavbarItem,
-};
+use super::{util::format_project_date, Base, NavbarItem};
 
 type DProject = FullyLoadedDocument<Project>;
 
