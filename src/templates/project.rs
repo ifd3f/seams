@@ -34,7 +34,7 @@ impl Render for ProjectIndexPage<'_> {
 
             }
 
-            main .project-tile-container {
+            main .tile-container {
                 @for p in projects {
                     (RenderProject::from(p).tile(&self.tags))
                 }
@@ -58,9 +58,8 @@ pub struct RenderProject<'a> {
 
 impl<'a> RenderProject<'a> {
     pub fn tile(&self, tags: &TagMap) -> Markup {
-        // TODO: fill in the summary
         html! {
-            nav .project-tile {
+            nav .tile {
                 header {
                     (self.title(true))
                     (self.tagline())

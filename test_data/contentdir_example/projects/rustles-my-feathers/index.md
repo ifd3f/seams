@@ -4,6 +4,7 @@ tagline: hehe crab lang
 slug: rustles-my-feathers
 tags:
   - lang:rust
+  - uwu
 date:
   started: 2020-10-01
   finished: 2020-12-12

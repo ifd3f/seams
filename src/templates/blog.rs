@@ -6,7 +6,7 @@ use crate::{
         metadata::{Post, PostDates},
         site_data::TagMap,
     },
-    templates::util::{format_dt_html, tag_list},
+    templates::util::{format_dt_html, tag_list, EmDash},
 };
 
 use super::{util::format_dt, Base, NavbarItem};
@@ -28,8 +28,17 @@ impl Render for BlogIndexPage<'_> {
             main .container .blog-root {
                 h1 { "Blog" }
 
-                @for p in posts {
-                    (RenderPost::from(p).short_item(&self.tags))
+                table .posts-table {
+                    colgroup {
+                        col .date-col;
+                        col .title-col;
+                        col .tags-col;
+                    }
+                    tbody {
+                        @for p in posts {
+                            (RenderPost::from(p).row(&self.tags))
+                        }
+                    }
                 }
             }
         };
@@ -50,24 +59,56 @@ pub struct RenderPost<'a> {
 }
 
 impl<'a> RenderPost<'a> {
-    pub fn short_item(&self, tags: &TagMap) -> Markup {
-        // TODO: fill in the summary
+    pub fn row(&self, tags: &TagMap) -> Markup {
+        let meta = self.post.meta();
+        let title_cell = match &meta.tagline {
+            Some(tagline) => html! {
+                span .title { (self.linked_title()) }
+                " " (EmDash) " "
+                span .tagline { (tagline) }
+            },
+            None => self.linked_title(),
+        };
+
         html! {
-            nav .post-preview {
+            tr .post-row {
+                td .date-col { a href=(meta.href()) { (self.date()) } }
+                td .title-col { (title_cell) }
+                td .tags-col { (tag_list(tags, &self.post.meta().tags)) }
+            }
+        }
+    }
+
+    pub fn tile(&self, tags: &TagMap) -> Markup {
+        // TODO make summary
+        let meta = self.post.meta();
+
+        html! {
+            nav .tile {
                 header {
-                    p { (self.date()) }
-                    (self.title(true))
+                    h1 { (self.linked_title()) }
                     (self.tagline())
-                    (tag_list(tags, &self.post.meta().tags))
                 }
 
                 summary {
+                    a .read-more href=(self.post.meta().href()) {
+                        "Read more..."
+                    }
                 }
 
-                p .read-more {
-                    a href=(self.post.meta().href()) { "Read more..." }
+                footer {
+                    (tag_list(tags, &meta.tags))
+                    p { (self.date()) }
                 }
             }
+        }
+    }
+
+    pub fn linked_title(&self) -> Markup {
+        let meta = self.post.meta();
+
+        html! {
+            a href=(meta.href()) { (meta.title) }
         }
     }
 

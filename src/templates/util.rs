@@ -1,10 +1,19 @@
 use chrono::{Datelike, Month, Timelike};
-use maud::{html, Markup};
+use maud::{html, Markup, PreEscaped, Render};
 
 use crate::model::{
     site_data::TagMap,
     tag::{TagSettings, TagStyling},
 };
+
+
+pub struct EmDash;
+
+impl Render for EmDash {
+    fn render(&self) -> Markup {
+        PreEscaped("&mdash;".into())
+    }
+}
 
 pub fn format_project_date(d: impl Datelike) -> String {
     let month = Month::try_from(d.month() as u8).unwrap();
@@ -35,9 +44,9 @@ where
     S: AsRef<str>,
 {
     html! {
-        ul .tag-list {
+        span .tag-list {
             @for t in tags {
-                li { (tag(&tag_map[t.as_ref()])) }
+                (tag(&tag_map[t.as_ref()])) " "
             }
         }
     }

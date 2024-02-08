@@ -12,7 +12,7 @@ use crate::{
     templates::util,
 };
 
-use super::{Base, Navbar, RenderPost};
+use super::{Base, Navbar, RenderPost, RenderProject};
 
 pub struct TagPage<'a> {
     pub slug: &'a str,
@@ -34,10 +34,8 @@ impl TagPage<'_> {
 
     fn render_item(&self, item: TaggedItem) -> Markup {
         match item {
-            TaggedItem::Post(p) => RenderPost::from(p).short_item(self.all_tags),
-            TaggedItem::Project(_p) => html! {
-                p { "TODO" }
-            },
+            TaggedItem::Post(p) => RenderPost::from(p).tile(self.all_tags),
+            TaggedItem::Project(p) => RenderProject::from(p).tile(self.all_tags)
         }
     }
 }
@@ -47,8 +45,11 @@ impl Render for TagPage<'_> {
         let items = self.items();
 
         let content = html! {
-            main .container {
+            header .container {
                 h1 { "Tag " (util::tag(self.settings)) }
+            }
+
+            main .tile-container {
                 @for i in items {
                     (self.render_item(i))
                 }

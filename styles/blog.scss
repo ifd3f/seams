@@ -1,16 +1,25 @@
-.post-preview {
-    & h1 {
-        color: inherit;
+@import "./variables.scss";
+
+.posts-table {
+    width: 100%;
+
+    & .tags-col {
+        width: 70px;
+
+        @media only screen and (min-width: $sm) {
+            width: 140px;
+        }
+        @media only screen and (min-width: $md) {
+            width: 200px;
+        }
     }
 
-    & h1 {
-        margin-top: 5px;
-        margin-bottom: 10px;
+    & .date-col {
+        max-width: 75px;
     }
 
-    & p {
-        margin-top: 5px;
-        margin-bottom: 5px;
+    & .date-col a {
+        text-decoration: none;
     }
 }
 

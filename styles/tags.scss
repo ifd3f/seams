@@ -5,15 +5,15 @@
     padding-left: 0px;
 
     & li {
-        display: inline;
+        display: inline-block;
     }
 }
 
 .tag {
-    margin-right: 0.5em;
+    margin-bottom: 0.5em;
 
-    padding-top: 3px;
-    padding-bottom: 3px;
+    padding-top: 2px;
+    padding-bottom: 2px;
     padding-left: 7px;
     padding-right: 7px;
     border-radius: 100px;

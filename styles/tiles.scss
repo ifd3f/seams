@@ -3,7 +3,7 @@
 .project-index {
 }
 
-.project-tile-container {
+.tile-container {
     display: flex;
 
     padding-left: 15px;
@@ -15,8 +15,8 @@
     justify-content: center;
 }
 
-.project-tile {
-    border: solid gray 1px;
+.tile {
+    border: solid lightgray 1px;
     border-radius: 10px;
     padding-left: 10px;
     padding-right: 10px;
