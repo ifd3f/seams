@@ -13,6 +13,8 @@ use crate::{
     },
 };
 
+use super::rss::make_rss;
+
 #[tracing::instrument(skip_all)]
 pub async fn build_static_site(
     content: impl AsRef<Path>,
@@ -50,6 +52,8 @@ pub fn write_static_site(
     let index = sd.build_index();
 
     outdir.create_dir_all()?;
+
+    write_file(&outdir.join("feed.rss")?, make_rss("https://astrid.tech", &sd.posts).to_string().as_bytes())?;
 
     write_markup(&outdir, Homepage)?;
     write_markup(&outdir.join("about")?, AboutPage)?;
@@ -99,12 +103,16 @@ pub fn write_static_site(
 }
 
 #[tracing::instrument(skip_all, fields(path = path.as_str()))]
-fn write_markup(path: &VfsPath, r: impl Render) -> Result<(), VfsError> {
+fn write_file(path: &VfsPath, r: &[u8]) -> Result<(), VfsError> {
     debug!("writing output file");
-    path.create_dir_all()?;
-    path.join("index.html")?
-        .create_file()?
-        .write_all(r.render().into_string().as_bytes())?;
+    path.parent().create_dir_all()?;
+    path.create_file()?
+        .write_all(r)?;
 
+    Ok(())
+}
+
+fn write_markup(path: &VfsPath, r: impl Render) -> Result<(), VfsError> {
+    write_file(&path.join("index.html")?, r.render().into_string().as_bytes())?;
     Ok(())
 }
