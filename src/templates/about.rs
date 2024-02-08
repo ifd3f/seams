@@ -12,7 +12,7 @@ impl Render for AboutPage {
                 highlighted: Some(NavbarItem::About),
             },
             content: html! {
-                main .homepage {
+                main .container {
                     p { "welcome to my about page" }
                 }
             },

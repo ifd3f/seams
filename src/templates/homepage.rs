@@ -10,7 +10,7 @@ impl Render for Homepage {
             title: "Homepage".into(),
             navbar: Navbar { highlighted: None },
             content: html! {
-                main .homepage {
+                main .homepage .container {
                     p { "welcome to my site nyaa" }
                 }
             },
