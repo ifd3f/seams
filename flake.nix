@@ -45,7 +45,7 @@
         devShells.default = with pkgs;
           mkShell {
             buildInputs =
-              [ cargo rustc rustfmt pre-commit rustPackages.clippy sass just ]
+              [ cargo rustc rustfmt pre-commit rustPackages.clippy sass just openssl pkg-config backblaze-b2 ]
               ++ buildPrograms;
             RUST_SRC_PATH = rustPlatform.rustLibSrc;
           };
