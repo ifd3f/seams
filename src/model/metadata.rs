@@ -1,7 +1,11 @@
 use chrono::{DateTime, Datelike, FixedOffset, NaiveDate};
+use csscolorparser::Color;
 use serde::{Deserialize, Serialize};
 
-use crate::date_sort::DateSort;
+use crate::{
+    date_sort::DateSort,
+    random_coloring::{ColorProfileExt, Rgb8, PASTEL},
+};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Post {
@@ -33,6 +37,9 @@ pub struct Post {
 
     /// Author information.
     pub author: Option<Author>,
+
+    /// Accent color. If null, it will be randomly picked based on the slug.
+    pub color: Option<Color>,
 }
 
 impl Post {
@@ -46,6 +53,10 @@ impl Post {
             0usize,
             &self.slug
         )
+    }
+
+    pub fn css_color(&self) -> String {
+        extract_color(self.color.clone(), &self.slug)
     }
 }
 
@@ -87,11 +98,18 @@ pub struct Project {
 
     /// Dates associated with the project.
     pub date: ProjectDates,
+
+    /// Accent color. If null, it will be randomly picked based on the slug.
+    pub color: Option<Color>,
 }
 
 impl Project {
     pub fn href(&self) -> String {
         format!("/projects/{}", self.slug)
+    }
+
+    pub fn css_color(&self) -> String {
+        extract_color(self.color.clone(), &self.slug)
     }
 }
 
@@ -124,4 +142,12 @@ impl ProjectDates {
 
         return DateSort::Now;
     }
+}
+
+fn extract_color(color: Option<Color>, slug: &str) -> String {
+    if let Some(c) = color {
+        return c.to_hex_string();
+    }
+    let color = PASTEL.for_text(slug);
+    Color::from((color.red, color.green, color.blue)).to_hex_string()
 }

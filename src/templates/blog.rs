@@ -84,7 +84,7 @@ impl<'a> RenderPost<'a> {
         let meta = self.post.meta();
 
         html! {
-            nav .tile {
+            nav .tile style=(format!("background-color: {}", meta.css_color())) {
                 header {
                     h1 { (self.linked_title()) }
                     (self.tagline())

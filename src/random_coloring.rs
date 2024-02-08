@@ -1,4 +1,4 @@
-use palette::{convert::TryIntoColor, Hsv, Srgb};
+use palette::{convert::TryIntoColor, Hsl, Hsv, Srgb};
 use rand::{Rng, SeedableRng};
 
 pub type ColorRng = rand_chacha::ChaCha8Rng;
@@ -30,24 +30,29 @@ pub fn text_into_rng(text: &str) -> impl Rng {
 
 pub struct HueColorProfile {
     pub saturation: f32,
-    pub value: f32,
+    pub lightness: f32,
 }
 
 pub const PASTEL: HueColorProfile = HueColorProfile {
-    saturation: 0.7,
-    value: 0.5,
+    saturation: 0.5,
+    lightness: 0.9,
+};
+
+pub const TINT: HueColorProfile = HueColorProfile {
+    saturation: 0.2,
+    lightness: 0.9,
 };
 
 pub const DARK: HueColorProfile = HueColorProfile {
     saturation: 0.7,
-    value: 0.5,
+    lightness: 0.5,
 };
 
 impl ColorProfile for HueColorProfile {
     fn gen_color(&self, mut preseeded_rng: impl Rng) -> Rgb8 {
         let h: f32 = preseeded_rng.gen::<f32>() * 360.0;
-        let hsv = Hsv::new_srgb(h, self.saturation, self.value);
-        let rgbf: Srgb<f32> = hsv.try_into_color().unwrap();
+        let hsl = Hsl::new_srgb(h, self.saturation, self.lightness);
+        let rgbf: Srgb<f32> = hsl.try_into_color().unwrap();
         rgbf.into_format()
     }
 }

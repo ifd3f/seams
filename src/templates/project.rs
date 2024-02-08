@@ -56,7 +56,7 @@ pub struct RenderProject<'a> {
 impl<'a> RenderProject<'a> {
     pub fn tile(&self, tags: &TagMap) -> Markup {
         html! {
-            nav .tile {
+            nav .tile style=(format!("background-color: {}", self.project.meta().css_color())) {
                 header {
                     (self.title(true))
                     (self.tagline())

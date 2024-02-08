@@ -12,7 +12,7 @@ base16 = "0.2.1"
 chrono = { version = "0.4.33", features = ["serde"] }
 clap = { version = "4.4.18", features = ["derive"] }
 comrak = { version = "0.21.0", features = ["emojis", "shortcodes"] }
-csscolorparser = "0.6.2"
+csscolorparser = { version = "0.6.2", features = ["serde"] }
 derive_more = "0.99.17"
 frunk = "0.4.2"
 futures = "0.3.30"
