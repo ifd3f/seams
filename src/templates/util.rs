@@ -76,7 +76,7 @@ impl Render for TagR<'_> {
         macro_rules! style {
             ($text:expr, $bg:expr) => {
                 format!("color: {}; background-color: {}", $text, $bg)
-            }
+            };
         }
 
         let settings = self.settings;

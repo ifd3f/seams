@@ -2,7 +2,7 @@ use maud::{html, Markup, Render};
 
 use crate::templates::*;
 
-pub struct Homepage {}
+pub struct Homepage;
 
 impl Render for Homepage {
     fn render(&self) -> Markup {

@@ -8,7 +8,9 @@ use vfs::{PhysicalFS, VfsError, VfsPath};
 use crate::{
     media::MediaRegistry,
     model::site_data::{SiteData, SiteIndex},
-    templates::{BlogIndexPage, Homepage, ProjectIndexPage, RenderPost, RenderProject, TagPage},
+    templates::{
+        AboutPage, BlogIndexPage, Homepage, ProjectIndexPage, RenderPost, RenderProject, TagPage,
+    },
 };
 
 #[tracing::instrument(skip_all)]
@@ -49,7 +51,8 @@ pub fn write_static_site(
 
     outdir.create_dir_all()?;
 
-    write_markup(&outdir, Homepage {})?;
+    write_markup(&outdir, Homepage)?;
+    write_markup(&outdir.join("about")?, AboutPage)?;
 
     write_markup(
         &outdir.join("blog")?,
