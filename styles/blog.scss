@@ -20,6 +20,9 @@
 
     & .date-col a {
         text-decoration: none;
+        &:hover {
+            text-decoration: underline $text-muted;
+        }
     }
 }
 
