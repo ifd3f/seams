@@ -25,20 +25,24 @@ pub struct ProjectIndexPage<'a> {
 impl Render for ProjectIndexPage<'_> {
     fn render(&self) -> Markup {
         let mut projects = self.projects.clone();
+        projects.sort_by_key(|p| p.meta().date.sort_key());
         projects.reverse();
 
         let content = html! {
-            main .container .projects-root {
+            header .container {
                 h1 { "Projects" }
 
+            }
+
+            main .project-tile-container {
                 @for p in projects {
-                    (RenderProject::from(p).short_item(&self.tags))
+                    (RenderProject::from(p).tile(&self.tags))
                 }
             }
         };
 
         Base {
-            title: "Broject".into(),
+            title: "Project".into(),
             navbar: NavbarItem::Projects.into(),
             content,
         }
@@ -53,22 +57,15 @@ pub struct RenderProject<'a> {
 }
 
 impl<'a> RenderProject<'a> {
-    pub fn short_item(&self, tags: &TagMap) -> Markup {
+    pub fn tile(&self, tags: &TagMap) -> Markup {
         // TODO: fill in the summary
         html! {
-            nav .project-preview {
+            nav .project-tile {
                 header {
-                    p { (self.date()) }
                     (self.title(true))
                     (self.tagline())
                     (tag_list(tags, &self.project.meta().tags))
-                }
-
-                summary {
-                }
-
-                p .read-more {
-                    a href=(self.project.meta().href()) { "Read more..." }
+                    p .date { (self.date()) }
                 }
             }
         }

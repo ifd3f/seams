@@ -1,0 +1,33 @@
+@import "./variables.scss";
+
+.project-index {
+}
+
+.project-tile-container {
+    display: flex;
+
+    padding-left: 15px;
+    padding-right: 15px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    justify-content: center;
+}
+
+.project-tile {
+    border: solid gray 1px;
+    border-radius: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-bottom: 10px;
+
+    width: 100%;
+    @media only screen and (min-width: $sm) {
+        width: 45%;
+        max-width: 300px;
+    }
+    @media only screen and (min-width: $md) {
+        width: 300px;
+    }
+}

@@ -1,5 +1,6 @@
 ---
 title: foo project
+tagline: project of the foo
 slug: my-project
 tags:
   - gaming
