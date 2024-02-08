@@ -30,7 +30,7 @@ async fn main() {
 async fn _main(args: cli::TopLevel) -> anyhow::Result<()> {
     match args.command {
         cli::Subcommand::Build(b) => {
-            build_static_site(b.src, b.templates, b.out).await?;
+            build_static_site(b.src, b.out).await?;
         }
         cli::Subcommand::Watch(_) => todo!(),
     }

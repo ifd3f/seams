@@ -18,10 +18,6 @@ pub struct BuildCommand {
     /// Content sources directory
     pub src: PathBuf,
 
-    /// Template directory
-    #[clap(short, long, default_value = "templates")]
-    pub templates: PathBuf,
-
     /// Output directory
     #[clap(short, long, default_value = "out")]
     pub out: PathBuf,
@@ -34,10 +30,6 @@ pub struct BuildCommand {
 pub struct WatchCommand {
     /// Content sources directory
     pub src: PathBuf,
-
-    /// Template directory
-    #[clap(short, long, default_value = "templates")]
-    pub templates: PathBuf,
 
     /// Port to listen on, or 0 to pick a random port
     #[clap(short, long, default_value = "0")]

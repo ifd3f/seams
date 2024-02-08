@@ -3,7 +3,10 @@ use rss::{extension::atom::AtomExtensionBuilder, validation::Validate, *};
 
 use crate::{load::document::FullyLoadedDocument, model::metadata::Post};
 
-pub fn make_rss<'a, I>(base_url: &str, posts: I) -> Channel where I : IntoIterator<Item = &'a FullyLoadedDocument<Post>> {
+pub fn make_rss<'a, I>(base_url: &str, posts: I) -> Channel
+where
+    I: IntoIterator<Item = &'a FullyLoadedDocument<Post>>,
+{
     let items = posts
         .into_iter()
         .map(|p| {
@@ -32,7 +35,9 @@ pub fn make_rss<'a, I>(base_url: &str, posts: I) -> Channel where I : IntoIterat
         .atom_ext(Some(AtomExtensionBuilder::default().build()))
         .build();
 
-    channel.validate().expect("Programmer error while building RSS");
+    channel
+        .validate()
+        .expect("Programmer error while building RSS");
 
     channel
 }

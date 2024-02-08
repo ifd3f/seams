@@ -18,13 +18,11 @@ use super::rss::make_rss;
 #[tracing::instrument(skip_all)]
 pub async fn build_static_site(
     content: impl AsRef<Path>,
-    templates: impl AsRef<Path>,
     out: impl AsRef<Path>,
 ) -> anyhow::Result<()> {
     info!(
         out = %out.as_ref().to_string_lossy(),
         content = %content.as_ref().to_string_lossy(),
-        templates = %templates.as_ref().to_string_lossy(),
         "Building static site"
     );
 
@@ -33,27 +31,27 @@ pub async fn build_static_site(
     create_dir_all(out.as_ref())?;
     let out = VfsPath::new(PhysicalFS::new(out.as_ref()));
     let content = VfsPath::new(PhysicalFS::new(content.as_ref()));
-    let templates = VfsPath::new(PhysicalFS::new(templates.as_ref()));
 
     let media = MediaRegistry::new("/static".into(), out.join("static")?);
     let sd = SiteData::load(content, &media).await?;
-    write_static_site(&sd, templates, out)?;
+    write_static_site(&sd, out)?;
 
     info!(elapsed = ?start.elapsed(), "Completed");
 
     Ok(())
 }
 
-pub fn write_static_site(
-    sd: &SiteData,
-    _templates: VfsPath,
-    outdir: VfsPath,
-) -> anyhow::Result<()> {
+pub fn write_static_site(sd: &SiteData, outdir: VfsPath) -> anyhow::Result<()> {
     let index = sd.build_index();
 
     outdir.create_dir_all()?;
 
-    write_file(&outdir.join("feed.rss")?, make_rss("https://astrid.tech", &sd.posts).to_string().as_bytes())?;
+    write_file(
+        &outdir.join("feed.rss")?,
+        make_rss("https://astrid.tech", &sd.posts)
+            .to_string()
+            .as_bytes(),
+    )?;
 
     write_markup(&outdir, Homepage)?;
     write_markup(&outdir.join("about")?, AboutPage)?;
@@ -106,13 +104,15 @@ pub fn write_static_site(
 fn write_file(path: &VfsPath, r: &[u8]) -> Result<(), VfsError> {
     debug!("writing output file");
     path.parent().create_dir_all()?;
-    path.create_file()?
-        .write_all(r)?;
+    path.create_file()?.write_all(r)?;
 
     Ok(())
 }
 
 fn write_markup(path: &VfsPath, r: impl Render) -> Result<(), VfsError> {
-    write_file(&path.join("index.html")?, r.render().into_string().as_bytes())?;
+    write_file(
+        &path.join("index.html")?,
+        r.render().into_string().as_bytes(),
+    )?;
     Ok(())
 }
