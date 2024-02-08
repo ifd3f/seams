@@ -74,7 +74,7 @@ pub struct Author {
 #[derive(Serialize, Deserialize)]
 pub struct Project {
     /// Title of the project.
-    pub title: Option<String>,
+    pub title: String,
 
     /// Tagline of the project.
     pub tagline: Option<String>,
@@ -87,6 +87,12 @@ pub struct Project {
 
     /// Dates associated with the project.
     pub date: ProjectDates,
+}
+
+impl Project {
+    pub fn href(&self) -> String {
+        format!("/projects/{}", self.slug)
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]

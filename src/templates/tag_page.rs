@@ -2,11 +2,14 @@ use itertools::Itertools;
 use maud::{html, Markup, Render};
 
 use crate::{
-    date_sort::DateSort, load::document::FullyLoadedDocument, model::{
+    date_sort::DateSort,
+    load::document::FullyLoadedDocument,
+    model::{
         metadata::{Post, Project},
         site_data::TagMap,
         tag::TagSettings,
-    }, templates::util
+    },
+    templates::util,
 };
 
 use super::{Base, Navbar, RenderPost};

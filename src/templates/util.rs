@@ -1,10 +1,15 @@
-use chrono::{Datelike, Timelike};
+use chrono::{Datelike, Month, Timelike};
 use maud::{html, Markup};
 
 use crate::model::{
     site_data::TagMap,
     tag::{TagSettings, TagStyling},
 };
+
+pub fn format_project_date(d: impl Datelike) -> String {
+    let month = Month::try_from(d.month() as u8).unwrap();
+    format!("{} {}", month.name(), d.year())
+}
 
 pub fn format_dt(d: impl Datelike + Timelike) -> String {
     format!(

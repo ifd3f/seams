@@ -8,7 +8,7 @@ use vfs::{PhysicalFS, VfsError, VfsPath};
 use crate::{
     media::MediaRegistry,
     model::site_data::{SiteData, SiteIndex},
-    templates::{BlogIndexPage, Homepage, RenderPost, TagPage},
+    templates::{BlogIndexPage, Homepage, ProjectIndexPage, RenderPost, RenderProject, TagPage},
 };
 
 #[tracing::instrument(skip_all)]
@@ -65,19 +65,21 @@ pub fn write_static_site(
         )?;
     }
 
-    /*
-    let projectsdir = outdir.join("projects").unwrap();
+    write_markup(
+        &outdir.join("projects")?,
+        ProjectIndexPage {
+            projects: sd.projects.iter().collect(),
+            tags: &sd.tags,
+        },
+    )?;
     for p in &sd.projects {
-        let projectdir = projectsdir.join(&p.document.meta.slug)?;
-        projectdir.create_dir_all()?;
-        let mut out = projectdir.join("index.html").unwrap().create_file()?;
-        out.write_all(p.transformed.html.as_bytes())?;
+        write_markup(
+            &outdir.join(&p.document.meta.href())?,
+            RenderProject::from(p).full_content_page(&sd.tags),
+        )?;
     }
-    */
 
     for (slug, settings) in &sd.tags {
-        debug!(?slug, "writing tag");
-
         write_markup(
             &outdir.join(format!("t/{slug}"))?,
             TagPage {
@@ -93,7 +95,9 @@ pub fn write_static_site(
     Ok(())
 }
 
+#[tracing::instrument(skip_all, fields(path = path.as_str()))]
 fn write_markup(path: &VfsPath, r: impl Render) -> Result<(), VfsError> {
+    debug!("writing output file");
     path.create_dir_all()?;
     path.join("index.html")?
         .create_file()?

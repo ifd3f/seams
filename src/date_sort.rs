@@ -29,9 +29,10 @@ impl PartialOrd for DateSort {
 
 impl From<NaiveDate> for DateSort {
     fn from(value: NaiveDate) -> Self {
-            value
-                .and_time(NaiveTime::from_hms_opt(0, 0, 0).unwrap())
-                .and_utc().into()
+        value
+            .and_time(NaiveTime::from_hms_opt(0, 0, 0).unwrap())
+            .and_utc()
+            .into()
     }
 }
 impl From<DateTime<FixedOffset>> for DateSort {
