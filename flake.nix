@@ -36,6 +36,8 @@
             cp -r ${styles}/* $out/
           '';
 
+        python = pkgs.python3.withPackages (ps: with ps; [ pyyaml click ]);
+
       in {
         packages = rec {
           inherit styles seams;
@@ -44,9 +46,19 @@
         };
         devShells.default = with pkgs;
           mkShell {
-            buildInputs =
-              [ cargo rustc rustfmt pre-commit rustPackages.clippy sass just openssl pkg-config backblaze-b2 ]
-              ++ buildPrograms;
+            buildInputs = [
+              cargo
+              rustc
+              rustfmt
+              pre-commit
+              rustPackages.clippy
+              sass
+              just
+              openssl
+              pkg-config
+              backblaze-b2
+              python
+            ] ++ buildPrograms;
             RUST_SRC_PATH = rustPlatform.rustLibSrc;
           };
       });
