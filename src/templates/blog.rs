@@ -26,18 +26,11 @@ impl Render for BlogIndexPage<'_> {
 
         let content = html! {
             main .container .blog-root {
-                h1 { "Blog" }
+                h2 { "Blog" }
 
-                table .posts-table {
-                    colgroup {
-                        col .date-col;
-                        col .title-col;
-                        col .tags-col;
-                    }
-                    tbody {
-                        @for p in posts {
-                            (RenderPost::from(p).row(&self.tags))
-                        }
+                div .posts-table {
+                    @for p in posts {
+                        (RenderPost::from(p).row(&self.tags))
                     }
                 }
             }
@@ -63,15 +56,21 @@ impl<'a> RenderPost<'a> {
         let meta = self.post.meta();
 
         html! {
-            tr .post-row {
-                td .date-col { a href=(meta.href()) { (self.date()) } }
-                td .title-col {
-                    p .title { (self.linked_title()) }
-                    @if let Some(t) = &meta.tagline {
-                        p .tagline { (t) }
+            div .post-row {
+                div .datepane {
+                    p .date { a href=(meta.href()) { (self.date()) } }
+                }
+                div .itempane {
+                    div .titlepane {
+                        h2 .title { (self.linked_title()) }
+                        @if let Some(t) = &meta.tagline {
+                            p .tagline { (t) }
+                        }
+                    }
+                    div .tagpane {
+                        p .tags { (tag_list(tags, &self.post.meta().tags)) }
                     }
                 }
-                td .tags-col { (tag_list(tags, &self.post.meta().tags)) }
             }
         }
     }
@@ -83,7 +82,7 @@ impl<'a> RenderPost<'a> {
         html! {
             nav .tile style=(format!("background-color: {}", meta.css_color())) {
                 header {
-                    h1 { (self.linked_title()) }
+                    h2 { (self.linked_title()) }
                     (self.tagline())
                 }
 

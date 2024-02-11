@@ -3,49 +3,69 @@
 .posts-table {
     width: 100%;
 
-    & .tags-col {
-        width: 70px;
-
-        @media only screen and (min-width: $sm) {
-            width: 140px;
-        }
-        @media only screen and (min-width: $md) {
-            width: 200px;
-        }
-    }
-
-    & .date-col {
-        max-width: 75px;
-    }
-
-    & .date-col a {
+    & .date a {
         text-decoration: none;
+
         &:hover {
             text-decoration: underline $text-muted;
         }
-    }
-
-    & .post-row {
-        & .title {
-            margin-top: 0px;
-            margin-bottom: 0px;
-            font-weight: bold;
-        }
-        & .tagline {
-            margin-top: 0px;
-            margin-bottom: 0px;
-            color: $text-muted;
-        }
-    }
-
-    & td {
-        padding-bottom: 15px;
     }
 }
 
 .date {
     color: $text-muted;
     font-size: smaller;
+}
+
+$datepane-max-width: 120px;
+
+.post-row {
+    margin-bottom: 2em;
+    display: flex;
+    align-items:baseline;
+
+    & p {
+        margin-top: 0px;
+        margin-bottom: 0.25em;
+    }
+
+    & h2 {
+        margin-top: 0px;
+        margin-bottom: 0.25em;
+    }
+
+    & .title {
+        font-weight: bold;
+        font-size: large;
+    }
+
+    & .tagline {
+        color: $text-muted;
+    }
+
+    flex-flow: row wrap;
+    flex-wrap: wrap;
+
+    & .datepane {
+        width: 100%;
+    }
+
+    & .titlepane {
+        width: 100%;
+    }
+
+    & .itempane {
+        width: 100%;
+    }
+
+    @media only screen and (min-width: $sm) {
+        & .datepane {
+            width: $datepane-max-width;
+        }
+        & .itempane {
+            width: calc(100% - #{$datepane-max-width});
+        }
+    }
 }
 
 .longform {
