@@ -1,6 +1,8 @@
-- tags: [uwu]
-  settings:
-    title: UwU
-    text_color: black
-    color: pink
+titles:
+  uwu: UwU
 
+styles:
+  - tags: [uwu]
+    apply:
+      text_color: black
+      color: pink

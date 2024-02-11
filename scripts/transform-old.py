@@ -132,14 +132,14 @@ def transform_tagdecl(tag_file: Path, outdir: Path):
 
     for decl in old:
         styling = {}
-        if text := decl.get("color"):
-            styling["textcolor"] = text
         if bg := decl.get("backgroundColor"):
-            styling["bgcolor"] = bg
+            styling["color"] = bg
+        if text := decl.get("color"):
+            styling["text_color"] = text
         styles.append(
             {
                 "tags": [t["slug"] for t in decl["tags"]],
-                "style": styling,
+                "apply": styling,
             }
         )
 

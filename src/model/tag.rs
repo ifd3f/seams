@@ -30,15 +30,14 @@ pub struct TagSettings {
 }
 
 #[derive(Serialize, Deserialize, Default, Clone, Debug)]
-pub struct TagSettingsDirectiveBody {
-    pub title: Option<String>,
+pub struct TagStyleDirectiveBody {
     pub text_color: Option<Color>,
     pub color: Option<Color>,
     pub class: Option<String>,
 }
 
-impl TagSettingsDirectiveBody {
-    pub fn materialize(self, tag_slug: &str) -> TagSettings {
+impl TagStyleDirectiveBody {
+    pub fn materialize(self, title: Option<String>, tag_slug: &str) -> TagSettings {
         let bg = self.color.unwrap_or_else(|| {
             let color = random_coloring::DARK.for_text(tag_slug);
             format!("rgb({}, {}, {})", color.red, color.green, color.blue)
@@ -63,18 +62,17 @@ impl TagSettingsDirectiveBody {
 
         // TODO color random selection
         TagSettings {
-            title: self.title.unwrap_or_else(|| tag_slug.to_owned()),
+            title: title.unwrap_or_else(|| tag_slug.to_owned()),
             href: format!("/t/{tag_slug}"),
             styling,
         }
     }
 }
 
-impl Semigroup for TagSettingsDirectiveBody {
+impl Semigroup for TagStyleDirectiveBody {
     fn combine(&self, other: &Self) -> Self {
         // other takes precedence over self
         Self {
-            title: other.title.clone().or(self.title.clone()),
             text_color: other.text_color.clone().or(self.text_color.clone()),
             color: other.color.clone().or(self.color.clone()),
             class: other.class.clone().or(self.class.clone()),
@@ -82,35 +80,38 @@ impl Semigroup for TagSettingsDirectiveBody {
     }
 }
 
-impl Monoid for TagSettingsDirectiveBody {
+impl Monoid for TagStyleDirectiveBody {
     fn empty() -> Self {
         Default::default()
     }
 }
 
 #[derive(Serialize, Deserialize, Default, Clone, Debug)]
-pub struct TagSettingsDirective {
+pub struct TagStyleDirective {
     pub tags: Vec<String>,
-    pub settings: TagSettingsDirectiveBody,
+    pub apply: TagStyleDirectiveBody,
 }
 
 #[derive(Serialize, Deserialize, Default, Clone)]
-pub struct TagSettingsSheet(pub Vec<TagSettingsDirective>);
+pub struct TagSettingsSheet {
+    titles: HashMap<String, String>,
+    styles: Vec<TagStyleDirective>,
+}
 
 impl TagSettingsSheet {
     pub fn materialize(self, additional_tags: Vec<&str>) -> HashMap<String, TagSettings> {
         use std::collections::hash_map::Entry;
 
-        let mut applied_directives = HashMap::<&str, TagSettingsDirectiveBody>::new();
+        let mut applied_directives = HashMap::<&str, TagStyleDirectiveBody>::new();
 
-        for d in &self.0 {
+        for d in &self.styles {
             for t in &d.tags {
                 match applied_directives.entry(t.as_str()) {
                     Entry::Occupied(v) => {
-                        *v.into_mut() = v.get().combine(&d.settings);
+                        *v.into_mut() = v.get().combine(&d.apply);
                     }
                     Entry::Vacant(v) => {
-                        v.insert(d.settings.clone());
+                        v.insert(d.apply.clone());
                     }
                 }
             }
@@ -122,14 +123,17 @@ impl TagSettingsSheet {
 
         applied_directives
             .into_iter()
-            .map(|(k, v)| (k.to_owned(), v.materialize(k)))
+            .map(|(k, v)| (k.to_owned(), v.materialize(self.titles.get(k).cloned(), k)))
             .collect()
     }
 }
 
 impl Semigroup for TagSettingsSheet {
     fn combine(&self, other: &Self) -> Self {
-        Self(self.0.combine(&other.0))
+        Self {
+            titles: self.titles.combine(&other.titles),
+            styles: self.styles.combine(&other.styles),
+        }
     }
 }
 
