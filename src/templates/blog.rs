@@ -61,19 +61,16 @@ pub struct RenderPost<'a> {
 impl<'a> RenderPost<'a> {
     pub fn row(&self, tags: &TagMap) -> Markup {
         let meta = self.post.meta();
-        let title_cell = match &meta.tagline {
-            Some(tagline) => html! {
-                span .title { (self.linked_title()) }
-                " " (EmDash) " "
-                span .tagline { (tagline) }
-            },
-            None => self.linked_title(),
-        };
 
         html! {
             tr .post-row {
                 td .date-col { a href=(meta.href()) { (self.date()) } }
-                td .title-col { (title_cell) }
+                td .title-col {
+                    p .title { (self.linked_title()) }
+                    @if let Some(t) = &meta.tagline {
+                        p .tagline { (t) }
+                    }
+                }
                 td .tags-col { (tag_list(tags, &self.post.meta().tags)) }
             }
         }

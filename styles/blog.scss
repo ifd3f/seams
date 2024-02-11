@@ -24,6 +24,23 @@
             text-decoration: underline $text-muted;
         }
     }
+
+    & .post-row {
+        & .title {
+            margin-top: 0px;
+            margin-bottom: 0px;
+            font-weight: bold;
+        }
+        & .tagline {
+            margin-top: 0px;
+            margin-bottom: 0px;
+            color: $text-muted;
+        }
+    }
+
+    & td {
+        padding-bottom: 15px;
+    }
 }
 
 .date {
