@@ -27,8 +27,7 @@ impl Render for ProjectIndexPage<'_> {
 
         let content = html! {
             header .container {
-                h1 { "Projects" }
-
+                h1 style="text-align: center" { "Projects" }
             }
 
             main .tile-container {
@@ -58,7 +57,9 @@ impl<'a> RenderProject<'a> {
         html! {
             nav .tile style=(format!("background-color: {}", self.project.meta().css_color())) {
                 header {
-                    (self.title(true))
+                    h2 .title {
+                        a href=(self.project.meta().href()) { (self.project.meta().title) }
+                    }
                     (self.tagline())
                     (tag_list(tags, &self.project.meta().tags))
                     p .date { (self.date()) }

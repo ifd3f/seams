@@ -26,7 +26,7 @@ impl Render for BlogIndexPage<'_> {
 
         let content = html! {
             main .container .blog-root {
-                h2 { "Blog" }
+                h1 style="text-align: center;" { "Blog" }
 
                 div .posts-table {
                     @for p in posts {

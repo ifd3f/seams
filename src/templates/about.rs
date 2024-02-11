@@ -7,6 +7,8 @@ pub struct AboutPage;
 impl Render for AboutPage {
     fn render(&self) -> Markup {
         let about = html! {
+            h1 style="text-align: center" { "About" }
+
             p { "This website is where I write about my projects." }
 
             p { "I got into coding when I was around 12, back when I played a ton of Minecraft. There was this mod for the game called ComputerCraft that added computers to the game. I thought that was really cool, so I ended up teaching myself Lua to program those computers." }
