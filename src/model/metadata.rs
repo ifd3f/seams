@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     date_sort::DateSort,
-    random_coloring::{ColorProfileExt, Rgb8, PASTEL},
+    random_coloring::{ColorProfileExt, PASTEL},
 };
 
 #[derive(Serialize, Deserialize, Clone, Debug)]

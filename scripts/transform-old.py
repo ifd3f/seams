@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
-from datetime import datetime
+from datetime import datetime, tzinfo
 from pathlib import Path
 import shutil
 import sys
 from typing import Any, Dict, Tuple
+from zoneinfo import ZoneInfo
 import yaml
 import click
 
@@ -53,29 +54,40 @@ def transform_post(post_file: Path, outdir: Path):
     ).removesuffix(".md")
 
     date = datetime.fromisoformat(str(old["date"]).replace("Z", " "))
+    if date.tzname() is None:
+        date = date.astimezone(ZoneInfo("America/Los_Angeles"))
+
+    if t := old.get("title"):
+        title = t
+        out_root = 'blog'
+    else:
+        title = None
+        out_root = '_untitled_posts'
+
     new = {
-        "title": old.get(
-            "title", f"Status on {date.year}-{date.month:02}-{date.day:02}"
-        ),
-        "tagline": old.get("description"),
+        "title": title,
+    }
+    if tagline := old.get("description"):
+        new["tagline"] = tagline
+    if ts := old.get("tags"):
+        new["tags"] = [transform_tag_slug(t) for t in ts]
+    if u := old.get("thumbnail"):
+        new["thumbnail"] = u
+    new = {
+        **new,
         "slug": slug,
         "date": {
             "created": str(date),
             "published": str(date),
         },
-        "url": {},
     }
-    if t := old.get("tags"):
-        new["tags"] = t
-    if u := old.get("thumbnail"):
-        new["thumbnail"] = u
 
-    new_ydata = yaml.safe_dump(new, sort_keys=False)
+    new_ydata = yamldump(new)
 
     post_subdir = "{}/{:02}/{:02}/{}/{}".format(
         date.year, date.month, date.day, old.get("ordinal", 0), slug
     )
-    outfile = outdir / "blog" / post_subdir / "index.md"
+    outfile = outdir / out_root / post_subdir / "index.md"
     outfile.parent.mkdir(parents=True, exist_ok=True)
     with outfile.open("w") as f:
         f.write("---\n")
@@ -98,7 +110,7 @@ def transform_project(project_file: Path, outdir: Path):
         "date": {
             "started": old["startDate"],
             "finished": old.get("endDate"),
-            "published": datetime.now(),
+            "published": datetime.now().astimezone(ZoneInfo("America/Los_Angeles")),
         },
         "tags": old["tags"],
         "url": {},
@@ -110,7 +122,7 @@ def transform_project(project_file: Path, outdir: Path):
     if u := old.get("thumbnail"):
         new["thumbnail"] = u
 
-    new_ydata = yaml.dump(new, sort_keys=False)
+    new_ydata = yamldump(new)
 
     sd: datetime = old["startDate"]
     project_subdir = "{}-{:02}-{}".format(sd.year, sd.month, slug)
@@ -148,16 +160,26 @@ def transform_tagdecl(tag_file: Path, outdir: Path):
 
     new = {"titles": slug_to_title, "styles": styles}
 
-    outfile = outdir / "tags" / tag_file.name
+    outfile = outdir / "settings" / "tags.tag.yml"
     outfile.parent.mkdir(parents=True, exist_ok=True)
     with outfile.open("w") as f:
-        f.write(yaml.safe_dump(new, sort_keys=False))
+        f.write(yamldump(new))
+
+
+def yamldump(x: Any) -> str:
+    return yaml.safe_dump(x, sort_keys=False, allow_unicode=True)
 
 
 def split_graymatter(file_contents: str) -> Tuple[Dict[str, Any], str]:
     _, _, yaml_and_rest = file_contents.partition("---")
     yaml_data, _, markdown = yaml_and_rest.partition("---")
     return yaml.safe_load(yaml_data), markdown.strip()
+
+
+def transform_tag_slug(tag: str):
+    if tag.startswith("/projects/"):
+        return 'projects:' + tag.removeprefix("/projects/").replace('/', '')
+    return tag
 
 
 if __name__ == "__main__":

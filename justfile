@@ -15,7 +15,7 @@ styles:
 
 html:
     mkdir -p out/
-    cargo run -- build ./test_data/contentdir_example -o out-html
+    cargo run -- build ./test_data/astrid_dot_tech_example -o out-html
     cp -ar out-html/* out/
     chmod +w -R out/
 
