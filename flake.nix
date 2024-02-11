@@ -11,7 +11,7 @@
         lib = pkgs.lib;
         pkgs = import nixpkgs { inherit system; };
         naersk-lib = pkgs.callPackage naersk { };
-        buildPrograms = with pkgs; [ graphviz ];
+        buildPrograms = with pkgs; [ graphviz nodePackages.katex ];
 
         seams = naersk-lib.buildPackage (builtins.filterSource
           (path: _: # path is of the format /nix/store/hash-whatever/Cargo.toml

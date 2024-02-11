@@ -331,6 +331,7 @@ mod test {
     use super::*;
     use assert_matches::*;
     use rstest::*;
+    use serde::Deserialize;
     use vfs::{PhysicalFS, VfsPath};
 
     #[derive(Deserialize)]
