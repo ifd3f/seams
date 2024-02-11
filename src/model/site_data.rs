@@ -67,10 +67,13 @@ impl SiteData {
             fully_load_docdir(media, path.join("projects")?)
         );
 
-        let (posts, post_failures): (Vec<FullyLoadedDocument<Post>>, Vec<_>) =
+        let (mut posts, post_failures): (Vec<FullyLoadedDocument<Post>>, Vec<_>) =
             posts?.into_iter().partition_result();
-        let (projects, project_failures): (Vec<FullyLoadedDocument<Project>>, Vec<_>) =
+        let (mut projects, project_failures): (Vec<FullyLoadedDocument<Project>>, Vec<_>) =
             projects?.into_iter().partition_result();
+
+        posts.sort_by_key(|p| p.meta().date.published);
+        projects.sort_by_key(|p| p.meta().date.sort_key());
 
         // this prevents move errors, albeit jankily.
         // TODO: get rid of this jank
