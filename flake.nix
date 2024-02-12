@@ -56,9 +56,9 @@
               just
               openssl
               pkg-config
-              backblaze-b2
               python
-            ] ++ buildPrograms;
+            ] ++ buildPrograms
+              ++ lib.optional (system != "aarch64-darwin") [ backblaze-b2 ];
             RUST_SRC_PATH = rustPlatform.rustLibSrc;
           };
       });
