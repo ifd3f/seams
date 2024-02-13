@@ -5,6 +5,7 @@ use tracing::trace;
 use vfs::{VfsError, VfsPath};
 
 use crate::{
+    errors::Errors,
     load::{
         document::{fully_load_docdir, FullyLoadedDocument, LoadError},
         settings::load_settings_in_dir,
@@ -32,16 +33,14 @@ pub struct SiteIndex<'a> {
 }
 
 #[derive(Debug)]
-pub struct SiteDataUserErrors {
-    pub load_errors: Vec<(VfsPath, LoadError)>,
+pub struct SiteDataUserError {
+    pub path: VfsPath,
+    pub error: LoadError,
 }
 
-impl Display for SiteDataUserErrors {
+impl Display for SiteDataUserError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for (path, error) in &self.load_errors {
-            writeln!(f, "In file {}:\n  {}", path.as_str(), error)?;
-        }
-        Ok(())
+        writeln!(f, "In file {}:\n  {}", self.path.as_str(), self.error)
     }
 }
 
@@ -51,13 +50,7 @@ pub enum SiteDataLoadError {
     Vfs(#[from] VfsError),
 
     #[error("User errors occurred: {0}")]
-    UserError(SiteDataUserErrors),
-}
-
-impl From<SiteDataUserErrors> for SiteDataLoadError {
-    fn from(errs: SiteDataUserErrors) -> Self {
-        Self::UserError(errs)
-    }
+    UserError(#[from] Errors<SiteDataUserError>),
 }
 
 impl SiteData {
@@ -83,16 +76,17 @@ impl SiteData {
                 Err(e) => (None, Some(e)),
             };
 
-        let mut load_errors = vec![];
+        let mut load_errors: Errors<SiteDataUserError> = Default::default();
         load_errors.extend(post_failures);
         load_errors.extend(project_failures);
         if let Some(e) = tag_failure {
-            load_errors.push((path.join("settings")?, LoadError::TagError(e)));
+            load_errors.push(SiteDataUserError {
+                path: path.join("settings")?,
+                error: LoadError::TagError(e),
+            });
         }
 
-        if !load_errors.is_empty() {
-            return Err(SiteDataUserErrors { load_errors })?;
-        }
+        load_errors.into_result()?;
 
         let mut additional_tags: Vec<&str> = vec![];
         for p in &posts {

@@ -12,7 +12,10 @@ use futures::TryFutureExt;
 use htmlentity::entity::EncodeType;
 use vfs::VfsError;
 
-use crate::media::{Media, MediaRegistry};
+use crate::{
+    errors::Errors,
+    media::{Media, MediaRegistry},
+};
 
 use super::{
     common::TransformContext,
@@ -41,7 +44,7 @@ pub fn make_md_options() -> comrak::Options {
 pub async fn transform_markdown<'a>(
     ctx: &'a TransformContext<'a>,
     raw: &'a str,
-) -> Result<String, MarkdownErrors> {
+) -> Result<String, Errors<MarkdownError>> {
     let mut arena = Arena::new();
 
     let md_options = make_md_options();
@@ -59,14 +62,14 @@ pub async fn transform_markdown<'a>(
 
     let root = parse_document(&mut arena, raw, &md_options);
 
-    let mut errors = MarkdownErrors::default();
+    let mut errors = Errors::new();
 
     if let Err(es) = apply_graphviz(&ctx.media(), root).await {
-        errors.0.extend(es.0)
+        errors.extend(es)
     }
 
     if let Err(es) = relink_images(ctx, root) {
-        errors.0.extend(es.0)
+        errors.extend(es)
     }
 
     /*
@@ -106,8 +109,8 @@ pub async fn transform_markdown<'a>(
 pub fn relink_images<'a>(
     ctx: &'a TransformContext,
     root: &'a AstNode<'a>,
-) -> Result<(), MarkdownErrors> {
-    let mut errors = MarkdownErrors::default();
+) -> Result<(), Errors<MarkdownError>> {
+    let mut errors = Errors::new();
 
     for n in root.descendants() {
         let mut ast = n.data.borrow_mut();
@@ -122,16 +125,14 @@ pub fn relink_images<'a>(
                     Ok(())
                 };
                 if let Err(e) = f() {
-                    errors.0.push(MarkdownError::new(ast.sourcepos, e))
+                    errors.push(MarkdownError::new(ast.sourcepos, e))
                 }
             }
             _ => (),
         };
     }
 
-    if !errors.0.is_empty() {
-        return Err(errors);
-    }
+    errors.into_result()?;
 
     Ok(())
 }
@@ -140,8 +141,8 @@ pub fn relink_images<'a>(
 pub async fn apply_graphviz<'a>(
     media: &'a MediaRegistry,
     root: &'a AstNode<'a>,
-) -> Result<(), MarkdownErrors> {
-    let mut errors = MarkdownErrors::default();
+) -> Result<(), Errors<MarkdownError>> {
+    let mut errors = Errors::new();
 
     for n in root.descendants() {
         let cell = &n.data;
@@ -182,13 +183,11 @@ pub async fn apply_graphviz<'a>(
         .await;
 
         if let Err(e) = result {
-            errors.0.push(e);
+            errors.push(e);
         }
     }
 
-    if errors.0.is_empty() {
-        return Err(errors);
-    }
+    errors.into_result()?;
 
     Ok(())
 }
@@ -208,11 +207,6 @@ fn parse_graphviz_info(infostr: &str) -> Option<GraphvizInfo> {
     }
 }
 
-#[derive(Default, Debug)]
-pub struct MarkdownErrors(pub Vec<MarkdownError>);
-
-impl std::error::Error for MarkdownErrors {}
-
 #[derive(thiserror::Error, Debug)]
 pub struct MarkdownError {
     pos: Sourcepos,
@@ -222,15 +216,6 @@ pub struct MarkdownError {
 impl MarkdownError {
     pub fn new(pos: Sourcepos, kind: MarkdownErrorKind) -> Self {
         Self { pos, kind }
-    }
-}
-
-impl std::fmt::Display for MarkdownErrors {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for e in &self.0 {
-            writeln!(f, "{e}")?;
-        }
-        Ok(())
     }
 }
 

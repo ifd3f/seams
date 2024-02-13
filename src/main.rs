@@ -16,6 +16,7 @@ mod render;
 mod templates;
 mod transform;
 mod upload;
+mod errors;
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() {

@@ -9,17 +9,7 @@ use futures::{stream::FuturesOrdered, StreamExt};
 use tokio::{io::AsyncWriteExt, process::Command, time::Instant};
 use tracing::trace;
 
-#[derive(thiserror::Error, derive_more::From, Debug, Default)]
-pub struct KatexErrors(pub Vec<KatexError>);
-
-impl Display for KatexErrors {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for e in &self.0 {
-            writeln!(f, "- {e}")?;
-        }
-        Ok(())
-    }
-}
+use crate::errors::Errors;
 
 #[derive(Debug)]
 pub struct KatexError {
@@ -47,7 +37,7 @@ pub enum KatexErrorKind {
     CmdFailed(ExitStatus, String),
 }
 
-pub async fn transform_katex_str(s: &str) -> Result<String, KatexErrors> {
+pub async fn transform_katex_str(s: &str) -> Result<String, Errors<KatexError>> {
     let mut fu = find_katex(s)
         .into_iter()
         .map(|n| async move {
@@ -63,7 +53,7 @@ pub async fn transform_katex_str(s: &str) -> Result<String, KatexErrors> {
         })
         .collect::<FuturesOrdered<_>>();
 
-    let mut errs = vec![];
+    let mut errs = Errors::new();
     let mut out = "".to_string();
     while let Some(s) = fu.next().await {
         match s {
@@ -72,9 +62,8 @@ pub async fn transform_katex_str(s: &str) -> Result<String, KatexErrors> {
         }
     }
 
-    if !errs.is_empty() {
-        return Err(errs.into());
-    }
+    errs.into_result()?;
+
     Ok(out)
 }
 

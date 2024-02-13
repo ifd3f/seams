@@ -7,11 +7,13 @@ use tracing::trace;
 use vfs::{VfsError, VfsPath};
 
 use crate::{
+    errors::Errors,
     load::util::split_extension,
     media::MediaRegistry,
+    model::site_data::SiteDataUserError,
     transform::{
         common::TransformContext,
-        markdown::{transform_markdown, MarkdownErrors},
+        markdown::{transform_markdown, MarkdownError},
     },
 };
 
@@ -151,19 +153,27 @@ fn load_docs_in_dir<M: DeserializeOwned>(
 pub async fn fully_load_docdir<M: DeserializeOwned>(
     media: &MediaRegistry,
     path: VfsPath,
-) -> Result<Vec<Result<FullyLoadedDocument<M>, (VfsPath, LoadError)>>, VfsError> {
+) -> Result<Vec<Result<FullyLoadedDocument<M>, SiteDataUserError>>, VfsError> {
     let docs = load_docs_in_dir(path)?;
 
     let futures = docs
         .map(|d| async move {
             let d = match d {
                 Ok(d) => d,
-                Err((p, e)) => return Err((p, e.into())),
+                Err((p, e)) => {
+                    return Err(SiteDataUserError {
+                        path: p,
+                        error: e.into(),
+                    })
+                }
             };
             let content_path = d.content.path();
             match d.fully_load_content(media).await {
                 Ok(fld) => Ok(fld),
-                Err(e) => Err((content_path, e)),
+                Err(e) => Err(SiteDataUserError {
+                    path: content_path,
+                    error: e,
+                }),
             }
         })
         .collect::<FuturesUnordered<_>>();
@@ -190,7 +200,7 @@ impl<M> FullyLoadedDocument<M> {
 #[derive(thiserror::Error, Debug)]
 pub enum ContentTransformError {
     #[error("error: {0}")]
-    Markdown(#[from] MarkdownErrors),
+    Markdown(#[from] Errors<MarkdownError>),
 }
 
 impl<M> Document<M>
