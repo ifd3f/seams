@@ -4,6 +4,7 @@ use std::{
 };
 
 use itertools::Itertools;
+use nom::FindToken;
 use tokio::{io::AsyncWriteExt, process::Command, time::Instant};
 use tracing::trace;
 
@@ -53,121 +54,49 @@ pub async fn transform_katex(source: &str) -> Result<String, KatexError> {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum ParsedKatexable {
-    Text(String),
+pub enum Block {
+    Plain(String),
     BlockMath(String),
     InlineMath(String),
 }
 
-pub fn find_katex(s: &str) -> Vec<ParsedKatexable> {
-    use Token::*;
+pub fn find_katex(s: &str) -> Vec<Block> {
+    use Block::*;
+    let chars = s.chars().collect::<Vec<char>>();
+    let mut s = &chars[..];
+    let mut tokens = vec![];
+    let mut buf = String::new();
 
-    let chars: Vec<char> = s.chars().collect::<Vec<_>>();
-    let tokens = tokenize(&chars);
-    let mut pos = &tokens[..];
-    let mut out = vec![];
-
-    macro_rules! terminate_dollar {
-        ($cap:expr, $constructor:expr) => {
-            let rest = &pos[1..];
-            match rest.iter().position(|t| t == &$cap) {
-                Some(i) => {
-                    // Found the cap to terminate
-                    let between = &rest[..i];
-                    let after = &rest[i + 1..];
-                    out.push($constructor(between.iter().map(|t| t.to_string()).join("")));
-                    pos = after;
+    macro_rules! handle_delimiter {
+        ($end_delim:expr, $constructor:expr) => {
+            match find_end_of_block($end_delim, &s[$end_delim.len()..]) {
+                Some((block, rest)) => {
+                    if !buf.is_empty() {
+                        tokens.push(Plain(buf));
+                        buf = String::new();
+                    }
+                    tokens.push($constructor(block.iter().collect()));
+                    s = rest;
                 }
                 None => {
-                    // Did not find terminator, assume it's simple text
-                    out.push(ParsedKatexable::Text(format!(
-                        "{}{}",
-                        $cap,
-                        rest.iter().map(|t| t.to_string()).join("")
-                    )));
-                    break;
+                    // We encountered end of string before finding the end,
+                    // treat this as part of the outer text.
+                    buf.extend(s);
+                    if !buf.is_empty() {
+                        tokens.push(Plain(buf));
+                    }
+                    return tokens;
                 }
             }
         };
     }
 
     loop {
-        match pos {
-            [Text(t), ..] => {
-                out.push(ParsedKatexable::Text(t.clone()));
-                pos = &pos[1..];
-            }
-            &[SingleDollar, ..] => {
-                terminate_dollar!(SingleDollar, ParsedKatexable::InlineMath);
-            }
-            &[DoubleDollar, ..] => {
-                terminate_dollar!(DoubleDollar, ParsedKatexable::BlockMath);
-            }
-            &[] => break,
-        }
-    }
+        // Invariant: outside of the match, s is inside Plain
 
-    if out.len() <= 1 {
-        return out;
-    }
-
-    let mut pos = &out[..];
-    let mut out2 = vec![];
-    while let Some((n, rest)) = pos.split_first() {
-        match (n, rest.split_first()) {
-            Some((ParsedKatexable::Text(l), Some((ParsedKatexable::Text(r), rest)))) => {
-                out2.push(ParsedKatexable::Text(format!("{}{}", l, r)));
-                pos = rest;
-            }
-            _ => {
-                
-                pos = rest;
-            }
-        }
-    }
-    return out2;
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-enum Token {
-    SingleDollar,
-    DoubleDollar,
-    Text(String),
-}
-
-impl std::fmt::Display for Token {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Token::SingleDollar => write!(f, "$")?,
-            Token::DoubleDollar => write!(f, "$$")?,
-            Token::Text(t) => write!(f, "{t}")?,
-        }
-        Ok(())
-    }
-}
-
-fn tokenize(mut s: &[char]) -> Vec<Token> {
-    use Token::*;
-    let mut tokens = vec![];
-    let mut buf = String::new();
-    loop {
         match s {
-            &['$', '$', ..] => {
-                if !buf.is_empty() {
-                    tokens.push(Text(buf));
-                    buf = String::new();
-                }
-                tokens.push(DoubleDollar);
-                s = &s[2..];
-            }
-            &['$', ..] => {
-                if !buf.is_empty() {
-                    tokens.push(Text(buf));
-                    buf = String::new();
-                }
-                tokens.push(SingleDollar);
-                s = &s[1..];
-            }
+            &['$', '$', ..] => handle_delimiter!(&['$', '$'], BlockMath),
+            &['$', ..] => handle_delimiter!(&['$'], InlineMath),
             &['\\', '$', '$', ..] => {
                 buf.extend("$$".chars());
                 s = &s[3..];
@@ -182,7 +111,7 @@ fn tokenize(mut s: &[char]) -> Vec<Token> {
             }
             &[] => {
                 if !buf.is_empty() {
-                    tokens.push(Text(buf));
+                    tokens.push(Plain(buf));
                 }
                 return tokens;
             }
@@ -190,73 +119,102 @@ fn tokenize(mut s: &[char]) -> Vec<Token> {
     }
 }
 
-#[cfg(test)]
-mod test {
-    use super::ParsedKatexable::*;
-    use super::*;
-    use rstest::rstest;
-
-    mod token_test {
-        use super::Token;
-        use super::Token::*;
-        use rstest::rstest;
-
-        #[rstest]
-        #[case(
-            "foo $\\frac{1}{2}$",
-            vec![Text("foo ".into()), SingleDollar, Text("\\frac{1}{2}".into()), SingleDollar]
-        )]
-        #[case(
-            "foo $\\frac{1}{",
-            vec![Text("foo ".into()), SingleDollar, Text("\\frac{1}{".into())]
-        )]
-        #[case(
-            "foo $$\\frac{1}{",
-            vec![Text("foo ".into()), DoubleDollar, Text("\\frac{1}{".into())]
-        )]
-        #[case(
-            "foo $$\\frac{1}{2}$$ foo",
-            vec![
-                Text("foo ".into()),
-                DoubleDollar,
-                Text("\\frac{1}{2}".into()),
-                DoubleDollar,
-                Text(" foo".into())
-            ]
-        )]
-        #[case(
-            "foo \\$$\\frac{1}{",
-            vec![Text("foo $$\\frac{1}{".into())]
-        )]
-        fn test_tokenize(#[case] input: &str, #[case] expected: Vec<Token>) {
-            let chars: Vec<char> = input.chars().collect::<Vec<_>>();
-            let actual = crate::transform::katex::tokenize(&chars);
-            assert_eq!(actual, expected);
+/// Returns (text before delim, text after delim)
+fn find_end_of_block<'a>(
+    end_delim: &'a [char],
+    text: &'a [char],
+) -> Option<(&'a [char], &'a [char])> {
+    let mut i = 0usize;
+    while i < text.len() {
+        if text[i..].starts_with(&['\\']) {
+            // If we find a backslash, treat it as part of the text,
+            // whether or not it is followed by end_delim.
+            //
+            // Examples of fully-formed math blocks:
+            // $ \frac{1}{2} $
+            // $ \$1 $
+            // $ \$$
+            i += 1 + end_delim.len();
+            continue;
+        } else if text[i..].starts_with(end_delim) {
+            // Found the delimiter
+            return Some((&text[..i], &text[i + end_delim.len()..]));
+        } else {
+            i += 1;
         }
     }
+    None
+}
+
+#[cfg(test)]
+mod test {
+    use super::Block::*;
+    use super::*;
+    use rstest::rstest;
 
     #[rstest]
     #[case(
         "foo $\\frac{1}{2}$",
-        vec![Text("foo ".into()), InlineMath("\\frac{1}{2}".into())]
+        vec![
+            Plain("foo ".into()),
+            InlineMath("\\frac{1}{2}".into())
+        ]
     )]
     #[case(
         "foo $\\frac{1}{",
-        vec![Text("foo $\\frac{1}{".into())]
+        vec![Plain("foo $\\frac{1}{".into())]
     )]
     #[case(
         "foo $$\\frac{1}{",
-        vec![Text("foo $$\\frac{1}{".into())]
+        vec![Plain("foo $$\\frac{1}{".into())]
     )]
     #[case(
         "foo $$\\frac{1}{2}$$ foo",
-        vec![Text("foo ".into()), BlockMath("\\frac{1}{2}".into()), Text(" foo".into())]
+        vec![
+            Plain("foo ".into()),
+            BlockMath("\\frac{1}{2}".into()),
+            Plain(" foo".into())
+        ]
     )]
     #[case(
         "foo \\$$\\frac{1}{",
-        vec![Text("foo $$\\frac{1}{".into())]
+        vec![Plain("foo $$\\frac{1}{".into())]
     )]
-    fn test_find_katex(#[case] input: &str, #[case] expected: Vec<ParsedKatexable>) {
+    #[case(
+        "i got $10 in my bank account",
+        vec![
+            Plain("i got $10 in my bank account".into()),
+        ]
+    )]
+    #[case(
+        "i got \\$10 in my bank account and $ \\$20 $ in my pocket",
+        vec![
+            Plain("i got $10 in my bank account and ".into()),
+            InlineMath(" \\$20 ".into()),
+            Plain(" in my pocket".into()),
+        ]
+    )]
+    #[case(
+        "$$ $ $$",
+        vec![
+            BlockMath(" $ ".into()),
+        ]
+    )]
+    #[case(
+        "$ $$$$$",
+        vec![
+            InlineMath(" ".into()),
+            BlockMath("".into()),
+        ]
+    )]
+    #[case(
+        "$ $$$",
+        vec![
+            InlineMath(" ".into()),
+            Plain("$$".into()),
+        ]
+    )]
+    fn test_find_katex(#[case] input: &str, #[case] expected: Vec<Block>) {
         let actual = find_katex(input);
         assert_eq!(actual, expected);
     }
