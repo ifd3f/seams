@@ -1,13 +1,42 @@
 use std::{
+    error::Error,
+    fmt::Display,
     process::{ExitStatus, Stdio},
     str::Utf8Error,
 };
 
+use futures::{stream::FuturesOrdered, StreamExt};
 use tokio::{io::AsyncWriteExt, process::Command, time::Instant};
 use tracing::trace;
 
+#[derive(thiserror::Error, derive_more::From, Debug, Default)]
+pub struct KatexErrors(pub Vec<KatexError>);
+
+impl Display for KatexErrors {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for e in &self.0 {
+            writeln!(f, "- {e}")?;
+        }
+        Ok(())
+    }
+}
+
+#[derive(Debug)]
+pub struct KatexError {
+    pub source: String,
+    pub kind: KatexErrorKind,
+}
+
+impl Display for KatexError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "Error parsing {:?}:\n  {}", self.source, self.kind)
+    }
+}
+
+impl Error for KatexError {}
+
 #[derive(thiserror::Error, Debug)]
-pub enum KatexError {
+pub enum KatexErrorKind {
     #[error("I/O error: {0}")]
     IO(#[from] std::io::Error),
 
@@ -18,14 +47,49 @@ pub enum KatexError {
     CmdFailed(ExitStatus, String),
 }
 
+pub async fn transform_katex_str(s: &str) -> Result<String, KatexErrors> {
+    let mut fu = find_katex(s)
+        .into_iter()
+        .map(|n| async move {
+            match &n {
+                Block::Plain(t) => Ok(t.to_owned()),
+                Block::BlockMath(m) => transform_math(m, true).await,
+                Block::InlineMath(m) => transform_math(m, false).await,
+            }
+            .map_err(|k| KatexError {
+                source: n.inner().to_owned(),
+                kind: k,
+            })
+        })
+        .collect::<FuturesOrdered<_>>();
+
+    let mut errs = vec![];
+    let mut out = "".to_string();
+    while let Some(s) = fu.next().await {
+        match s {
+            Ok(s) => out.extend(s.chars()),
+            Err(e) => errs.push(e),
+        }
+    }
+
+    if !errs.is_empty() {
+        return Err(errs.into());
+    }
+    Ok(out)
+}
+
 #[tracing::instrument(skip_all)]
-pub async fn transform_katex(source: &str) -> Result<String, KatexError> {
+async fn transform_math(source: &str, display_mode: bool) -> Result<String, KatexErrorKind> {
     let mut cmd = Command::new("katex");
     cmd.arg("--trust")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .kill_on_drop(true);
+    if display_mode {
+        cmd.arg("--display");
+    }
+
     trace!(?cmd, "executing katex");
 
     let start = Instant::now();
@@ -45,7 +109,7 @@ pub async fn transform_katex(source: &str) -> Result<String, KatexError> {
     let log = String::from_utf8_lossy(&result.stderr);
 
     if !status.success() {
-        return Err(KatexError::CmdFailed(status, log.into()));
+        return Err(KatexErrorKind::CmdFailed(status, log.into()));
     }
 
     Ok(svg)
@@ -56,6 +120,16 @@ pub enum Block {
     Plain(String),
     BlockMath(String),
     InlineMath(String),
+}
+
+impl Block {
+    fn inner(&self) -> &str {
+        match self {
+            Block::Plain(s) => s,
+            Block::BlockMath(s) => s,
+            Block::InlineMath(s) => s,
+        }
+    }
 }
 
 pub fn find_katex(s: &str) -> Vec<Block> {
