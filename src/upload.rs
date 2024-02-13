@@ -1,6 +1,6 @@
 use s3::{creds::Credentials, Bucket, Region};
 use sha2::{Digest, Sha256};
-use tracing::{debug, debug_span, info};
+use tracing::{debug, debug_span};
 
 use crate::media::Uploadable;
 

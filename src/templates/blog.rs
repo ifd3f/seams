@@ -6,7 +6,7 @@ use crate::{
         metadata::{Post, PostDates},
         site_data::TagMap,
     },
-    templates::util::{format_dt_html, tag_list, EmDash},
+    templates::util::{format_dt_html, tag_list},
 };
 
 use super::{util::format_dt, Base, NavbarItem};

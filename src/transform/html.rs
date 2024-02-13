@@ -1,5 +1,3 @@
-use html_parser::Dom;
-
 /*
 pub fn process_html(html: &str) -> anyhow::Result<String> {
     let mut dom = Dom::parse(html)?;

@@ -1,4 +1,4 @@
-use palette::{convert::TryIntoColor, Hsl, Hsv, Srgb};
+use palette::{convert::TryIntoColor, Hsl, Srgb};
 use rand::{Rng, SeedableRng};
 
 pub type ColorRng = rand_chacha::ChaCha8Rng;
