@@ -8,6 +8,7 @@ use upload::upload_to_s3;
 
 mod cli;
 mod date_sort;
+mod errors;
 mod load;
 mod media;
 mod model;
@@ -16,7 +17,6 @@ mod render;
 mod templates;
 mod transform;
 mod upload;
-mod errors;
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() {

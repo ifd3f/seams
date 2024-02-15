@@ -33,7 +33,7 @@ impl<E> Errors<E> {
     }
 
     /// Converts this into a Result based on its contents.
-    /// 
+    ///
     /// If this is not empty, converts this into an [Err]. Otherwise,
     /// converts into an [Ok].
     pub fn into_result(self) -> Result<(), Self> {

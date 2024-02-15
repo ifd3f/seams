@@ -5,6 +5,7 @@ use std::{
     str::Utf8Error,
 };
 
+use comrak::nodes::NodeValue;
 use futures::{stream::FuturesOrdered, StreamExt};
 use tokio::{io::AsyncWriteExt, process::Command, time::Instant};
 use tracing::trace;
@@ -37,34 +38,38 @@ pub enum KatexErrorKind {
     CmdFailed(ExitStatus, String),
 }
 
-pub async fn transform_katex_str(s: &str) -> Result<String, Errors<KatexError>> {
-    let mut fu = find_katex(s)
+pub async fn transform_text_katex_nodes<'a>(
+    text: &'a str,
+) -> Result<Vec<NodeValue>, Errors<KatexError>> {
+    let mut fu = find_katex(&text)
         .into_iter()
-        .map(|n| async move {
-            match &n {
-                Block::Plain(t) => Ok(t.to_owned()),
-                Block::BlockMath(m) => transform_math(m, true).await,
-                Block::InlineMath(m) => transform_math(m, false).await,
-            }
-            .map_err(|k| KatexError {
-                source: n.inner().to_owned(),
-                kind: k,
+        .map(|b| async {
+            Ok(match b {
+                Block::Plain(t) => NodeValue::Text(t.to_owned()),
+                Block::BlockMath(m) => NodeValue::HtmlInline(
+                    transform_math(&m, true)
+                        .await
+                        .map_err(|e| KatexError { source: m, kind: e })?,
+                ),
+                Block::InlineMath(m) => NodeValue::HtmlInline(
+                    transform_math(&m, false)
+                        .await
+                        .map_err(|e| KatexError { source: m, kind: e })?,
+                ),
             })
         })
         .collect::<FuturesOrdered<_>>();
 
-    let mut errs = Errors::new();
-    let mut out = "".to_string();
-    while let Some(s) = fu.next().await {
-        match s {
-            Ok(s) => out.extend(s.chars()),
-            Err(e) => errs.push(e),
+    let mut result = vec![];
+    let mut errors = Errors::new();
+    while let Some(n) = fu.next().await {
+        match n {
+            Ok(n) => result.push(n),
+            Err(e) => errors.push(e),
         }
     }
-
-    errs.into_result()?;
-
-    Ok(out)
+    errors.into_result()?;
+    Ok(result)
 }
 
 #[tracing::instrument(skip_all)]
@@ -76,14 +81,14 @@ pub async fn transform_math(source: &str, display_mode: bool) -> Result<String, 
         .stderr(Stdio::piped())
         .kill_on_drop(true);
     if display_mode {
-        cmd.arg("--display");
+        cmd.arg("--display-mode");
     }
 
-    trace!(?cmd, "executing katex");
+    trace!(?cmd, ?source, "executing katex");
 
     let start = Instant::now();
     let mut proc = cmd.spawn()?;
-    trace!(%source, "writing source code");
+    trace!(?source, "writing source code");
     let mut stdin = proc.stdin.take().unwrap();
     stdin.write(source.as_bytes()).await?;
     drop(stdin);
@@ -109,16 +114,6 @@ pub enum Block {
     Plain(String),
     BlockMath(String),
     InlineMath(String),
-}
-
-impl Block {
-    fn inner(&self) -> &str {
-        match self {
-            Block::Plain(s) => s,
-            Block::BlockMath(s) => s,
-            Block::InlineMath(s) => s,
-        }
-    }
 }
 
 pub fn find_katex(s: &str) -> Vec<Block> {
