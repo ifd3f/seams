@@ -1,15 +1,21 @@
-use std::io::BufWriter;
+use std::{
+    borrow::{Borrow, BorrowMut},
+    cell::RefCell,
+    io::BufWriter,
+};
 
 use comrak::{
+    arena_tree::Node,
     format_html_with_plugins,
-    nodes::{AstNode, NodeLink, NodeValue, Sourcepos},
+    nodes::{Ast, AstNode, LineColumn, NodeLink, NodeValue, Sourcepos},
     parse_document,
     plugins::syntect::SyntectAdapter,
     Arena, PluginsBuilder, RenderPluginsBuilder,
 };
-use futures::TryFutureExt;
+use futures::{stream::FuturesOrdered, StreamExt, TryFutureExt};
 
 use htmlentity::entity::EncodeType;
+use itertools::Itertools;
 use vfs::VfsError;
 
 use crate::{
@@ -20,6 +26,7 @@ use crate::{
 use super::{
     common::TransformContext,
     graphviz::{transform_graphviz, GraphvizError},
+    katex::{find_katex, transform_katex_str, transform_math, Block, KatexError},
 };
 
 pub fn make_md_options() -> comrak::Options {
@@ -94,6 +101,7 @@ pub async fn transform_markdown<'a>(
         */
     let mut bw = BufWriter::new(Vec::new());
     format_html_with_plugins(root, &md_options, &mut bw, &plugins).unwrap();
+    apply_katex(&mut arena, root);
 
     let raw = &bw.into_inner().unwrap();
     let entity_escaped = htmlentity::entity::encode(
@@ -205,6 +213,60 @@ fn parse_graphviz_info(infostr: &str) -> Option<GraphvizInfo> {
     } else {
         None
     }
+}
+
+#[tracing::instrument(skip_all)]
+pub async fn apply_katex<'a>(
+    arena: &'a mut Arena<AstNode<'a>>,
+    node: &'a AstNode<'a>,
+) -> Result<(), Errors<KatexError>> {
+    let mut to_visit = node.children().collect_vec();
+
+    while let Some(n) = to_visit.pop() {
+        for c in n.children() {
+            let nv = c.data.borrow().value.clone();
+            let bmut = c.data.borrow_mut();
+            match nv {
+                NodeValue::Text(t) => {
+                    for new in transform_text_katex_nodes(&t).await? {
+                        let node = AstNode::new(RefCell::new(Ast::new(new, bmut.sourcepos.start)));
+                        let arenaval = arena.alloc(node);
+                        c.insert_before(arenaval);
+                    }
+                    c.detach();
+                }
+                _ => to_visit.push(c),
+            }
+        }
+    }
+
+    Ok(())
+}
+
+async fn transform_text_katex_nodes<'a>(
+    text: &'a str,
+) -> Result<Vec<NodeValue>, Errors<KatexError>> {
+    let fu = find_katex(&text)
+        .into_iter()
+        .map(|b| async {
+            Ok(match b {
+                Block::Plain(t) => NodeValue::Text(t.to_owned()),
+                Block::BlockMath(m) => NodeValue::HtmlInline(transform_math(&m, true).await?),
+                Block::InlineMath(m) => NodeValue::HtmlInline(transform_math(&m, false).await?),
+            })
+        })
+        .collect::<FuturesOrdered<_>>();
+
+    let mut result = vec![];
+    let mut errors = Errors::new();
+    while let Some(n) = fu.next().await {
+        match n {
+            Ok(n) => result.push(n),
+            Err(e) => errors.push(e),
+        }
+    }
+    errors.into_result()?;
+    Ok(result)
 }
 
 #[derive(thiserror::Error, Debug)]

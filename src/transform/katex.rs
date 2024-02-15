@@ -68,7 +68,7 @@ pub async fn transform_katex_str(s: &str) -> Result<String, Errors<KatexError>> 
 }
 
 #[tracing::instrument(skip_all)]
-async fn transform_math(source: &str, display_mode: bool) -> Result<String, KatexErrorKind> {
+pub async fn transform_math(source: &str, display_mode: bool) -> Result<String, KatexErrorKind> {
     let mut cmd = Command::new("katex");
     cmd.arg("--trust")
         .stdin(Stdio::piped())
