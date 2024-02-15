@@ -11,6 +11,10 @@ impl<E> Errors<E> {
         Self { errors: vec![] }
     }
 
+    pub fn empty() -> Self {
+        Self { errors: vec![] }
+    }
+
     pub fn iter(&self) -> impl IntoIterator<Item = &E> {
         self.errors.iter()
     }
