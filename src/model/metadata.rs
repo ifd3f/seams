@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     date_sort::DateSort,
-    random_coloring::{ColorProfileExt, PASTEL},
+    random_coloring::{ColorProfile, ColorProfileExt, PASTEL},
 };
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -55,8 +55,8 @@ impl Post {
         )
     }
 
-    pub fn css_color(&self) -> String {
-        extract_color(self.color.clone(), &self.slug)
+    pub fn css_color(&self, profile: impl ColorProfile) -> Color {
+        extract_color(self.color.clone(), profile, &self.slug)
     }
 }
 
@@ -101,6 +101,9 @@ pub struct Project {
 
     /// Accent color. If null, it will be randomly picked based on the slug.
     pub color: Option<Color>,
+
+    /// A URL to the image that represents the project
+    pub thumbnail: Option<String>,
 }
 
 impl Project {
@@ -108,8 +111,8 @@ impl Project {
         format!("/projects/{}", self.slug)
     }
 
-    pub fn css_color(&self) -> String {
-        extract_color(self.color.clone(), &self.slug)
+    pub fn css_color(&self, profile: impl ColorProfile) -> Color {
+        extract_color(self.color.clone(), profile, &self.slug)
     }
 }
 
@@ -144,10 +147,10 @@ impl ProjectDates {
     }
 }
 
-fn extract_color(color: Option<Color>, slug: &str) -> String {
+fn extract_color(color: Option<Color>, profile: impl ColorProfile, slug: &str) -> Color {
     if let Some(c) = color {
-        return c.to_hex_string();
+        return c;
     }
-    let color = PASTEL.for_text(slug);
-    Color::from((color.red, color.green, color.blue)).to_hex_string()
+    let color = profile.for_text(slug);
+    Color::from((color.red, color.green, color.blue))
 }

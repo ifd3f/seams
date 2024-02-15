@@ -1,12 +1,10 @@
 use maud::{html, Markup, PreEscaped, Render};
 
 use crate::{
-    load::document::FullyLoadedDocument,
-    model::{
+    load::document::FullyLoadedDocument, model::{
         metadata::{Post, PostDates},
         site_data::TagMap,
-    },
-    templates::util::{format_dt_html, tag_list},
+    }, random_coloring::PASTEL, templates::util::{format_dt_html, tag_list}
 };
 
 use super::{util::format_dt, Base, NavbarItem};
@@ -80,7 +78,7 @@ impl<'a> RenderPost<'a> {
         let meta = self.post.meta();
 
         html! {
-            nav .tile style=(format!("background-color: {}", meta.css_color())) {
+            nav .tile style=(format!("background-color: {}", meta.css_color(PASTEL).to_hex_string())) {
                 header {
                     h2 { (self.linked_title()) }
                     (self.tagline())

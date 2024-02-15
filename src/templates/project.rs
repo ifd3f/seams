@@ -1,12 +1,10 @@
 use maud::{html, Markup, PreEscaped, Render};
 
 use crate::{
-    load::document::FullyLoadedDocument,
-    model::{
+    load::document::FullyLoadedDocument, model::{
         metadata::{Project, ProjectDates},
         site_data::TagMap,
-    },
-    templates::util::tag_list,
+    }, random_coloring::{PASTEL, TINT}, templates::util::tag_list
 };
 
 use super::{util::format_project_date, Base, NavbarItem};
@@ -54,8 +52,15 @@ pub struct RenderProject<'a> {
 
 impl<'a> RenderProject<'a> {
     pub fn tile(&self, tags: &TagMap) -> Markup {
+        let color = self.project.meta().css_color(TINT);
+        let style = if let Some(url) = &self.project.meta().thumbnail {
+            let rgba = format!("rgba({}, {}, {}, 0.1)", color.r, color.g, color.b,);
+            format!(r#"background-image: linear-gradient({rgba}, {rgba}), url("{url}")"#,)
+        } else {
+            format!("background-color: {}", color.to_hex_string())
+        };
         html! {
-            nav .tile style=(format!("background-color: {}", self.project.meta().css_color())) {
+            nav .tile style=(style) {
                 header {
                     h2 .title {
                         a href=(self.project.meta().href()) { (self.project.meta().title) }
