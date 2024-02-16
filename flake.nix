@@ -43,6 +43,8 @@
           inherit styles seams;
           default = seams;
           test-site = makeSite "test-site" ./test_data/contentdir_example;
+          astrid-dot-tech-test-site = makeSite "astrid-dot-tech-test-site"
+            ./test_data/astrid_dot_tech_example;
         };
         devShells.default = with pkgs;
           mkShell {
@@ -57,8 +59,11 @@
               openssl
               pkg-config
               python
+              iconv
             ] ++ buildPrograms
-              ++ lib.optional (system != "aarch64-darwin") [ backblaze-b2 ];
+              ++ lib.optional (system != "aarch64-darwin") [ backblaze-b2 ]
+              ++ lib.optional (system == "aarch64-darwin")
+              [ darwin.apple_sdk.frameworks.SystemConfiguration ];
             RUST_SRC_PATH = rustPlatform.rustLibSrc;
           };
       });
