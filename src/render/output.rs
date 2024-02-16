@@ -110,9 +110,15 @@ fn write_file(path: &VfsPath, r: &[u8]) -> Result<(), VfsError> {
 }
 
 fn write_markup(path: &VfsPath, r: impl Render) -> Result<(), VfsError> {
+    let rendered = r.render().into_string();
+    let entity_escaped = htmlentity::entity::encode(
+        &rendered.as_bytes(),
+        &htmlentity::entity::EncodeType::NamedOrHex,
+        &htmlentity::entity::CharacterSet::NonASCII,
+    );
     write_file(
         &path.join("index.html")?,
-        r.render().into_string().as_bytes(),
+        &entity_escaped.into_bytes()
     )?;
     Ok(())
 }
