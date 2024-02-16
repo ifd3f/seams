@@ -97,6 +97,8 @@ pub fn write_static_site(sd: &SiteData, outdir: VfsPath) -> anyhow::Result<()> {
         )?;
     }
 
+    outdir.join(".nojekyll")?.create_file()?;
+
     Ok(())
 }
 

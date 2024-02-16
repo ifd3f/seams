@@ -31,6 +31,8 @@
         makeSite = name: content:
           with pkgs;
           runCommand name { buildInputs = [ seams ]; } ''
+            shopt -s dotglob
+
             mkdir -p $out
             seams build ${content} -o $out
             cp -r ${styles}/* $out/
