@@ -116,9 +116,6 @@ fn write_markup(path: &VfsPath, r: impl Render) -> Result<(), VfsError> {
         &htmlentity::entity::EncodeType::NamedOrHex,
         &htmlentity::entity::CharacterSet::NonASCII,
     );
-    write_file(
-        &path.join("index.html")?,
-        &entity_escaped.into_bytes()
-    )?;
+    write_file(&path.join("index.html")?, &entity_escaped.into_bytes())?;
     Ok(())
 }

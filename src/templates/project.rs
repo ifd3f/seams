@@ -89,6 +89,22 @@ impl<'a> RenderProject<'a> {
                     (self.tagline())
                     p .date { (self.date()) }
                     p { (tag_list(tags, &self.project.meta().tags)) }
+                    @if self.project.meta().url.site.len() > 0 {
+                        p { "Site: " }
+                        ul {
+                            @for link in &self.project.meta().url.site {
+                                li { a href=(link) { (link) } }
+                            }
+                        }
+                    }
+                    @if self.project.meta().url.source.len() > 0 {
+                        p { "Source: " }
+                        ul {
+                            @for link in &self.project.meta().url.source {
+                                li { a href=(link) { (link) } }
+                            }
+                        }
+                    }
                 }
 
                 (PreEscaped(&self.project.transformed.html))

@@ -99,8 +99,26 @@ pub struct Project {
     /// Dates associated with the project.
     pub date: ProjectDates,
 
+    /// URLs associated with the project.
+    pub url: ProjectUrls,
+
     /// Accent color. If null, it will be randomly picked based on the slug.
     pub color: Option<Color>,
+}
+
+#[derive(Serialize, Deserialize, Default)]
+pub struct ProjectUrls {
+    #[serde(
+        default,
+        deserialize_with = "crate::model::util::permissive_vec::deserialize"
+    )]
+    pub site: Vec<String>,
+
+    #[serde(
+        default,
+        deserialize_with = "crate::model::util::permissive_vec::deserialize"
+    )]
+    pub source: Vec<String>,
 }
 
 impl Project {
