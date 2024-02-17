@@ -6,7 +6,7 @@ use std::{
 
 use comrak::{
     format_html_with_plugins,
-    nodes::{Ast, AstNode, LineColumn, NodeLink, NodeValue, Sourcepos},
+    nodes::{Ast, AstNode, LineColumn, NodeHtmlBlock, NodeLink, NodeValue, Sourcepos},
     parse_document,
     plugins::syntect::SyntectAdapter,
     Arena, PluginsBuilder, RenderPluginsBuilder,
@@ -16,6 +16,7 @@ use futures::{StreamExt, TryFutureExt};
 use htmlentity::entity::EncodeType;
 use itertools::Itertools;
 
+use tracing::trace;
 use vfs::VfsError;
 
 use crate::{
@@ -91,6 +92,8 @@ pub async fn transform_markdown<'a>(
             })
             .collect::<Errors<MarkdownError>>()
     })?;
+
+    transform_image_to_picture(root);
 
     let mut bw = BufWriter::new(Vec::new());
     format_html_with_plugins(root, &md_options, &mut bw, &plugins).unwrap();
@@ -233,6 +236,35 @@ pub async fn apply_katex<'a>(
     }
 
     Ok(())
+}
+
+#[tracing::instrument(skip_all)]
+pub fn transform_image_to_picture<'a>(root: &'a AstNode<'a>) {
+    use maud::html;
+
+    let mut to_visit = root.children().collect_vec();
+    while let Some(n) = to_visit.pop() {
+        let mut cell = n.data.borrow_mut();
+
+        trace!(?cell, "visiting");
+
+        match &cell.value {
+            NodeValue::Image(l) => {
+                let markup = html! {
+                    div {
+                        a href=(l.url) {
+                            img src=(l.url); // title=(l.title);
+                        }
+                    }
+                };
+                cell.value = NodeValue::HtmlBlock(NodeHtmlBlock {
+                    block_type: 0,
+                    literal: markup.into_string(),
+                });
+            }
+            _ => to_visit.extend(n.children()),
+        };
+    }
 }
 
 #[derive(thiserror::Error, Debug)]
