@@ -11,9 +11,8 @@ use comrak::{
     plugins::syntect::SyntectAdapter,
     Arena, PluginsBuilder, RenderPluginsBuilder,
 };
-use futures::{StreamExt, TryFutureExt};
+use futures::TryFutureExt;
 
-use htmlentity::entity::EncodeType;
 use itertools::Itertools;
 
 use tracing::trace;
@@ -48,6 +47,8 @@ pub fn make_md_options() -> comrak::Options {
 }
 
 /// Transform markdown into HTML. May be computationally expensive.
+///
+/// Returns HTML containing unicode.
 #[tracing::instrument(skip_all)]
 pub async fn transform_markdown<'a>(
     ctx: &'a TransformContext<'a>,
@@ -95,15 +96,9 @@ pub async fn transform_markdown<'a>(
 
     transform_image_to_picture(root);
 
-    let mut bw = BufWriter::new(Vec::new());
+    let mut bw = Vec::new();
     format_html_with_plugins(root, &md_options, &mut bw, &plugins).unwrap();
-    let raw = &bw.into_inner().unwrap();
-    let entity_escaped = htmlentity::entity::encode(
-        &raw,
-        &EncodeType::NamedOrHex,
-        &htmlentity::entity::CharacterSet::NonASCII,
-    );
-    Ok(String::from_utf8(entity_escaped.into_bytes()).unwrap())
+    Ok(String::from_utf8(bw).unwrap())
 }
 
 /// Transform links in images into what they should be, and upload them.
@@ -117,7 +112,7 @@ pub fn relink_images<'a>(
     for n in root.descendants() {
         let mut ast = n.data.borrow_mut();
         match &mut ast.value {
-            NodeValue::Image(link) if link.url.starts_with("./") => {
+            NodeValue::Image(link) if link.url.trim().starts_with("./") => {
                 let mut f = move || {
                     let image = ctx.content_root().join(&link.url)?;
                     link.url = ctx
@@ -250,10 +245,26 @@ pub fn transform_image_to_picture<'a>(root: &'a AstNode<'a>) {
 
         match &cell.value {
             NodeValue::Image(l) => {
+                // Collect alt texts together
+                let mut alt = String::new();
+                // skip this image node
+                for c in n.descendants().skip(1) {
+                    if let NodeValue::Text(t) = &c.data.borrow().value {
+                        alt.extend(t.chars());
+                    }
+                }
+
                 let markup = html! {
-                    div {
-                        a href=(l.url) {
-                            img src=(l.url); // title=(l.title);
+                    figure {
+                        picture {
+                            a href=(l.url) {
+                                img src=(l.url) alt=(alt);
+                            }
+                        }
+                        @if l.title.len() > 0 {
+                            figcaption {
+                                (l.title)
+                            }
                         }
                     }
                 };
@@ -261,6 +272,11 @@ pub fn transform_image_to_picture<'a>(root: &'a AstNode<'a>) {
                     block_type: 0,
                     literal: markup.into_string(),
                 });
+
+                // Remove all children of this node
+                for c in n.children() {
+                    c.detach()
+                }
             }
             _ => to_visit.extend(n.children()),
         };
@@ -299,4 +315,34 @@ pub enum MarkdownErrorKind {
 
     #[error("katex error: {0}")]
     Katex(#[from] KatexError),
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    pub fn transform_image_to_picture_does_not_duplicate_title() {
+        let mut arena = Arena::new();
+        let md = r#"![my title](./some.jpg)"#;
+        let options = make_md_options();
+        let root = parse_document(&mut arena, md, &options);
+
+        eprintln!("BEFORE TRANFORM: {root:#?}");
+        transform_image_to_picture(root);
+        eprintln!("AFTER TRANFORM: {root:#?}");
+
+        let mut html = vec![];
+        format_html_with_plugins(root, &options, &mut html, &comrak::Plugins::default()).unwrap();
+        let html = String::from_utf8_lossy(&html);
+
+        // root.descendants().contains(|n| match n)
+        assert!(
+            html.match_indices("my title").count() == 1,
+            "HTML does not contain exactly one occurrence of the title.\nFull html: {}",
+            html
+        );
+
+        todo!()
+    }
 }
