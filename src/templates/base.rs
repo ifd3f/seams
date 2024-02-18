@@ -15,6 +15,7 @@ impl Render for Base {
                 head {
                     title { (self.title) }
                     link rel="stylesheet" type="text/css" href="/styles.css";
+                    script type="text/javascript" src="/bundle.js" {}
                 }
                 body {
                     (self.navbar)

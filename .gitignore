@@ -7,3 +7,5 @@ result-styles
 out/
 out-html/
 .direnv
+node_modules
+out-scripts

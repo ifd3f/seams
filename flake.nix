@@ -62,6 +62,8 @@
               pkg-config
               python
               iconv
+              nodePackages.npm
+              nodejs_21
             ] ++ buildPrograms
               ++ lib.optional (system != "aarch64-darwin") [ backblaze-b2 ]
               ++ lib.optional (system == "aarch64-darwin")
