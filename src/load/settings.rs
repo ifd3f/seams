@@ -6,6 +6,9 @@ use vfs::VfsPath;
 use super::util::split_extension;
 
 /// Recursively load all documents in directory.
+///
+/// This will match files matching this glob:
+/// - *.<sub_extension>.yml
 #[tracing::instrument(skip_all, fields(path = path.as_str(), ?sub_extension))]
 pub fn load_settings_in_dir<S: DeserializeOwned + Monoid>(
     path: VfsPath,

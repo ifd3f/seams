@@ -14,6 +14,7 @@ use crate::{
 };
 
 use super::{
+    button88x31::Button88x31,
     metadata::{Post, Project},
     news::NewsItem,
     tag::{TagSettings, TagSettingsSheet},
@@ -26,6 +27,7 @@ pub struct SiteData {
     pub projects: Vec<FullyLoadedDocument<Project>>,
     pub tags: TagMap,
     pub news: Vec<NewsItem>,
+    pub buttons: Vec<Button88x31>,
 }
 
 #[derive(Default, Clone)]
@@ -82,6 +84,11 @@ impl SiteData {
                 Ok(r) => (Some(r), None),
                 Err(e) => (None, Some(e)),
             };
+        let (buttons, buttons_failure) =
+            match load_settings_in_dir::<Vec<Button88x31>>(path.join("settings")?, "88x31") {
+                Ok(r) => (Some(r), None),
+                Err(e) => (None, Some(e)),
+            };
 
         let mut load_errors: Errors<SiteDataUserError> = Default::default();
         load_errors.extend(post_failures);
@@ -93,6 +100,12 @@ impl SiteData {
             });
         }
         if let Some(e) = news_failure {
+            load_errors.push(SiteDataUserError {
+                path: path.join("settings")?,
+                error: LoadError::SettingsError(e),
+            });
+        }
+        if let Some(e) = buttons_failure {
             load_errors.push(SiteDataUserError {
                 path: path.join("settings")?,
                 error: LoadError::SettingsError(e),
@@ -116,6 +129,7 @@ impl SiteData {
         let mut news = news.unwrap();
         news.sort();
         news.reverse();
+        let buttons = buttons.unwrap();
 
         trace!(?tags, "finished loading");
 
@@ -124,6 +138,7 @@ impl SiteData {
             projects,
             tags,
             news,
+            buttons,
         })
     }
 
