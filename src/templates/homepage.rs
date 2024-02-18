@@ -15,10 +15,16 @@ impl BaseTemplatePage for Homepage {
     fn render_page(&self, sd: &SiteData, _si: &SiteIndex) -> (PageMeta, Markup) {
         let content = html! {
             main .homepage .container {
+                div style="text-align: center" {
+                    img
+                        src="https://s3.us-west-000.backblazeb2.com/nyaabucket/0aaa02e26cd9aee680f4ac3a2dc2f9c9e6792cdebcfc6d93255104e033de4654/under-construction.gif"
+                        alt="under construction banner"
+                        title="we are UNDER CONSTRUCTION!!!";
+                }
                 h1 { "welcome to the site" }
                 p { "please enjoy the site" }
-                cat-chatbox { }
                 (news_box(&sd.news))
+                cat-chatbox { }
                 (buttons(&sd.buttons))
             }
         };
