@@ -34,7 +34,7 @@ modded vibrator.
 
 ## Motivation
 
-My vibrator wand was a cheapo \$20 one from eBay. However, it ran on a tiny
+My vibrator wand was a cheapo $20 one from eBay. However, it ran on a tiny
 battery, and it was getting a bit weak for my purposes. Additionally, it somehow
 ended up in the laundry and got waterlogged. I had to disassemble it to let it
 dry, and that was when I thought "well why not just put an Arduino in here?

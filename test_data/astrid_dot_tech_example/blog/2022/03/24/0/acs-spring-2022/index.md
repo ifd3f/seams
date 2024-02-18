@@ -134,7 +134,7 @@ afternoon.
 
 However, I did go to the Expo in Exhibit Hall A, where all the industry folks
 came down to advertise their super high-tech chemical hardware. This included
-the \$10,000 personal DNA printer, delta robot auto-pipetters, NMR machines,
+the $10,000 personal DNA printer, delta robot auto-pipetters, NMR machines,
 vaccum chambers...
 
 One super cool company was [Nanome](https://nanome.ai/), which was a startup

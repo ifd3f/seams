@@ -66,10 +66,10 @@ off of Microsoft's hosting.
 
 For the backend, I'm looking at [Contabo](https://contabo.com/), because their
 rates look way better than anyone else I've seen. Their cheapest service is
-€4/mo (\$4.89/mo) and it gives you 2 cores, 4GB RAM, and 300GB hybrid drive
+€4/mo ($4.89/mo) and it gives you 2 cores, 4GB RAM, and 300GB hybrid drive
 storage! It's in Germany, however, which has 137ms latency from where I live, so
 that might not be the best. Their cheapest US-based service is €6/mo
-(\$7.34/mo).
+($7.34/mo).
 
 Even though I'm running containers, I'm avoiding container hosting because I'm
 really cheap and I don't really care much for scalability. Plus, I want the

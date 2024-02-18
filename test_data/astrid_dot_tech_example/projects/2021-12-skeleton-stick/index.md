@@ -31,7 +31,7 @@ it at some point.
 ## Whitepaper
 
 [Click here to read the "whitepaper" I wrote for class.](./report.pdf) It's
-written in $\LaTeX$ and serves as a fairly comprehensive summary of what I've
+written in <m>\LaTeX</m> and serves as a fairly comprehensive summary of what I've
 implemented.
 
 ## Future plans

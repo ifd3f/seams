@@ -98,7 +98,7 @@ digraph {
 ```
 
 Already, we can see that this code will cause the example implementation will go
-through all the $n$ existing chunks every single loop, like so:
+through all the <m>n</m> existing chunks every single loop, like so:
 
 ```dot
 digraph {
@@ -150,7 +150,7 @@ digraph {
 }
 ```
 
-Since we're scanning $n$ items $n$ times, this is already $O(n^2)$! This can
+Since we're scanning <m>n</m> items <m>n</m> times, this is already <m>O(n^2)</m>! This can
 definitely be improved, as we'll see later.
 
 ### Long sequential freeing
@@ -204,7 +204,7 @@ digraph {
 
 Note that since we're scanning from the start, we had to look through 6 nodes
 (0, 90, 91, 92, 93, 94) before reaching the one we wanted (95), making this
-$O(n)$. While not terrible, this could be improved as well.
+<m>O(n)</m>. While not terrible, this could be improved as well.
 
 ### Allocating into the best fit
 
@@ -268,15 +268,15 @@ digraph {
 ```
 
 Every single `free()` is 1 link away from the heap start, so in this case, it
-will be $O(n)$.
+will be <m>O(n)</m>.
 
 ## How could we improve this?
 
-The greatest amount of time comes from the first part, the $O(n^2)$ sequential
+The greatest amount of time comes from the first part, the <m>O(n^2)</m> sequential
 `malloc()`. In a test I ran, using this implementation took about 200us on my
 computer, while my more optimized implementation was only 160us! The solution I
 came up with also ended up making every single one of the `malloc()`s and
-`free()`s on this benchmark $O(1)$ (though, once again, only for this
+`free()`s on this benchmark <m>O(1)</m> (though, once again, only for this
 benchmark).
 
 It was fairly simple: besides keeping a doubly-linked list for node order, also
@@ -309,7 +309,7 @@ So in the end, I just submitted my doubly-linked free list implementation.
 
 If the benchmark weren't as sequential, and had more random accesses causing
 more fragmentation, I probably would have used a free chunk BST keyed by node
-size, so that I can have $O(\log n)$ rather than $O(n)$ free node scanning. This
+size, so that I can have <m>O(\log n)</m> rather than <m>O(n)</m> free node scanning. This
 is because the best fit is the smallest chunk that fully contains the size
 you're allocating, so we would want to be able to do a search for that node on
 an ordered collection.

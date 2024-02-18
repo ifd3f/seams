@@ -29,7 +29,7 @@ thumbnail: https://s3.us-west-000.backblazeb2.com/nyaabucket/ad72604434e53b51fb3
 
 An IO game that involves cars crashing into each other. It used to be located at
 collision.zone, but I have shut it down due to hosting and domain name costs
-(why are .zone domains \$30/yr!?). However, I am considering bringing it back
+(why are .zone domains $30/yr!?). However, I am considering bringing it back
 (possibly at collisionzone.astrid.tech?)
 
 Here's a GIF of some AIs playing the game against each other!

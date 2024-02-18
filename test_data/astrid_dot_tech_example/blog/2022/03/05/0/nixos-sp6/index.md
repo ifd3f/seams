@@ -29,7 +29,7 @@ digital notes on it, so I wanted a tablet.
 
 A friend of mine actually uses a Surface Pro 6 with Gentoo installed, so I
 thought, why not try it out with NixOS? So, I ordered a used Surface Pro 6 (with
-128GB SSD, 8GB RAM, and i5) from eBay for about \$500, which included a pen,
+128GB SSD, 8GB RAM, and i5) from eBay for about $500, which included a pen,
 charger, keyboard cover, and arc touch mouse.
 
 ## Installing the initial NixOS generation

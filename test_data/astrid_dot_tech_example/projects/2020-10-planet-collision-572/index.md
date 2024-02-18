@@ -82,16 +82,16 @@ This phase performs a single Euler step of position and rotation.
 
 Position is integrated with
 
-$$s_{k+1} = v \cdot \Delta t + s_k$$
+<M>s_{k+1} = v \cdot \Delta t + s_k</M>
 
-where $s$ is position, $v$ is velocity, and $\Delta t$ is the time step.
+where <m>s</m> is position, <m>v</m> is velocity, and <m>\Delta t</m> is the time step.
 
-Rotation is stored in a matrix $\Theta$ to avoid gimbal lock. Angular velocity
-is a vector $\omega$ which is in the direction that the axis the object is
+Rotation is stored in a matrix <m>\Theta</m> to avoid gimbal lock. Angular velocity
+is a vector <m>\omega</m> which is in the direction that the axis the object is
 rotating around using the right-hand rule, scaled to the speed in radians per
 second.
 
-Suppose $M$ is the matrix representing a rotation of $|\omega|\cdot \Delta t$
-around $\omega$. Thus, we integrate rotation with
+Suppose <m>M</m> is the matrix representing a rotation of <m>|\omega|\cdot \Delta t</m>
+around <m>\omega</m>. Thus, we integrate rotation with
 
-$$\Theta_{k+1} = M \cdot \Theta_k$$
+<M>\Theta_{k+1} = M \cdot \Theta_k</M>

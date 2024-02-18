@@ -370,7 +370,7 @@ coming up on me, and I had to put my project on hiatus.
 ## Acquiring fresh firmwares!
 
 As the days passed by, and I waited for my sweet release from the scholarly
-prisons, I noticed that Blink Minis were on sale, \$30 for a pack of 2. I bought
+prisons, I noticed that Blink Minis were on sale, $30 for a pack of 2. I bought
 them because I held onto hope that I would be able to crack the code eventually.
 
 On Saturday 7/23, after finishing all my classwork, I was ready to just halt and

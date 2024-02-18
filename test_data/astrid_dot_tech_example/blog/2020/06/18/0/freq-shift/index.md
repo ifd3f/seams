@@ -168,9 +168,9 @@ plt.show()
 
 ### Mixing for Shifting
 
-Next, we mix with a 115MHz signal. For a signal with frequency $f$, this should
-produce two signals, one at $f - 115\text{MHz}$, and the other reflected at
-$115\text{MHz} - (f - 115\text{MHz})$.
+Next, we mix with a 115MHz signal. For a signal with frequency <m>f</m>, this should
+produce two signals, one at <m>f - 115\text{MHz}</m>, and the other reflected at
+<m>115\text{MHz} - (f - 115\text{MHz})</m>.
 
 ```python
 mixed = bp_sig * np.cos(115e6 * 2 * np.pi * time)

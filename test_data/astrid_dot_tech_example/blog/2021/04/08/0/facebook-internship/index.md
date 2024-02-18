@@ -145,21 +145,21 @@ recursion in both the `serialize()` and `deserialize()` methods.
 ### PE Coding Interview
 
 The question was how to find
-[$k$-th largest element in an array](https://leetcode.com/problems/kth-largest-element-in-an-array/),
+[<m>k</m>-th largest element in an array](https://leetcode.com/problems/kth-largest-element-in-an-array/),
 which is a medium problem.
 
 I first solved the solution by sorting the array, then picking the item at index
-$k - 1$, which would be $O(n \log n)$.
+<m>k - 1</m>, which would be <m>O(n \log n)</m>.
 
 Then, the interviewer asked me how I could improve it. I responded by rewriting
-it to use a min heap as a sort of running tally of top-$k$ elements, which would
-make it $O(n \log k)$.
+it to use a min heap as a sort of running tally of top-<m>k</m> elements, which would
+make it <m>O(n \log k)</m>.
 
 Then, he asked, "what if you have 50 elements and you want to get the 49th?" to
-which I responded by reframing the problem not as the $k$-th largest, but as the
-$(n - k)$-th smallest and using a max heap. Next, I made the algorithm decide
-which problem to solve based on if $k > \frac{n}{2}$, making the problem
-$O(n \log \min(k, n - k))$.
+which I responded by reframing the problem not as the <m>k</m>-th largest, but as the
+<m>(n - k)</m>-th smallest and using a max heap. Next, I made the algorithm decide
+which problem to solve based on if <m>k > \frac{n}{2}</m>, making the problem
+<m>O(n \log \min(k, n - k))</m>.
 
 ### Mock Interview
 
@@ -184,7 +184,7 @@ Leetcode Premium, but
 [other sites](https://aaronice.gitbook.io/lintcode/data_structure/design-tic-tac-toe)
 seem to say it's a medium problem.
 
-> Design a Tic-tac-toe game that is played between two players on a $n \times n$
+> Design a Tic-tac-toe game that is played between two players on a <m>n \times n</m>
 > grid. You may assume the following rules:
 >
 > 1. A move is guaranteed to be valid and is placed on an empty block.

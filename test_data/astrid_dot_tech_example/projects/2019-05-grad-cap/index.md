@@ -39,8 +39,8 @@ didn't have any motors that could spin like I wanted, and I didn't really know
 how I'd go about doing that.
 
 Suddenly had a breakthrough: instead of one motor, you have 2 servos, one for
-pitch and one for yaw. If $t$ is time, then you have the yaw servo doing a
-$\cos(t)$ and the pitch servo doing a $\sin(t)$, so the arm goes in a circle,
+pitch and one for yaw. If <m>t</m> is time, then you have the yaw servo doing a
+<m>\cos(t)</m> and the pitch servo doing a <m>\sin(t)</m>, so the arm goes in a circle,
 and the tassel can go spinny!
 
 There was one problem: Burlingame High School explicitly said that no

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import re
 from datetime import datetime, tzinfo
 from pathlib import Path
 import shutil
@@ -97,7 +98,7 @@ def transform_post(post_file: Path, outdir: Path):
         f.write("---\n")
         f.write(new_ydata)
         f.write("\n---\n\n")
-        f.write(markdown)
+        f.write(transform_md(markdown))
 
 
 def transform_project(project_file: Path, outdir: Path, published_date: datetime):
@@ -136,7 +137,7 @@ def transform_project(project_file: Path, outdir: Path, published_date: datetime
         f.write("---\n")
         f.write(new_ydata)
         f.write("\n---\n\n")
-        f.write(markdown)
+        f.write(transform_md(markdown))
 
 
 def transform_tagdecl(tag_file: Path, outdir: Path):
@@ -185,6 +186,28 @@ def transform_tag_slug(tag: str):
         return 'project:' + tag.removeprefix("/projects/").replace('/', '')
     return tag
 
+
+def transform_md(md: str) -> str:
+    in_code = False
+
+    out = []
+    for l in md.splitlines():
+        if l.startswith('```'):
+            in_code = not in_code
+        if in_code:
+            out.append(l)
+            continue
+
+        l = re.sub(r'\$\$(.*?)\$\$', r'<M>\1</M>', l)    
+        # janky escape system
+        tempval = 'TEMPORARYDOLLARPLACEHOLDEReZczkZiMod'
+        l = l.replace('\\$', tempval)
+        l = re.sub(r'\$(.*?)\$', r'<m>\1</m>', l)    
+        l = l.replace(tempval, '$')
+
+        out.append(l)
+    
+    return '\n'.join(out)
 
 if __name__ == "__main__":
     main()

@@ -30,7 +30,7 @@ and truck accessories.
 
 With what I gleaned from the 20 hours of instruction and 20 hours of hacking and
 reverse engineering, I decided that I should apply what I learned to a real
-device! These \$20 Blink Mini cameras seemed like perfect victims... at the
+device! These $20 Blink Mini cameras seemed like perfect victims... at the
 time.
 
 Big thanks to [Ada](https://twitter.com/lacecard) and

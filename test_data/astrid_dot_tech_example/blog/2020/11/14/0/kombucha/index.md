@@ -32,7 +32,7 @@ Here is a summary of my limited understanding of kombucha.
 - You can get a **pellicle**, which lots of people _think_ is the SCOBY, but in
   reality, it's just a bunch of celluose that the SCOBY generates during
   fermentation.
-  - There is SCOBY on the pellicle, but pellicle $\neq$ SCOBY. The pellicle is
+  - There is SCOBY on the pellicle, but pellicle <m>\neq</m> SCOBY. The pellicle is
     apparently edible, too.
 
 There are two fermentation steps:

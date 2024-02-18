@@ -70,8 +70,8 @@ I began making measurements on it, to make sure that it was working.
 
 ![](https://s3.us-west-000.backblazeb2.com/nyaabucket/7558d153955e447dad043d6187a22adcfc67a1b3237f498b975526ecdc140f7f/070-measurement.jpg)
 
-As advertised, this is was a $20k\Omega$ potentiometer, give or take a
-$k\Omega$. However, when I tried measuring the resistance of the middle leads, I
+As advertised, this is was a <m>20k\Omega</m> potentiometer, give or take a
+<m>k\Omega</m>. However, when I tried measuring the resistance of the middle leads, I
 noticed that the bottom one changed resistance as I turned the potentiometer,
 but the top one didn't. I thought I was maybe measuring it wrong, or my leads
 were broken, so I swapped leads and noticeD the same thing. Very strange.

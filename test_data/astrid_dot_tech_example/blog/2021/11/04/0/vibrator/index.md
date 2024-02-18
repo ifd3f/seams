@@ -32,7 +32,7 @@ project that are not enclosed inside the wand, see
 ## The original device
 
 [This is the original wand I had.](https://www.amazon.com/gp/product/B07T3JSKDP)
-For \$20, it's a pretty decent piece of hardware: multiple modes, decent power,
+For $20, it's a pretty decent piece of hardware: multiple modes, decent power,
 very inexpensive.
 
 ![The vibrator, as seen on Amazon.](https://s3.us-west-000.backblazeb2.com/nyaabucket/f389befd2fa4a7551e11924154320c90f3e499258937dc676e059c58ec6e83c2/original.jpg)

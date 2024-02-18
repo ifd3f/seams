@@ -84,6 +84,6 @@ Not everything has gone perfectly well, though.
 
 - As mentioned earlier, Discord is laggy for no good reason.
 - I haven't done much programming on my NixOS machine just yet, only editing
-  $\LaTeX$ documents.
+  <m>\LaTeX</m> documents.
 
 I'm still enjoying it though, and I'll definitely continue using it.

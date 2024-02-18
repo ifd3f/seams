@@ -100,11 +100,11 @@ https://github.com/ifd3f/Basys3-1D-Cellular-Automata.
 ### Motivation
 
 I wanted to make it so that if you increment, you increase the frequency at a
-constant rate. Say we started at a clock divider output period of $1000ms$, or
-$1Hz$, and we wanted to increase the frequency by 0.1hz every time the increment
+constant rate. Say we started at a clock divider output period of <m>1000ms</m>, or
+<m>1Hz</m>, and we wanted to increase the frequency by 0.1hz every time the increment
 button is pressed. We would have to change the period to
-$\frac{1}{1.1Hz} = 909ms$, then $\frac{1}{1.2Hz} = 833ms$, then
-$\frac{1}{1.3Hz} = 769ms$, etc.
+<m>\frac{1}{1.1Hz} = 909ms</m>, then <m>\frac{1}{1.2Hz} = 833ms</m>, then
+<m>\frac{1}{1.3Hz} = 769ms</m>, etc.
 
 If I’m being completely honest, I didn’t need to do any of this, but I thought
 it would be cool at the time.
@@ -113,32 +113,32 @@ it would be cool at the time.
 
 Division is inefficient, so I decided to use an approximation to convert
 frequency to period. In the graph, the black curve is the function
-$T(f)=\frac{1}{f}$ on $f \in [14 Hz,2 Hz]$, the bounds I want to restrict the
-simulator’s frequency to. The green curve is $T_1(t)$, which is the same
-function, but rescaled to $[0,1]$ and centered on the origin.
+<m>T(f)=\frac{1}{f}</m> on <m>f \in [14 Hz,2 Hz]</m>, the bounds I want to restrict the
+simulator’s frequency to. The green curve is <m>T_1(t)</m>, which is the same
+function, but rescaled to <m>[0,1]</m> and centered on the origin.
 
-### Approximation of $T(f)$
+### Approximation of <m>T(f)</m>
 
-Let the third-order Taylor series approximation of $T_1(t)$ be the cubic
-function $g(t)=at^3+bt^2+ct+d$. The blue function on the graph is the Taylor
+Let the third-order Taylor series approximation of <m>T_1(t)</m> be the cubic
+function <m>g(t)=at^3+bt^2+ct+d</m>. The blue function on the graph is the Taylor
 series approximation of it. I decided that the simulator would have 16
-increments, so the actual function used is $g(t)$ rescaled to $[0,16]$ centered
+increments, so the actual function used is <m>g(t)</m> rescaled to <m>[0,16]</m> centered
 at 8:
 
-$g_1(n)=g(\frac{n-8}{8})$
+<m>g_1(n)=g(\frac{n-8}{8})</m>
 
-### Optimization of $g_1(n)$
+### Optimization of <m>g_1(n)</m>
 
 Since multiplication is slow and exponentiation is even slower, I decided to
 optimize the polynomial calculation using a third-order recursive sequence:
 
-$$s_0(n)=s_0(n-1)+s_1(n-1) \text{ (period)}$$
+<M>s_0(n)=s_0(n-1)+s_1(n-1) \text{ (period)}</M>
 
-$$s_1(n)=s_1(n-1)+s_2(n-1) \text{ (first-order difference)}$$
+<M>s_1(n)=s_1(n-1)+s_2(n-1) \text{ (first-order difference)}</M>
 
-$$s_2(n)=s_2(n-1)+s_3 \text{ (second-order difference)}$$
+<M>s_2(n)=s_2(n-1)+s_3 \text{ (second-order difference)}</M>
 
-$$s_3=Constant \text{ (third-order difference)}$$
+<M>s_3=Constant \text{ (third-order difference)}</M>
 
 A third-order recursive sequence like this creates a sequence of numbers that
 lie on a cubic curve.
@@ -147,16 +147,16 @@ This allows us to calculate the result in a single clock cycle, and only using a
 few adders when going forward, or doing a small amount of subtraction when going
 backward.
 
-I set $s_0(0)=g_1(\frac{1}{2})$ and found the formulas for the initial values
+I set <m>s_0(0)=g_1(\frac{1}{2})</m> and found the formulas for the initial values
 for these functions using a computer algebra system (specifically, a TI-92+):
 
-$$s_0(0)=d$$
+<M>s_0(0)=d</M>
 
-$$s_1(0)=\frac{a+b+c}{8}$$
+<M>s_1(0)=\frac{a+b+c}{8}</M>
 
-$$s_2(0)=\frac{b}{4}$$
+<M>s_2(0)=\frac{b}{4}</M>
 
-$$s_3=\frac{3a}{4}$$
+<M>s_3=\frac{3a}{4}</M>
 
 The code that implements these formulas is in
 [`SpeedControl.sv`](https://github.com/ifd3f/Basys3-1D-Cellular-Automata/blob/master/FinalProject.srcs/sources_1/new/SpeedControl.sv).

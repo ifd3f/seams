@@ -42,7 +42,7 @@ you can read all about it, assuming I'm still blogging around then!
 
 Anyways, with what I gleaned from the 20 hours of instruction and 20 hours of
 hacking, I decided that I should apply what I learned to a real device! These
-\$20 Blink Mini cameras that I bought a few months ago seemed like perfect
+$20 Blink Mini cameras that I bought a few months ago seemed like perfect
 victims to fuck around with!
 
 ![Blink Mini camera from Amazon.](https://s3.us-west-000.backblazeb2.com/nyaabucket/54b1f995f2ec9ed5d304f1df1ee52544152071219ea63fd05f6951d77f0eed8d/blink-mini.jpg)
@@ -63,7 +63,7 @@ Unfortunately, you need to use the Blink app to do _anything_ with this camera.
 It's free, but it's only a phone app (thye don't have a web app) and if you want
 to record videos, you need to subscribe to their
 [Blink Premium](https://support.blinkforhome.com/en_US/subscriptions/purchasing-a-blink-subscription-plan-through-amazon)
-service, which costs \$30/year for one device and a whopping \$100/year for more
+service, which costs $30/year for one device and a whopping $100/year for more
 devices! It's also probably why the hardware is so cheap -- they made it a
 [loss leader](https://www.investopedia.com/terms/l/lossleader.asp) for that
 service.
@@ -124,7 +124,7 @@ that associates them with Blink.
 
 Finally, I found
 [this Reuters article](https://www.reuters.com/article/us-amazon-com-m-a-chips/exclusive-amazon-paid-90-million-for-camera-makers-chip-technology-sources-idUSKBN1FW0BI)
-that says that Amazon bought Blink and Immedia for \$90 million. Vertical
+that says that Amazon bought Blink and Immedia for $90 million. Vertical
 integration, of course.
 
 ### AC1002B2... microcontroller? microprocessor?

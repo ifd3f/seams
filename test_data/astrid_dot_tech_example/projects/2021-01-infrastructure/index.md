@@ -137,7 +137,7 @@ There are a couple reasons why I use it despite its cracked screen:
 
 #### Bongus
 
-This server was an absolute steal I got off of eBay for \$200.
+This server was an absolute steal I got off of eBay for $200.
 
 - **Hostname:** bongus-hv.id.astrid.tech
 - **Location:** Site 1
@@ -216,7 +216,7 @@ strategy the normal way, either, I wanted to write a genetic algorithm to do it.
 And it didn't just stop there, I wanted to run it on multiple computers to do
 parallel processing.
 
-So, I spent \$50 on a pair of Dell Optiplexes from eBay, hooked them into my
+So, I spent $50 on a pair of Dell Optiplexes from eBay, hooked them into my
 LAN, installed Ubuntu Server on them, and tried to set up
 [Apache Spark](https://spark.apache.org/) on them. What could possibly go wrong?
 

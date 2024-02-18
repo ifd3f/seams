@@ -55,8 +55,8 @@ It's a cute MicroATX build packing tons of power! Here is the
 | **Operating System**         | [NixOS Unstable](https://nixos.org/)                                                                                                                                                                                 | $0.00                 |
 | **Total**                    |                                                                                                                                                                                                                      | **$1094.02**          |
 
-I got the RTX 3070 Ti from eBay used for about \$100 below MSRP. Not included in
-this part list are the 4 120mm ARGB fans, adding an additional \$35.
+I got the RTX 3070 Ti from eBay used for about $100 below MSRP. Not included in
+this part list are the 4 120mm ARGB fans, adding an additional $35.
 
 ### Build justification
 
