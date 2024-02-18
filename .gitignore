@@ -9,3 +9,4 @@ out-html/
 .direnv
 node_modules
 out-scripts
+.rollup.cache
