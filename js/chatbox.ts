@@ -27,7 +27,7 @@ export class CatChatbox extends HTMLElement {
 
   connectedCallback() {
     const box = new ActiveCatChatbox(this);
-    box.addMessage({
+    box.queueMessage({
       user: assistant,
       text: "Hello! I'm your virtual assistant. Let me know if you need anything!",
     });
@@ -73,15 +73,7 @@ class ActiveCatChatbox {
       this.addMessage({ user: you, text: message });
       this.chatform.reset();
       this.scrollToBottom();
-      setTimeout(() => {
-        this.setEllipsis(true);
-        this.scrollToBottom();
-        setTimeout(() => {
-          this.setEllipsis(false);
-          this.addMessage({ user: assistant, text: generateNya() });
-          this.scrollToBottom();
-        }, 1000);
-      }, 1000);
+      this.queueMessage({ user: assistant, text: generateNya() });
     };
   }
 
@@ -103,12 +95,27 @@ class ActiveCatChatbox {
     this.chatlog.append(node);
   }
 
+  queueMessage(message: Message) {
+    setTimeout(() => {
+      this.setEllipsis(true);
+      this.scrollToBottom();
+      setTimeout(() => {
+        this.setEllipsis(false);
+        this.addMessage(message);
+        this.scrollToBottom();
+      }, 1000);
+    }, 1000);
+  }
+
   setEllipsis(shown: boolean) {
     this.ellipsis.hidden = !shown;
   }
 
   scrollToBottom() {
-    (this.chatlog.lastElementChild as HTMLElement).scrollIntoView();
+    const c = this.chatlog.lastElementChild;
+    if (c) {
+      (c as HTMLElement).scrollIntoView();
+    }
   }
 }
 
