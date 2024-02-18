@@ -42,6 +42,7 @@ pub enum MathMode {
 }
 
 impl MathMode {
+    #[allow(dead_code)]
     pub fn html_tag_name(&self) -> &str {
         match self {
             MathMode::Inline => "m",

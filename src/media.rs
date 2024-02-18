@@ -71,6 +71,7 @@ impl MediaRegistry {
     }
 
     /// Consume the VfsMediaRegistry, and returns a list of every file that has been stored.
+    #[allow(dead_code)]
     pub fn into_files(self) -> Vec<FileUploadable> {
         self.files.into_inner().unwrap()
     }

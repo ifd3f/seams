@@ -131,7 +131,7 @@ impl<'a> RenderPost<'a> {
                     p { (tag_list(tags, &self.post.meta().tags)) }
                 }
 
-                (PreEscaped(&self.post.transformed.html))
+                (PreEscaped(&self.post.html()))
             }
         }
     }

@@ -268,6 +268,7 @@ where
     }
 
     /// The root directory to consider assets from.
+    #[allow(dead_code)]
     pub fn asset_root(&self) -> VfsPath {
         self.path.parent()
     }

@@ -38,11 +38,6 @@ pub const PASTEL: HueColorProfile = HueColorProfile {
     lightness: 0.9,
 };
 
-pub const TINT: HueColorProfile = HueColorProfile {
-    saturation: 0.2,
-    lightness: 0.9,
-};
-
 pub const DARK: HueColorProfile = HueColorProfile {
     saturation: 0.7,
     lightness: 0.5,

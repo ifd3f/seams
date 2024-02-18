@@ -19,7 +19,7 @@ where
                 .title(Some(p.meta().title.clone()))
                 .link(Some(format!("{}{}", base_url, p.meta().href())))
                 .pub_date(Some(p.meta().date.published.to_rfc2822()))
-                .content(Some(p.transformed.html.clone()))
+                .content(Some(p.html().to_owned()))
                 .categories(categories)
                 .build()
         })

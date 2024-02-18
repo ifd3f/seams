@@ -107,7 +107,7 @@ impl<'a> RenderProject<'a> {
                     }
                 }
 
-                (PreEscaped(&self.project.transformed.html))
+                (PreEscaped(&self.project.html()))
             }
         }
     }
