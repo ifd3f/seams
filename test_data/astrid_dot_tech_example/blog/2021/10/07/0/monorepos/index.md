@@ -2,7 +2,10 @@
 title: Why do I put stuff in monorepos?
 tags:
 - git
-slug: monorepos
+slug:
+  date: 2021-10-07
+  ordinal: 0
+  name: monorepos
 date:
   created: '2021-10-07 16:39:59-07:00'
   published: '2021-10-07 16:39:59-07:00'

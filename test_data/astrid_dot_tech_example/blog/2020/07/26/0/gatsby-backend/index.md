@@ -5,7 +5,10 @@ tags:
 - project:astrid-tech
 - gatsby-js
 - graphviz
-slug: gatsby-backend
+slug:
+  date: 2020-07-26
+  ordinal: 0
+  name: gatsby-backend
 date:
   created: '2020-07-26 01:07:00-07:00'
   published: '2020-07-26 01:07:00-07:00'

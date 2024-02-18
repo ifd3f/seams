@@ -4,7 +4,10 @@ tagline: A guide on using overlays to enable your impatience
 tags:
 - nixos
 - fediverse
-slug: overlay-nixpkgs-pr
+slug:
+  date: 2022-11-03
+  ordinal: 0
+  name: overlay-nixpkgs-pr
 date:
   created: '2022-11-02 18:44:56-07:00'
   published: '2022-11-02 18:44:56-07:00'

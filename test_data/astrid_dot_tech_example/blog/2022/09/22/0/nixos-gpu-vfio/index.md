@@ -8,7 +8,10 @@ tags:
 - vm
 - vfio
 - project:infrastructure
-slug: nixos-gpu-vfio
+slug:
+  date: 2022-09-22
+  ordinal: 0
+  name: nixos-gpu-vfio
 date:
   created: '2022-09-22 15:15:17-07:00'
   published: '2022-09-22 15:15:17-07:00'

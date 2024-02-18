@@ -7,7 +7,10 @@ tags:
 - nixos
 - ci-cd
 - incompetency
-slug: infra-repo-gh-actions
+slug:
+  date: 2022-04-05
+  ordinal: 0
+  name: infra-repo-gh-actions
 date:
   created: '2022-04-04 17:37:04-07:00'
   published: '2022-04-04 17:37:04-07:00'

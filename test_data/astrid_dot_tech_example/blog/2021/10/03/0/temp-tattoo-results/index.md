@@ -2,7 +2,10 @@
 title: QR Tattoo Preliminary Testing Results
 tags:
 - project:qr-tattoo
-slug: temp-tattoo-results
+slug:
+  date: 2021-10-03
+  ordinal: 0
+  name: temp-tattoo-results
 date:
   created: '2021-10-03 00:28:21-07:00'
   published: '2021-10-03 00:28:21-07:00'

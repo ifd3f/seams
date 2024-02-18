@@ -3,7 +3,10 @@ title: APRS on the trip back for Thanksgiving
 tags:
 - ham-radio
 - aprs
-slug: aprs-ride
+slug:
+  date: 2021-11-21
+  ordinal: 0
+  name: aprs-ride
 date:
   created: '2021-11-21 09:21:16-08:00'
   published: '2021-11-21 09:21:16-08:00'

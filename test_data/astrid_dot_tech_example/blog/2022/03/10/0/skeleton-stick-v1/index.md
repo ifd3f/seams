@@ -5,7 +5,10 @@ tags:
 - python
 - cybersecurity
 - project:skeleton-stick
-slug: skeleton-stick-v1
+slug:
+  date: 2022-03-10
+  ordinal: 0
+  name: skeleton-stick-v1
 date:
   created: '2022-03-10 09:45:08-08:00'
   published: '2022-03-10 09:45:08-08:00'

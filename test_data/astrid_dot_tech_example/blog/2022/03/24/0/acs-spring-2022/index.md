@@ -7,7 +7,10 @@ tags:
 - chemistry
 - project:mdsapt
 - project:qr-tattoo
-slug: acs-spring-2022
+slug:
+  date: 2022-03-24
+  ordinal: 0
+  name: acs-spring-2022
 date:
   created: '2022-03-24 14:34:12-07:00'
   published: '2022-03-24 14:34:12-07:00'

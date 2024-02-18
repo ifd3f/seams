@@ -9,7 +9,10 @@ tags:
 - cybersecurity
 - cybertruck-challenge
 - reverse-engineering
-slug: blink-mini-disassembly
+slug:
+  date: 2022-07-07
+  ordinal: 0
+  name: blink-mini-disassembly
 date:
   created: '2022-07-07 14:38:11-07:00'
   published: '2022-07-07 14:38:11-07:00'

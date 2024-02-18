@@ -9,7 +9,10 @@ tags:
 - next-js
 - docker
 - kubernetes
-slug: backend
+slug:
+  date: 2020-12-20
+  ordinal: 0
+  name: backend
 date:
   created: '2020-12-20 00:00:00-08:00'
   published: '2020-12-20 00:00:00-08:00'

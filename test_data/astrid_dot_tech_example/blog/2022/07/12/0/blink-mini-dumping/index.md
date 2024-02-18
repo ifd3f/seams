@@ -9,7 +9,10 @@ tags:
 - reverse-engineering
 - soldering
 - incompetency
-slug: blink-mini-dumping
+slug:
+  date: 2022-07-13
+  ordinal: 0
+  name: blink-mini-dumping
 date:
   created: '2022-07-12 17:47:14-07:00'
   published: '2022-07-12 17:47:14-07:00'

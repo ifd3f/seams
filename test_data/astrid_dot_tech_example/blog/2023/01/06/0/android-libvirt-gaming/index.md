@@ -7,7 +7,10 @@ tags:
 - virtualization
 - gaming
 - android
-slug: android-libvirt-gaming
+slug:
+  date: 2023-01-07
+  ordinal: 0
+  name: android-libvirt-gaming
 date:
   created: '2023-01-06 17:03:17-08:00'
   published: '2023-01-06 17:03:17-08:00'

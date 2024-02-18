@@ -7,7 +7,10 @@ tags:
 - docker
 - server
 - devops
-slug: selfhost
+slug:
+  date: 2021-01-18
+  ordinal: 0
+  name: selfhost
 date:
   created: '2021-01-18 07:49:00-08:00'
   published: '2021-01-18 07:49:00-08:00'

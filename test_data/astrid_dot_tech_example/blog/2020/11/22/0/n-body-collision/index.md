@@ -7,7 +7,10 @@ tags:
 - physics
 - school:cal-poly=csc-572
 - project:planet-collision-572
-slug: n-body-collision
+slug:
+  date: 2020-11-22
+  ordinal: 0
+  name: n-body-collision
 date:
   created: '2020-11-22 00:00:00-08:00'
   published: '2020-11-22 00:00:00-08:00'

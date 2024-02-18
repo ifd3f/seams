@@ -3,7 +3,10 @@ title: astrid.tech's belated 1-year anniversary! 🎉
 tagline: If the website was better late than never, then this post is too!
 tags:
 - project:astrid-tech
-slug: belated-anniversary
+slug:
+  date: 2021-10-14
+  ordinal: 0
+  name: belated-anniversary
 date:
   created: '2021-10-14 00:27:33-07:00'
   published: '2021-10-14 00:27:33-07:00'

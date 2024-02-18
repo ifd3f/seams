@@ -5,7 +5,10 @@ tags:
 - history
 - internet
 - project:qr-tattoo
-slug: dead-tlds
+slug:
+  date: 2022-04-05
+  ordinal: 0
+  name: dead-tlds
 date:
   created: '2022-04-04 20:00:07-07:00'
   published: '2022-04-04 20:00:07-07:00'

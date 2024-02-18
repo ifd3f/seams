@@ -8,7 +8,10 @@ tags:
 - jupyter
 - numpy
 - osint
-slug: blink-mini-4
+slug:
+  date: 2022-08-06
+  ordinal: 0
+  name: blink-mini-4
 date:
   created: '2022-08-05 19:08:09-07:00'
   published: '2022-08-05 19:08:09-07:00'

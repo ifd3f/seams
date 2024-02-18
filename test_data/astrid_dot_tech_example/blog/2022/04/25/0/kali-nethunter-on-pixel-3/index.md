@@ -6,7 +6,10 @@ tags:
 - kali-linux
 - cybersecurity
 - incompetency
-slug: kali-nethunter-on-pixel-3
+slug:
+  date: 2022-04-25
+  ordinal: 0
+  name: kali-nethunter-on-pixel-3
 date:
   created: '2022-04-25 16:21:52-07:00'
   published: '2022-04-25 16:21:52-07:00'

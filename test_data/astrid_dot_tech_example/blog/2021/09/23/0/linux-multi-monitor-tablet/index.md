@@ -4,7 +4,10 @@ tags:
 - blogumentation
 - drawing-tablet
 - linux
-slug: linux-multi-monitor-tablet
+slug:
+  date: 2021-09-24
+  ordinal: 0
+  name: linux-multi-monitor-tablet
 date:
   created: '2021-09-23 21:07:16-07:00'
   published: '2021-09-23 21:07:16-07:00'

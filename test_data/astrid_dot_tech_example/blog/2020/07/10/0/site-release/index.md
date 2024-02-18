@@ -4,7 +4,10 @@ tagline: Yay!
 tags:
 - project:astrid-tech
 - gatsby-js
-slug: site-release
+slug:
+  date: 2020-07-10
+  ordinal: 0
+  name: site-release
 date:
   created: '2020-07-10 11:48:00-07:00'
   published: '2020-07-10 11:48:00-07:00'

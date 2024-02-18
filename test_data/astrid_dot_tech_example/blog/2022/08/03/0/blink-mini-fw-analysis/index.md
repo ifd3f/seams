@@ -8,7 +8,10 @@ tags:
 - ghidra
 - python
 - jupyter
-slug: blink-mini-fw-analysis
+slug:
+  date: 2022-08-03
+  ordinal: 0
+  name: blink-mini-fw-analysis
 date:
   created: '2022-08-03 10:01:19-07:00'
   published: '2022-08-03 10:01:19-07:00'

@@ -10,7 +10,10 @@ tags:
 - fpgas
 - verilog
 - systemverilog
-slug: cs-major
+slug:
+  date: 2020-06-08
+  ordinal: 0
+  name: cs-major
 date:
   created: '2020-06-08 14:14:00-07:00'
   published: '2020-06-08 14:14:00-07:00'

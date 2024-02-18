@@ -7,7 +7,10 @@ tags:
 - w6bhz
 - linux
 - incompetency
-slug: at-d878uv-misadventures
+slug:
+  date: 2021-11-11
+  ordinal: 0
+  name: at-d878uv-misadventures
 date:
   created: '2021-11-10 20:51:11-08:00'
   published: '2021-11-10 20:51:11-08:00'

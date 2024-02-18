@@ -9,7 +9,10 @@ tags:
 - devops
 - elk
 - proxmox
-slug: janky-kube-cluster
+slug:
+  date: 2021-01-21
+  ordinal: 0
+  name: janky-kube-cluster
 date:
   created: '2021-01-20 22:14:00-08:00'
   published: '2021-01-20 22:14:00-08:00'

@@ -8,7 +8,10 @@ tags:
 - latex
 - physics
 thumbnail: https://s3.us-west-000.backblazeb2.com/nyaabucket/960aed3807b3a827195d2cc04456ceca6c8c9b7aed20d484da65f87660a1e593/svg-in-latex.png
-slug: latex
+slug:
+  date: 2020-09-15
+  ordinal: 0
+  name: latex
 date:
   created: '2020-09-15 00:00:00-07:00'
   published: '2020-09-15 00:00:00-07:00'

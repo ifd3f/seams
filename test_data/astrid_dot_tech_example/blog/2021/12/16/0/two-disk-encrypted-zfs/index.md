@@ -6,7 +6,10 @@ tags:
 - linux
 - blogumentation
 - guide
-slug: two-disk-encrypted-zfs
+slug:
+  date: 2021-12-17
+  ordinal: 0
+  name: two-disk-encrypted-zfs
 date:
   created: '2021-12-16 18:31:27-08:00'
   published: '2021-12-16 18:31:27-08:00'

@@ -13,7 +13,10 @@ tags:
 - project:hascas
 - haskell
 - rust
-slug: astrid-tech-v1
+slug:
+  date: 2020-10-17
+  ordinal: 0
+  name: astrid-tech-v1
 date:
   created: '2020-10-17 00:00:00-07:00'
   published: '2020-10-17 00:00:00-07:00'

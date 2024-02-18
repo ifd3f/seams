@@ -9,7 +9,10 @@ tags:
 - haskell
 - python
 - django
-slug: third-redesign
+slug:
+  date: 2021-05-03
+  ordinal: 0
+  name: third-redesign
 date:
   created: '2021-05-03 10:17:05-07:00'
   published: '2021-05-03 10:17:05-07:00'

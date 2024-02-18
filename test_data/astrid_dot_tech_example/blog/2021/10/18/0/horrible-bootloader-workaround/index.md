@@ -6,7 +6,10 @@ tags:
 - incompetency
 - linux
 - blogumentation
-slug: horrible-bootloader-workaround
+slug:
+  date: 2021-10-19
+  ordinal: 0
+  name: horrible-bootloader-workaround
 date:
   created: '2021-10-18 19:20:01-07:00'
   published: '2021-10-18 19:20:01-07:00'

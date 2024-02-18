@@ -6,7 +6,10 @@ tags:
 - kubernetes
 - devops
 - raspberry-pi
-slug: pi-clustering
+slug:
+  date: 2021-01-27
+  ordinal: 0
+  name: pi-clustering
 date:
   created: '2021-01-26 22:29:00-08:00'
   published: '2021-01-26 22:29:00-08:00'

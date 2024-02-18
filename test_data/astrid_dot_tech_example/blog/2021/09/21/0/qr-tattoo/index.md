@@ -5,7 +5,10 @@ tags:
 - project:qr-tattoo
 - transhumanism
 - research-notes
-slug: qr-tattoo
+slug:
+  date: 2021-09-22
+  ordinal: 0
+  name: qr-tattoo
 date:
   created: '2021-09-21 22:56:00-07:00'
   published: '2021-09-21 22:56:00-07:00'

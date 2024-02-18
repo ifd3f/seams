@@ -5,7 +5,10 @@ tags:
 - kombucha
 - notes
 thumbnail: https://s3.us-west-000.backblazeb2.com/nyaabucket/a01fd7589087459659b6d93ac1b47e330289aa86b74a232a5fd0e3274fd2faf6/2020-10-31-thermometer.jpg
-slug: kombucha
+slug:
+  date: 2020-11-14
+  ordinal: 0
+  name: kombucha
 date:
   created: '2020-11-14 00:00:00-08:00'
   published: '2020-11-14 00:00:00-08:00'

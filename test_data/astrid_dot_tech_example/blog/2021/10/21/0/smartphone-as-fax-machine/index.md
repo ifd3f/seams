@@ -5,7 +5,10 @@ tags:
 - fax
 - w6bhz
 - ham-radio
-slug: smartphone-as-fax-machine
+slug:
+  date: 2021-10-22
+  ordinal: 0
+  name: smartphone-as-fax-machine
 date:
   created: '2021-10-21 22:51:53-07:00'
   published: '2021-10-21 22:51:53-07:00'

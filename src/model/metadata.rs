@@ -15,8 +15,8 @@ pub struct Post {
     /// Tagline of the post.
     pub tagline: Option<String>,
 
-    /// A short, URL-friendly string identifying this project.
-    pub slug: String,
+    /// A URL-friendly string identifying this post.
+    pub slug: PostSlug,
 
     /// Dates important to the post.
     pub date: PostDates,
@@ -44,19 +44,19 @@ pub struct Post {
 
 impl Post {
     pub fn href(&self) -> String {
-        let slugday = &self.date.published;
+        let slugday = self.slug.date.unwrap_or(self.date.published.date_naive());
         format!(
             "/{}/{:02}/{:02}/{}/{}",
             slugday.year(),
             slugday.month(),
             slugday.day(),
-            0usize,
-            &self.slug
+            self.slug.ordinal,
+            &self.slug.name
         )
     }
 
     pub fn css_color(&self) -> String {
-        extract_color(self.color.clone(), &self.slug)
+        extract_color(self.color.clone(), &self.slug.name)
     }
 }
 
@@ -105,6 +105,14 @@ pub struct Project {
 
     /// Accent color. If null, it will be randomly picked based on the slug.
     pub color: Option<Color>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct PostSlug {
+    pub date: Option<NaiveDate>,
+    #[serde(default)]
+    pub ordinal: u8,
+    pub name: String,
 }
 
 #[derive(Serialize, Deserialize, Default)]

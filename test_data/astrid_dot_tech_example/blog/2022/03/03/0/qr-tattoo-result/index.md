@@ -4,7 +4,10 @@ tags:
 - project:qr-tattoo
 - gimp
 - rust
-slug: qr-tattoo-result
+slug:
+  date: 2022-03-03
+  ordinal: 0
+  name: qr-tattoo-result
 date:
   created: '2022-03-03 07:48:02-08:00'
   published: '2022-03-03 07:48:02-08:00'

@@ -6,7 +6,10 @@ tags:
 - school:cal-poly=cpe-357
 - c
 - school
-slug: malloc
+slug:
+  date: 2020-09-06
+  ordinal: 0
+  name: malloc
 date:
   created: '2020-09-06 00:00:00-07:00'
   published: '2020-09-06 00:00:00-07:00'

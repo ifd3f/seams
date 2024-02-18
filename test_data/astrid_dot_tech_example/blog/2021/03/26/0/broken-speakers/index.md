@@ -4,7 +4,10 @@ tagline: Cracking open a hard one with no one but myself because there's a pande
   outside
 tags:
 - electrical-engineering
-slug: broken-speakers
+slug:
+  date: 2021-03-26
+  ordinal: 0
+  name: broken-speakers
 date:
   created: '2021-03-26 12:33:50-08:00'
   published: '2021-03-26 12:33:50-08:00'

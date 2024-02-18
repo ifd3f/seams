@@ -9,7 +9,10 @@ tags:
 - internship
 - job-interview
 - facebook
-slug: facebook-internship
+slug:
+  date: 2021-04-08
+  ordinal: 0
+  name: facebook-internship
 date:
   created: '2021-04-08 12:48:35-07:00'
   published: '2021-04-08 12:48:35-07:00'

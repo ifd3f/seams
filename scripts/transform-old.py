@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import re
-from datetime import datetime, tzinfo
+from datetime import datetime, timezone, tzinfo
 from pathlib import Path
 import shutil
 import sys
@@ -80,7 +80,11 @@ def transform_post(post_file: Path, outdir: Path):
         new["thumbnail"] = u
     new = {
         **new,
-        "slug": slug,
+        "slug": {
+            "date": date.astimezone(timezone.utc).date(),
+            "ordinal": 0,
+            "name": slug,
+        },
         "date": {
             "created": str(date),
             "published": str(date),
