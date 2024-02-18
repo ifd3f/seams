@@ -4,7 +4,7 @@
   "description": "",
   "main": "js/index.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "rollup --config",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

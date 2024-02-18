@@ -2,15 +2,17 @@
   inputs = {
     naersk.url = "github:nix-community/naersk/master";
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    dream2nix.url = "github:nix-community/dream2nix";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils, naersk, ... }:
+  outputs = { self, nixpkgs, flake-utils, naersk, dream2nix, ... }:
     let runtimePrograms = pkgs: with pkgs; [ graphviz nodePackages.katex ];
     in {
       lib.makeSite = { pkgs, name, content
         , seams ? self.packages.${pkgs.system}.seams
-        , styles ? self.packages.${pkgs.system}.styles }:
+        , styles ? self.packages.${pkgs.system}.styles
+        , js ? self.packages.${pkgs.system}.js }:
         pkgs.runCommand name {
           buildInputs = [ seams ] ++ runtimePrograms pkgs;
         } ''
@@ -19,6 +21,7 @@
           mkdir -p $out
           seams build ${content} -o $out --script-assets ${./js}
           cp -r ${styles}/* $out/
+          cp -r ${js}/* $out/
         '';
 
     } // flake-utils.lib.eachDefaultSystem (system:
@@ -28,6 +31,59 @@
 
         naersk-lib = pkgs.callPackage naersk { };
         styles = pkgs.callPackage ./styles { };
+
+        js-build = dream2nix.lib.evalModules {
+          packageSets.nixpkgs = pkgs;
+          modules = [
+            ({ lib, config, dream2nix, ... }:
+              let
+                src = builtins.filterSource
+                  (path: _: # path is of the format /nix/store/hash-whatever/Cargo.toml
+                    let
+                      rootDirName =
+                        builtins.elemAt (lib.splitString "/" path) 4;
+                    in builtins.elem rootDirName [
+                      "js"
+                      "lock.json"
+                      "package-lock.json"
+                      "package.json"
+                      "rollup.config.mjs"
+                      "tsconfig.json"
+                    ]) ./.;
+              in {
+                imports = [
+                  dream2nix.modules.dream2nix.nodejs-package-json-v3
+                  dream2nix.modules.dream2nix.nodejs-granular-v3
+                ];
+
+                nodejs-granular-v3 = {
+                  buildScript = ''
+                    rollup --config
+                    rm out-scripts/*.tsbuildinfo
+                  '';
+                };
+
+                name = lib.mkForce "seams-js";
+                version = lib.mkForce "3.0.0";
+
+                mkDerivation = {
+                  #inherit src;
+                  src = lib.cleanSource ./.;
+                };
+              })
+            {
+              paths.projectRoot = ./.;
+              # can be changed to ".git" or "flake.nix" to get rid of .project-root
+              paths.projectRootFile = "flake.nix";
+              paths.package = ./.;
+            }
+          ];
+        };
+
+        js = pkgs.runCommand "seams-js" { } ''
+          mkdir -p $out
+          cp -r ${js-build}/lib/node_modules/seams-js/out-scripts/* $out
+        '';
 
         rustDeps = with pkgs;
           [ openssl pkg-config iconv ]
@@ -55,7 +111,7 @@
 
       in {
         packages = rec {
-          inherit styles seams;
+          inherit js styles seams;
           default = seams;
           test-site = self.lib.makeSite {
             inherit pkgs;
@@ -81,6 +137,7 @@
               just
               python
               nodePackages.npm
+              nodePackages.node2nix
               nodejs_21
             ] ++ rustDeps ++ runtimePrograms pkgs
               ++ lib.optional (system != "aarch64-darwin") [ backblaze-b2 ];
