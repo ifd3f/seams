@@ -69,7 +69,7 @@ pub async fn transform_markdown<'a>(
         .build()
         .unwrap();
 
-    let root = parse_document(&mut arena, raw, &md_options);
+    let root = parse_document(&arena, raw, &md_options);
 
     let mut errors = Errors::new();
 
@@ -81,8 +81,7 @@ pub async fn transform_markdown<'a>(
         errors.extend(es)
     }
 
-    let arena2 = Arena::new();
-    apply_katex(&arena2, root).await.map_err(|e| {
+    apply_katex(&arena, root).await.map_err(|e| {
         e.into_iter()
             .map(|e| MarkdownError {
                 pos: Sourcepos {
