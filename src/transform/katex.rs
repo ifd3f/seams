@@ -36,8 +36,38 @@ pub enum KatexErrorKind {
     CmdFailed(ExitStatus, String),
 }
 
+#[derive(Clone, Copy, Debug, Default)]
+pub enum MathMode {
+    #[default]
+    Inline,
+    Display,
+}
+
+impl MathMode {
+    pub fn html_tag_name(&self) -> &str {
+        match self {
+            MathMode::Inline => "m",
+            MathMode::Display => "M",
+        }
+    }
+
+    pub fn opening_tag(&self) -> &str {
+        match self {
+            MathMode::Inline => "<m>",
+            MathMode::Display => "<M>",
+        }
+    }
+
+    pub fn closing_tag(&self) -> &str {
+        match self {
+            MathMode::Inline => "</m>",
+            MathMode::Display => "</M>",
+        }
+    }
+}
+
 #[tracing::instrument(skip_all)]
-pub async fn transform_math(source: &str, display_mode: bool) -> Result<String, KatexError> {
+pub async fn transform_math(source: &str, display_mode: MathMode) -> Result<String, KatexError> {
     match transform_math_raw(source, display_mode).await {
         Ok(r) => Ok(r),
         Err(e) => Err(KatexError {
@@ -48,14 +78,14 @@ pub async fn transform_math(source: &str, display_mode: bool) -> Result<String, 
 }
 
 #[tracing::instrument(skip_all)]
-async fn transform_math_raw(source: &str, display_mode: bool) -> Result<String, KatexErrorKind> {
+async fn transform_math_raw(source: &str, display_mode: MathMode) -> Result<String, KatexErrorKind> {
     let mut cmd = Command::new("katex");
     cmd.arg("--trust")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .kill_on_drop(true);
-    if display_mode {
+    if let MathMode::Display = display_mode {
         cmd.arg("--display-mode");
     }
 
