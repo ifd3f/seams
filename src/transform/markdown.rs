@@ -21,12 +21,13 @@ use vfs::VfsError;
 use crate::{
     errors::Errors,
     media::{Media, MediaRegistry},
+    transform::katex,
 };
 
 use super::{
     common::TransformContext,
     graphviz::{transform_graphviz, GraphvizError},
-    katex::{transform_text_katex_nodes, KatexError},
+    katex::KatexError,
 };
 
 pub fn make_md_options() -> comrak::Options {
@@ -81,7 +82,7 @@ pub async fn transform_markdown<'a>(
         errors.extend(es)
     }
 
-    apply_katex(&arena, root).await.map_err(|e| {
+    apply_katex(root).await.map_err(|e| {
         e.into_iter()
             .map(|e| MarkdownError {
                 pos: Sourcepos {
@@ -204,23 +205,59 @@ fn parse_graphviz_info(infostr: &str) -> Option<GraphvizInfo> {
 }
 
 #[tracing::instrument(skip_all)]
-pub async fn apply_katex<'a>(
-    arena: &'a Arena<AstNode<'a>>,
-    node: &'a AstNode<'a>,
-) -> Result<(), Errors<KatexError>> {
-    let mut to_visit = node.children().collect_vec();
+pub async fn apply_katex<'a>(node: &'a AstNode<'a>) -> Result<(), Errors<KatexError>> {
+    fn get_math_html(html: &str) -> Option<(&str, bool)> {
+        let display = || Some((html.strip_prefix("<M>")?.strip_suffix("</M>")?, true));
+        let non_display = || Some((html.strip_prefix("<m>")?.strip_suffix("</m>")?, false));
+        display().or_else(non_display)
+    }
 
+    let mut errors = Errors::new();
+    let mut to_visit = node.children().collect_vec();
     while let Some(n) = to_visit.pop() {
-        let borrowed = n.data.borrow();
-        match &borrowed.value {
-            NodeValue::Text(t) => {
-                for new in transform_text_katex_nodes(&t).await? {
-                    let node = AstNode::new(RefCell::new(Ast::new(new, borrowed.sourcepos.start)));
-                    let arenaval = arena.alloc(node);
-                    n.insert_before(arenaval);
+        let mut borrowed = n.data.borrow_mut();
+
+        match &mut borrowed.value {
+            NodeValue::HtmlBlock(b) => {
+                if let Some((math, mode)) = get_math_html(&b.literal) {
+                    match katex::transform_math(math, mode).await {
+                        Ok(html) => {
+                            b.literal = maud::html! {
+                                div .math-block { (html) }
+                            }
+                            .into_string()
+                        }
+                        Err(e) => errors.push(e),
+                    }
                 }
-                n.detach();
             }
+            NodeValue::HtmlInline(h) => {
+                if let Some((math, mode)) = get_math_html(h) {
+                    match katex::transform_math(math, mode).await {
+                        Ok(html) => {
+                            *h = html;
+                        }
+                        Err(e) => errors.push(e),
+                    }
+                }
+            }
+            /*
+            NodeValue::CodeBlock(cb) if cb.info == "math" => {
+                if let Some((mode, math)) = get_math_html(&cb.literal) {
+                    match katex::transform_math(math, mode).await {
+                        Ok(m) => {
+                            let html = maud::html! {
+                                div .math-block {
+                                    (m)
+                                }
+                            }
+                            .into_string();
+                        }
+                        Err(e) => errors.push(e),
+                    }
+                }
+            }
+            */
             _ => to_visit.extend(n.children()),
         }
     }
@@ -314,9 +351,14 @@ pub enum MarkdownErrorKind {
 
 #[cfg(test)]
 mod tests {
-    use crate::transform::test_resources::MULTIPLE_KATEX_STR;
-
     use super::*;
+
+    const MULTIPLE_KATEX_STR: &str =
+        "Let the third-order Taylor series approximation of <m>T_1(t)</m> be the cubic
+function <m>g(t)=at^3+bt^2+ct+d</m>. The blue function on the graph is the Taylor
+series approximation of it. I decided that the simulator would have 16
+increments, so the actual function used is <m>g(t)</m> rescaled to <m>[0,16]</m> centered
+at 8:";
 
     #[tokio::test]
     pub async fn katex_transforms_correctly() {
@@ -324,10 +366,9 @@ mod tests {
         let md = MULTIPLE_KATEX_STR;
         let options = make_md_options();
         let root = parse_document(&mut arena, md, &options);
-        let arena2 = Arena::new();
 
         eprintln!("BEFORE TRANFORM: {root:#?}");
-        apply_katex(&arena2, root).await.unwrap();
+        apply_katex(root).await.unwrap();
         eprintln!("AFTER TRANFORM: {root:#?}");
 
         let mut html = vec![];
@@ -336,7 +377,7 @@ mod tests {
 
         // root.descendants().contains(|n| match n)
         assert!(
-            !html.contains("$g(t)=at"),
+            !html.contains("<m>"),
             "We did not transform correctly.\nFull html: {}",
             html
         );
