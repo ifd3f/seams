@@ -1,18 +1,18 @@
 use itertools::Itertools;
-use maud::{html, Markup, Render};
+use maud::{html, Markup};
 
 use crate::{
     date_sort::DateSort,
     load::document::FullyLoadedDocument,
     model::{
         metadata::{Post, Project},
-        site_data::TagMap,
+        site_data::{SiteData, SiteIndex, TagMap},
         tag::TagSettings,
     },
     templates::util::TagR,
 };
 
-use super::{Base, Navbar, RenderPost, RenderProject};
+use super::{BaseTemplatePage, PageMeta, RenderPost, RenderProject};
 
 pub struct TagPage<'a> {
     pub slug: &'a str,
@@ -40,8 +40,8 @@ impl TagPage<'_> {
     }
 }
 
-impl Render for TagPage<'_> {
-    fn render(&self) -> Markup {
+impl BaseTemplatePage for TagPage<'_> {
+    fn render_page(&self, _sd: &SiteData, _si: &SiteIndex<'_>) -> (PageMeta, Markup) {
         let items = self.items();
 
         let content = html! {
@@ -56,12 +56,11 @@ impl Render for TagPage<'_> {
             }
         };
 
-        Base {
+        let meta = PageMeta {
             title: format!("Tag {}", self.settings.title),
-            navbar: Navbar { highlighted: None },
-            content,
-        }
-        .render()
+            navbar_highlighted: None,
+        };
+        (meta, content)
     }
 }
 

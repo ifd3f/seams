@@ -1,11 +1,13 @@
-use maud::{html, Markup, Render};
+use maud::{html, Markup};
 
-use super::{Base, Navbar, NavbarItem};
+use crate::model::site_data::{SiteData, SiteIndex};
+
+use super::{BaseTemplatePage, NavbarItem, PageMeta};
 
 pub struct AboutPage;
 
-impl Render for AboutPage {
-    fn render(&self) -> Markup {
+impl BaseTemplatePage for AboutPage {
+    fn render_page(&self, _sd: &SiteData, _si: &SiteIndex) -> (PageMeta, Markup) {
         let about = html! {
             h1 style="text-align: center" { "About" }
 
@@ -18,18 +20,18 @@ impl Render for AboutPage {
             p { "This website has undergone 2 rewrites. Now, it is under construction." }
         };
 
-        let base = Base {
+        let meta = PageMeta {
             title: "About".into(),
-            navbar: Navbar {
-                highlighted: Some(NavbarItem::About),
-            },
-            content: html! {
+            navbar_highlighted: Some(NavbarItem::About),
+        };
+
+        (
+            meta,
+            html! {
                 main .container {
                     (about)
                 }
             },
-        };
-
-        base.render()
+        )
     }
 }

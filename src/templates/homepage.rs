@@ -1,37 +1,33 @@
-use maud::{html, Markup, Render};
+use maud::{html, Markup};
 
 use crate::{
-    model::{button88x31::Button88x31, news::NewsItem, site_data::SiteData},
+    model::{
+        button88x31::Button88x31,
+        news::NewsItem,
+        site_data::{SiteData, SiteIndex},
+    },
     templates::*,
 };
 
-pub struct Homepage<'a> {
-    sd: &'a SiteData,
-}
+pub struct Homepage;
 
-impl<'a> Homepage<'a> {
-    pub fn new(sd: &'a SiteData) -> Self {
-        Self { sd }
-    }
-}
-
-impl Render for Homepage<'_> {
-    fn render(&self) -> Markup {
+impl BaseTemplatePage for Homepage {
+    fn render_page(&self, sd: &SiteData, _si: &SiteIndex) -> (PageMeta, Markup) {
         let content = html! {
             main .homepage .container {
                 h1 { "welcome to the site" }
                 p { "please enjoy the site" }
-                (news_box(&self.sd.news))
-                (buttons(&self.sd.buttons))
+                cat-chatbox { }
+                (news_box(&sd.news))
+                (buttons(&sd.buttons))
             }
         };
-        let base = Base {
+        let meta = PageMeta {
             title: "Homepage".into(),
-            navbar: Navbar { highlighted: None },
-            content,
+            navbar_highlighted: None,
         };
 
-        base.render()
+        (meta, content)
     }
 }
 

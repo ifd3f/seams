@@ -9,7 +9,8 @@ use crate::{
     media::MediaRegistry,
     model::site_data::SiteData,
     templates::{
-        AboutPage, BlogIndexPage, Homepage, ProjectIndexPage, RenderPost, RenderProject, TagPage,
+        AboutPage, BaseRenderer, BlogIndexPage, Homepage, ProjectIndexPage, RenderPost,
+        RenderProject, TagPage,
     },
 };
 
@@ -44,6 +45,11 @@ pub async fn build_static_site(
 pub fn write_static_site(sd: &SiteData, outdir: VfsPath) -> anyhow::Result<()> {
     let index = sd.build_index();
 
+    let renderer = BaseRenderer {
+        script_templates: "".into(),
+        site_data: sd,
+        site_index: &index,
+    };
     outdir.create_dir_all()?;
 
     write_file(
@@ -53,47 +59,47 @@ pub fn write_static_site(sd: &SiteData, outdir: VfsPath) -> anyhow::Result<()> {
             .as_bytes(),
     )?;
 
-    write_markup(&outdir, Homepage::new(sd))?;
-    write_markup(&outdir.join("about")?, AboutPage)?;
+    write_markup(&outdir, renderer.render_page(Homepage))?;
+    write_markup(&outdir.join("about")?, renderer.render_page(AboutPage))?;
 
     write_markup(
         &outdir.join("blog")?,
-        BlogIndexPage {
+        renderer.render_page(BlogIndexPage {
             posts: sd.posts.iter().collect(),
             tags: &sd.tags,
-        },
+        }),
     )?;
     for p in &sd.posts {
         write_markup(
             &outdir.join(&p.document.meta.href())?,
-            RenderPost::from(p).full_content_page(&sd.tags),
+            renderer.render_page(RenderPost::from(p)),
         )?;
     }
 
     write_markup(
         &outdir.join("projects")?,
-        ProjectIndexPage {
+        renderer.render_page(ProjectIndexPage {
             projects: sd.projects.iter().collect(),
             tags: &sd.tags,
-        },
+        }),
     )?;
     for p in &sd.projects {
         write_markup(
             &outdir.join(&p.document.meta.href())?,
-            RenderProject::from(p).full_content_page(&sd.tags),
+            renderer.render_page(RenderProject::from(p)),
         )?;
     }
 
     for (slug, settings) in &sd.tags {
         write_markup(
             &outdir.join(format!("t/{slug}"))?,
-            TagPage {
+            renderer.render_page(TagPage {
                 slug,
                 settings,
                 posts: index.tag_to_posts[slug.as_str()].clone(),
                 projects: index.tag_to_projects[slug.as_str()].clone(),
                 all_tags: &sd.tags,
-            },
+            }),
         )?;
     }
 

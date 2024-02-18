@@ -1,29 +1,49 @@
-use maud::{html, Markup, Render, DOCTYPE};
+use maud::{html, Markup, PreEscaped, Render, DOCTYPE};
 
-#[derive(Debug, Clone)]
-pub struct Base {
-    pub title: String,
-    pub navbar: Navbar,
-    pub content: Markup,
+use crate::model::site_data::{SiteData, SiteIndex};
+
+/// Renders pages using the base template
+#[derive(Clone)]
+pub struct BaseRenderer<'a> {
+    pub script_templates: String,
+    pub site_data: &'a SiteData,
+    pub site_index: &'a SiteIndex<'a>,
 }
 
-impl Render for Base {
-    fn render(&self) -> Markup {
+impl BaseRenderer<'_> {
+    pub fn render_page(&self, page: impl BaseTemplatePage) -> Markup {
+        let (page_meta, rendered) = page.render_page(self.site_data, self.site_index);
+        let navbar = Navbar {
+            highlighted: page_meta.navbar_highlighted,
+        };
         html! {
             (DOCTYPE)
             html {
                 head {
-                    title { (self.title) }
+                    title { (page_meta.title) }
                     link rel="stylesheet" type="text/css" href="/styles.css";
                     script type="text/javascript" src="/bundle.js" {}
                 }
                 body {
-                    (self.navbar)
-                    (self.content)
+                    (navbar)
+                    (rendered)
+                    div .script-templates style="display: hidden" {
+                        (PreEscaped(&self.script_templates))
+                    }
                 }
             }
         }
     }
+}
+
+pub struct PageMeta {
+    pub title: String,
+    pub navbar_highlighted: Option<NavbarItem>,
+}
+
+/// A page that uses the base template.
+pub trait BaseTemplatePage {
+    fn render_page(&self, sd: &SiteData, si: &SiteIndex<'_>) -> (PageMeta, Markup);
 }
 
 #[derive(Debug, Clone)]

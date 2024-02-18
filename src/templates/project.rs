@@ -1,15 +1,15 @@
-use maud::{html, Markup, PreEscaped, Render};
+use maud::{html, Markup, PreEscaped};
 
 use crate::{
     load::document::FullyLoadedDocument,
     model::{
         metadata::{Project, ProjectDates},
-        site_data::TagMap,
+        site_data::{SiteData, SiteIndex, TagMap},
     },
     templates::util::tag_list,
 };
 
-use super::{util::format_project_date, Base, NavbarItem};
+use super::{util::format_project_date, BaseTemplatePage, NavbarItem, PageMeta};
 
 type DProject = FullyLoadedDocument<Project>;
 
@@ -19,8 +19,8 @@ pub struct ProjectIndexPage<'a> {
     pub tags: &'a TagMap,
 }
 
-impl Render for ProjectIndexPage<'_> {
-    fn render(&self) -> Markup {
+impl BaseTemplatePage for ProjectIndexPage<'_> {
+    fn render_page(&self, _sd: &SiteData, _si: &SiteIndex<'_>) -> (PageMeta, Markup) {
         let mut projects = self.projects.clone();
         projects.sort_by_key(|p| p.meta().date.sort_key());
         projects.reverse();
@@ -37,12 +37,12 @@ impl Render for ProjectIndexPage<'_> {
             }
         };
 
-        Base {
+        let meta = PageMeta {
             title: "Project".into(),
-            navbar: NavbarItem::Projects.into(),
-            content,
-        }
-        .render()
+            navbar_highlighted: NavbarItem::Projects.into(),
+        };
+
+        (meta, content)
     }
 }
 
@@ -66,19 +66,6 @@ impl<'a> RenderProject<'a> {
                 }
             }
         }
-    }
-
-    pub fn full_content_page(&self, tags: &TagMap) -> Markup {
-        Base {
-            title: self.project.meta().title.clone(),
-            navbar: NavbarItem::Projects.into(),
-            content: html! {
-                main .container .longform {
-                    (self.page_content(tags))
-                }
-            },
-        }
-        .render()
     }
 
     pub fn page_content(&self, tags: &TagMap) -> Markup {
@@ -144,5 +131,22 @@ impl<'a> RenderProject<'a> {
         };
 
         format!("{} - {}", format_project_date(*started), finished)
+    }
+}
+
+impl BaseTemplatePage for RenderProject<'_> {
+    fn render_page(&self, sd: &SiteData, _si: &SiteIndex<'_>) -> (PageMeta, Markup) {
+        let content = html! {
+            main .container .longform {
+                (self.page_content(&sd.tags))
+            }
+        };
+
+        let meta = PageMeta {
+            title: self.project.meta().title.clone(),
+            navbar_highlighted: NavbarItem::Projects.into(),
+        };
+
+        (meta, content)
     }
 }

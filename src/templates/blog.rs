@@ -1,15 +1,15 @@
-use maud::{html, Markup, PreEscaped, Render};
+use maud::{html, Markup, PreEscaped};
 
 use crate::{
     load::document::FullyLoadedDocument,
     model::{
         metadata::{Post, PostDates},
-        site_data::TagMap,
+        site_data::{SiteData, SiteIndex, TagMap},
     },
     templates::util::{format_dt_html, tag_list},
 };
 
-use super::{util::format_dt, Base, NavbarItem};
+use super::{util::format_dt, BaseTemplatePage, NavbarItem, PageMeta};
 
 type DPost = FullyLoadedDocument<Post>;
 
@@ -19,8 +19,8 @@ pub struct BlogIndexPage<'a> {
     pub tags: &'a TagMap,
 }
 
-impl Render for BlogIndexPage<'_> {
-    fn render(&self) -> Markup {
+impl BaseTemplatePage for BlogIndexPage<'_> {
+    fn render_page(&self, _sd: &SiteData, _si: &SiteIndex) -> (PageMeta, Markup) {
         let mut posts = self.posts.clone();
         posts.reverse();
 
@@ -36,12 +36,13 @@ impl Render for BlogIndexPage<'_> {
             }
         };
 
-        Base {
-            title: "Blog".into(),
-            navbar: NavbarItem::Blog.into(),
+        (
+            PageMeta {
+                title: "Blog".into(),
+                navbar_highlighted: NavbarItem::Blog.into(),
+            },
             content,
-        }
-        .render()
+        )
     }
 }
 
@@ -108,19 +109,6 @@ impl<'a> RenderPost<'a> {
         }
     }
 
-    pub fn full_content_page(&self, tags: &TagMap) -> Markup {
-        Base {
-            title: self.post.meta().title.clone(),
-            navbar: NavbarItem::Blog.into(),
-            content: html! {
-                main .container .longform {
-                    (self.page_content(tags))
-                }
-            },
-        }
-        .render()
-    }
-
     pub fn page_content(&self, tags: &TagMap) -> Markup {
         html! {
             article .post-content {
@@ -178,5 +166,20 @@ impl<'a> RenderPost<'a> {
                 }
             }
         }
+    }
+}
+
+impl BaseTemplatePage for RenderPost<'_> {
+    fn render_page(&self, sd: &SiteData, _si: &SiteIndex<'_>) -> (PageMeta, Markup) {
+        let meta = PageMeta {
+            title: self.post.meta().title.clone(),
+            navbar_highlighted: NavbarItem::Blog.into(),
+        };
+        let content = html! {
+            main .container .longform {
+                (self.page_content(&sd.tags))
+            }
+        };
+        (meta, content)
     }
 }
