@@ -270,6 +270,24 @@ mod test {
             Plain("$$".into()),
         ]
     )]
+    #[case(
+        crate::transform::test_resources::MULTIPLE_KATEX_STR,
+        vec![
+            Plain("Let the third-order Taylor series approximation of ".into()),
+            InlineMath("T_1(t)".into()),
+            Plain(" be the cubic\nfunction ".into()),
+            InlineMath("g(t)=at^3+bt^2+ct+d".into()),
+            Plain(
+                ". The blue function on the graph is the Taylor\nseries approximation \
+                of it. I decided that the simulator would have 16\nincrements, so the actual \
+                function used is ".into()
+            ),
+            InlineMath("g(t)".into()),
+            Plain(" rescaled to ".into()),
+            InlineMath("[0,16]".into()),
+            Plain(" centered\nat 8:".into())
+        ]
+    )]
     fn test_find_katex(#[case] input: &str, #[case] expected: Vec<Block>) {
         let actual = find_katex(input);
         assert_eq!(actual, expected);

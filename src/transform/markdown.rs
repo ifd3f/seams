@@ -212,21 +212,17 @@ pub async fn apply_katex<'a>(
     let mut to_visit = node.children().collect_vec();
 
     while let Some(n) = to_visit.pop() {
-        for c in n.children() {
-            let borrowed = c.data.borrow();
-            let nv = borrowed.value.clone();
-            match nv {
-                NodeValue::Text(t) => {
-                    for new in transform_text_katex_nodes(&t).await? {
-                        let node =
-                            AstNode::new(RefCell::new(Ast::new(new, borrowed.sourcepos.start)));
-                        let arenaval = arena.alloc(node);
-                        c.insert_before(arenaval);
-                    }
-                    c.detach();
+        let borrowed = n.data.borrow();
+        match &borrowed.value {
+            NodeValue::Text(t) => {
+                for new in transform_text_katex_nodes(&t).await? {
+                    let node = AstNode::new(RefCell::new(Ast::new(new, borrowed.sourcepos.start)));
+                    let arenaval = arena.alloc(node);
+                    n.insert_before(arenaval);
                 }
-                _ => to_visit.push(c),
+                n.detach();
             }
+            _ => to_visit.extend(n.children()),
         }
     }
 
@@ -319,7 +315,33 @@ pub enum MarkdownErrorKind {
 
 #[cfg(test)]
 mod tests {
+    use crate::transform::test_resources::MULTIPLE_KATEX_STR;
+
     use super::*;
+
+    #[tokio::test]
+    pub async fn katex_transforms_correctly() {
+        let mut arena = Arena::new();
+        let md = MULTIPLE_KATEX_STR;
+        let options = make_md_options();
+        let root = parse_document(&mut arena, md, &options);
+        let arena2 = Arena::new();
+
+        eprintln!("BEFORE TRANFORM: {root:#?}");
+        apply_katex(&arena2, root).await.unwrap();
+        eprintln!("AFTER TRANFORM: {root:#?}");
+
+        let mut html = vec![];
+        format_html_with_plugins(root, &options, &mut html, &comrak::Plugins::default()).unwrap();
+        let html = String::from_utf8_lossy(&html);
+
+        // root.descendants().contains(|n| match n)
+        assert!(
+            !html.contains("$g(t)=at"),
+            "We did not transform correctly.\nFull html: {}",
+            html
+        );
+    }
 
     #[test]
     pub fn transform_image_to_picture_does_not_duplicate_title() {
