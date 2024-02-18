@@ -1,9 +1,10 @@
-use std::{fs::create_dir_all, path::Path};
+use std::{ffi::OsString, fs::create_dir_all, path::Path};
 
 use maud::Render;
 use tokio::time::Instant;
 use tracing::{debug, info};
 use vfs::{PhysicalFS, VfsError, VfsPath};
+use walkdir::WalkDir;
 
 use crate::{
     media::MediaRegistry,
@@ -20,12 +21,20 @@ use super::rss::make_rss;
 pub async fn build_static_site(
     content: impl AsRef<Path>,
     out: impl AsRef<Path>,
+    script_assets: Option<impl AsRef<Path>>,
 ) -> anyhow::Result<()> {
+    let script_assets = script_assets.map(|s| s.as_ref().to_owned());
     info!(
         out = %out.as_ref().to_string_lossy(),
         content = %content.as_ref().to_string_lossy(),
+        script_assets = ?script_assets.clone().map(|s| s.to_string_lossy().into_owned()),
         "Building static site"
     );
+
+    let script_templates = match &script_assets {
+        Some(p) => gather_templates(p)?,
+        None => vec![],
+    };
 
     let start = Instant::now();
 
@@ -35,18 +44,22 @@ pub async fn build_static_site(
 
     let media = MediaRegistry::new("/static".into(), out.join("static")?);
     let sd = SiteData::load(content, &media).await?;
-    write_static_site(&sd, out)?;
+    write_static_site(&sd, out, script_templates)?;
 
     info!(elapsed = ?start.elapsed(), "Completed");
 
     Ok(())
 }
 
-pub fn write_static_site(sd: &SiteData, outdir: VfsPath) -> anyhow::Result<()> {
+pub fn write_static_site(
+    sd: &SiteData,
+    outdir: VfsPath,
+    script_templates: Vec<String>,
+) -> anyhow::Result<()> {
     let index = sd.build_index();
 
     let renderer = BaseRenderer {
-        script_templates: "".into(),
+        script_templates,
         site_data: sd,
         site_index: &index,
     };
@@ -126,4 +139,20 @@ fn write_markup(path: &VfsPath, r: impl Render) -> Result<(), VfsError> {
     );
     write_file(&path.join("index.html")?, &entity_escaped.into_bytes())?;
     Ok(())
+}
+
+fn gather_templates(script_assets: impl AsRef<Path>) -> anyhow::Result<Vec<String>> {
+    let mut script_templates = vec![];
+    for entry in WalkDir::new(script_assets) {
+        let entry = entry?;
+        if !entry.file_type().is_file() {
+            continue;
+        }
+
+        let path = entry.path();
+        if path.extension() == Some(&OsString::from("html")) {
+            script_templates.push(std::fs::read_to_string(path)?)
+        }
+    }
+    Ok(script_templates)
 }

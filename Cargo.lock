@@ -2290,6 +2290,7 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "vfs",
+ "walkdir",
 ]
 
 [[package]]

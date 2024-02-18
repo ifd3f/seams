@@ -31,6 +31,10 @@ pub struct BuildCommand {
     /// Content sources directory
     pub src: PathBuf,
 
+    /// Script assets directory
+    #[clap(long)]
+    pub script_assets: Option<PathBuf>,
+
     /// Output directory
     #[clap(short, long, default_value = "out")]
     pub out: PathBuf,

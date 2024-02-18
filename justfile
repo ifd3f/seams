@@ -15,12 +15,12 @@ styles:
 
 html:
     mkdir -p out/
-    cargo run -- build ./test_data/astrid_dot_tech_example -o out-html
+    cargo run -- build ./test_data/astrid_dot_tech_example -o out-html --script-assets js
     cp -ar out-html/* out-html/.* out/
     chmod +w -R out/
 
 scripts:
     npx rollup --config
     mkdir -p out/
-    rm -f out/*.js out/*.js.map
-    cp -ar out-scripts/*.js out-scripts/*.js.map out/
+    rm -rf out/*.js out/*.js.map
+    cp -r out-scripts/*.js out-scripts/*.js.map out/

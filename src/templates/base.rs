@@ -5,7 +5,7 @@ use crate::model::site_data::{SiteData, SiteIndex};
 /// Renders pages using the base template
 #[derive(Clone)]
 pub struct BaseRenderer<'a> {
-    pub script_templates: String,
+    pub script_templates: Vec<String>,
     pub site_data: &'a SiteData,
     pub site_index: &'a SiteIndex<'a>,
 }
@@ -27,8 +27,10 @@ impl BaseRenderer<'_> {
                 body {
                     (navbar)
                     (rendered)
-                    div .script-templates style="display: hidden" {
-                        (PreEscaped(&self.script_templates))
+                    div #script-templates style="display: none" {
+                        @for st in &self.script_templates {
+                            (PreEscaped(st))
+                        }
                     }
                 }
             }

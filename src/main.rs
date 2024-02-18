@@ -32,7 +32,7 @@ async fn main() {
 async fn _main(args: cli::TopLevel) -> anyhow::Result<()> {
     match args.command {
         cli::Subcommand::Build(b) => {
-            build_static_site(b.src, b.out).await?;
+            build_static_site(b.src, b.out, b.script_assets).await?;
         }
         cli::Subcommand::Upload(u) => {
             u.run().await?;
