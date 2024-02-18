@@ -1,8 +1,5 @@
 pub mod permissive_vec {
-    use serde::Deserialize;
-    use serde::Deserializer;
-    use serde::Serialize;
-    use serde::Serializer;
+    use serde::{Deserialize, Deserializer, Serialize};
 
     #[derive(Serialize, Deserialize)]
     #[serde(untagged)]

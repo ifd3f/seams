@@ -5,8 +5,6 @@ use std::{
     str::Utf8Error,
 };
 
-use comrak::nodes::NodeValue;
-use futures::{stream::FuturesOrdered, StreamExt};
 use tokio::{io::AsyncWriteExt, process::Command, time::Instant};
 use tracing::trace;
 
@@ -78,7 +76,10 @@ pub async fn transform_math(source: &str, display_mode: MathMode) -> Result<Stri
 }
 
 #[tracing::instrument(skip_all)]
-async fn transform_math_raw(source: &str, display_mode: MathMode) -> Result<String, KatexErrorKind> {
+async fn transform_math_raw(
+    source: &str,
+    display_mode: MathMode,
+) -> Result<String, KatexErrorKind> {
     let mut cmd = Command::new("katex");
     cmd.arg("--trust")
         .stdin(Stdio::piped())

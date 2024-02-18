@@ -20,7 +20,8 @@ use crate::{
 use super::{
     common::TransformContext,
     graphviz::{transform_graphviz, GraphvizError},
-    katex::KatexError, katex_md::apply_katex,
+    katex::KatexError,
+    katex_md::apply_katex,
 };
 
 pub fn make_md_options() -> comrak::Options {
@@ -48,7 +49,7 @@ pub async fn transform_markdown<'a>(
     ctx: &'a TransformContext<'a>,
     raw: &'a str,
 ) -> Result<String, Errors<MarkdownError>> {
-    let mut arena = Arena::new();
+    let arena = Arena::new();
 
     let md_options = make_md_options();
 
