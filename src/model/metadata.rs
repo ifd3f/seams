@@ -100,6 +100,7 @@ pub struct Project {
     pub date: ProjectDates,
 
     /// URLs associated with the project.
+    #[serde(default)]
     pub url: ProjectUrls,
 
     /// Accent color. If null, it will be randomly picked based on the slug.

@@ -342,7 +342,5 @@ mod tests {
             "HTML does not contain exactly one occurrence of the title.\nFull html: {}",
             html
         );
-
-        todo!()
     }
 }
