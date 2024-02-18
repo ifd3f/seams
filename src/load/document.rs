@@ -80,8 +80,8 @@ pub enum LoadError {
     #[error("Error during content transform phase: {0}")]
     ContentTransform(#[from] ContentTransformError),
 
-    #[error("Error loading tags: {0}")]
-    TagError(anyhow::Error),
+    #[error("Error loading from /settings: {0}")]
+    SettingsError(anyhow::Error),
 }
 
 /// Errors regarding the document load phase.

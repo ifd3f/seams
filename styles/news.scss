@@ -1,0 +1,50 @@
+$newsbox-outer-border-color: gray;
+$news-item-separator-color: lightgray;
+
+.newsbox {
+    border: 1px solid $newsbox-outer-border-color;
+    background-color: lightgoldenrodyellow;
+    height: 300px;
+    overflow: scroll;
+
+    & p {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    & .items {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    & > header {
+        padding: 3pt;
+        border-bottom: 1px solid $newsbox-outer-border-color;
+
+        & .title {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+    }
+
+    & .item {
+        border-bottom: 1px solid $news-item-separator-color;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        margin-top: 0;
+        margin-bottom: 0;
+
+        & .title {
+            font-size: medium;
+            margin-top: 0;
+            margin-bottom: 0.1em;
+            margin-right: auto;
+        }
+
+        & .date {
+            float: right;
+            vertical-align: top;
+        }
+    }
+}

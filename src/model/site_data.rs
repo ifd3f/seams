@@ -15,6 +15,7 @@ use crate::{
 
 use super::{
     metadata::{Post, Project},
+    news::NewsItem,
     tag::{TagSettings, TagSettingsSheet},
 };
 
@@ -24,6 +25,7 @@ pub struct SiteData {
     pub posts: Vec<FullyLoadedDocument<Post>>,
     pub projects: Vec<FullyLoadedDocument<Project>>,
     pub tags: TagMap,
+    pub news: Vec<NewsItem>,
 }
 
 #[derive(Default, Clone)]
@@ -75,6 +77,11 @@ impl SiteData {
                 Ok(r) => (Some(r), None),
                 Err(e) => (None, Some(e)),
             };
+        let (news, news_failure) =
+            match load_settings_in_dir::<Vec<NewsItem>>(path.join("settings")?, "news") {
+                Ok(r) => (Some(r), None),
+                Err(e) => (None, Some(e)),
+            };
 
         let mut load_errors: Errors<SiteDataUserError> = Default::default();
         load_errors.extend(post_failures);
@@ -82,7 +89,13 @@ impl SiteData {
         if let Some(e) = tag_failure {
             load_errors.push(SiteDataUserError {
                 path: path.join("settings")?,
-                error: LoadError::TagError(e),
+                error: LoadError::SettingsError(e),
+            });
+        }
+        if let Some(e) = news_failure {
+            load_errors.push(SiteDataUserError {
+                path: path.join("settings")?,
+                error: LoadError::SettingsError(e),
             });
         }
 
@@ -100,6 +113,9 @@ impl SiteData {
             }
         }
         let tags = tags.unwrap().materialize(additional_tags);
+        let mut news = news.unwrap();
+        news.sort();
+        news.reverse();
 
         trace!(?tags, "finished loading");
 
@@ -107,6 +123,7 @@ impl SiteData {
             posts,
             projects,
             tags,
+            news,
         })
     }
 

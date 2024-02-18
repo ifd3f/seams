@@ -53,7 +53,7 @@ pub fn write_static_site(sd: &SiteData, outdir: VfsPath) -> anyhow::Result<()> {
             .as_bytes(),
     )?;
 
-    write_markup(&outdir, Homepage)?;
+    write_markup(&outdir, Homepage::new(sd))?;
     write_markup(&outdir.join("about")?, AboutPage)?;
 
     write_markup(
