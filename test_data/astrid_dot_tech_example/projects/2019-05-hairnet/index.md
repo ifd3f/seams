@@ -6,7 +6,7 @@ status: complete
 date:
   started: 2019-05-29
   finished: 2019-09-25
-  published: 2024-02-10 21:39:22.382815-08:00
+  published: 2024-02-10 21:39:22-08:00
 tags:
 - tensorflow
 - image-processing

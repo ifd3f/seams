@@ -6,7 +6,7 @@ status: wip
 date:
   started: 2020-01-01
   finished: 2020-03-01
-  published: 2024-02-10 21:39:22.395491-08:00
+  published: 2024-02-10 21:39:22-08:00
 tags:
 - react-js
 - javascript

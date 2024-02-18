@@ -6,7 +6,7 @@ status: scrapped
 date:
   started: 2018-02-27
   finished: 2018-04-17
-  published: 2024-02-10 21:39:22.399715-08:00
+  published: 2024-02-10 21:39:22-08:00
 tags:
 - java
 - kotlin

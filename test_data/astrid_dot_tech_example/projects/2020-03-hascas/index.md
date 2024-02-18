@@ -6,7 +6,7 @@ status: early
 date:
   started: 2020-03-01
   finished: 2020-11-16
-  published: 2024-02-10 21:39:22.389698-08:00
+  published: 2024-02-10 21:39:22-08:00
 tags:
 - haskell
 - abstract-syntax-trees

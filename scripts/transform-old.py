@@ -11,12 +11,16 @@ import click
 
 
 @click.command()
-@click.option("-o", "--out", help="Output directory root")
+@click.option("-o", "--out", required=True, help="Output directory root")
 @click.option(
     "-f", "--force", is_flag=True, help="Clobber output directory if it exists"
 )
+@click.option(
+    "--published", required=True, help="Default published date"
+)
 @click.argument("input_dir")
-def main(input_dir: str, force: bool, out: str):
+def main(input_dir: str, force: bool, out: str, published: str):
+    published: datetime = datetime.fromisoformat(published)
     if Path(out).exists():
         if force:
             print(f"clobbering {out}")
@@ -39,7 +43,7 @@ def main(input_dir: str, force: bool, out: str):
         transform_tagdecl(p, Path(out))
 
     for p in (Path(input_dir) / "projects").glob("**/*.md"):
-        transform_project(p, Path(out))
+        transform_project(p, Path(out), published)
 
 
 def transform_post(post_file: Path, outdir: Path):
@@ -96,7 +100,7 @@ def transform_post(post_file: Path, outdir: Path):
         f.write(markdown)
 
 
-def transform_project(project_file: Path, outdir: Path):
+def transform_project(project_file: Path, outdir: Path, published_date: datetime):
     with project_file.open("r") as f:
         data = f.read()
     old, markdown = split_graymatter(data)
@@ -110,7 +114,7 @@ def transform_project(project_file: Path, outdir: Path):
         "date": {
             "started": old["startDate"],
             "finished": old.get("endDate"),
-            "published": datetime.now().astimezone(ZoneInfo("America/Los_Angeles")),
+            "published": published_date,
         },
         "tags": old["tags"],
         "url": {},
@@ -178,7 +182,7 @@ def split_graymatter(file_contents: str) -> Tuple[Dict[str, Any], str]:
 
 def transform_tag_slug(tag: str):
     if tag.startswith("/projects/"):
-        return 'projects:' + tag.removeprefix("/projects/").replace('/', '')
+        return 'project:' + tag.removeprefix("/projects/").replace('/', '')
     return tag
 
 

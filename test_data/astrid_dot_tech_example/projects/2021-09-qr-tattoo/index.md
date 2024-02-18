@@ -6,7 +6,7 @@ status: complete
 date:
   started: 2021-09-21
   finished: 2022-02-27
-  published: 2024-02-10 21:39:22.409987-08:00
+  published: 2024-02-10 21:39:22-08:00
 tags:
 - rust
 - transhumanism

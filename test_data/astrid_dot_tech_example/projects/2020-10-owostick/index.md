@@ -6,7 +6,7 @@ status: complete
 date:
   started: 2020-10-01
   finished: 2021-01-16
-  published: 2024-02-10 21:39:22.411320-08:00
+  published: 2024-02-10 21:39:22-08:00
 tags:
 - teledildonics
 - arduino

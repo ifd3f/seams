@@ -6,7 +6,7 @@ status: complete
 date:
   started: 2020-02-20
   finished: 2020-03-05
-  published: 2024-02-10 21:39:22.402605-08:00
+  published: 2024-02-10 21:39:22-08:00
 tags:
 - school:cal-poly=cpe-133
 - verilog

@@ -6,7 +6,7 @@ status: wip
 date:
   started: 2022-07-07
   finished: null
-  published: 2024-02-10 21:39:22.400837-08:00
+  published: 2024-02-10 21:39:22-08:00
 tags:
 - reverse-engineering
 - electrical-engineering

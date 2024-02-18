@@ -7,7 +7,7 @@ status: wip
 date:
   started: 2021-01-07
   finished: null
-  published: 2024-02-10 21:39:22.403834-08:00
+  published: 2024-02-10 21:39:22-08:00
 tags:
 - python
 - ci-cd

@@ -6,7 +6,7 @@ status: complete
 date:
   started: 2017-09-01
   finished: 2018-02-28
-  published: 2024-02-10 21:39:22.413799-08:00
+  published: 2024-02-10 21:39:22-08:00
 tags:
 - libgdx
 - kotlin

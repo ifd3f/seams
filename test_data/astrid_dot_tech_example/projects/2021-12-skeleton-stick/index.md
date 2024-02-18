@@ -6,7 +6,7 @@ status: complete
 date:
   started: 2021-12-15
   finished: 2022-02-15
-  published: 2024-02-10 21:39:22.407522-08:00
+  published: 2024-02-10 21:39:22-08:00
 tags:
 - cybersecurity
 - raspberry-pi

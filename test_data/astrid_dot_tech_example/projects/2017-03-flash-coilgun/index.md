@@ -6,7 +6,7 @@ status: complete
 date:
   started: 2017-03-17
   finished: 2017-03-24
-  published: 2024-02-10 21:39:22.412515-08:00
+  published: 2024-02-10 21:39:22-08:00
 tags:
 - electrical-engineering
 url: {}

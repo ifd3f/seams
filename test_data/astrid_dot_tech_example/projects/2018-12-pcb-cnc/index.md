@@ -6,7 +6,7 @@ status: null
 date:
   started: 2018-12-01
   finished: 2019-02-01
-  published: 2024-02-10 21:39:22.388517-08:00
+  published: 2024-02-10 21:39:22-08:00
 tags:
 - electrical-engineering
 - mechanical-engineering

@@ -6,7 +6,7 @@ status: complete
 date:
   started: 2019-05-14
   finished: 2019-05-29
-  published: 2024-02-10 21:39:22.406312-08:00
+  published: 2024-02-10 21:39:22-08:00
 tags:
 - 3d-printing
 - arduino

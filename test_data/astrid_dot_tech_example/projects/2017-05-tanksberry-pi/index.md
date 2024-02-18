@@ -6,7 +6,7 @@ status: complete
 date:
   started: 2017-05-14
   finished: 2017-07-03
-  published: 2024-02-10 21:39:22.396836-08:00
+  published: 2024-02-10 21:39:22-08:00
 tags:
 - python
 - robotics

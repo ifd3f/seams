@@ -6,7 +6,7 @@ status: scrapped
 date:
   started: 2018-06-01
   finished: 2018-08-15
-  published: 2024-02-10 21:39:22.398360-08:00
+  published: 2024-02-10 21:39:22-08:00
 tags:
 - sensor-fusion
 - motion-sensing
