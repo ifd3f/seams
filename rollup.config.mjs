@@ -1,3 +1,5 @@
+import typescript from "@rollup/plugin-typescript";
+
 export default {
 	input: 'js/index.ts',
 	output: {
@@ -5,4 +7,7 @@ export default {
 		format: 'cjs',
 		sourcemap: true,
 	},
+	plugins: [
+		typescript()
+	]
 };

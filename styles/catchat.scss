@@ -1,0 +1,45 @@
+$catchat-padding: 3px;
+$catchat-avatar-size: 48px;
+
+.catchat-container {
+    border: 1px solid black;
+    padding: $catchat-padding;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+
+    & p {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+}
+
+.catchat-container form {
+    display: flex;
+}
+
+.catchat-input {
+    flex-grow: 1;
+    margin-right: $catchat-padding;
+}
+
+.catchat-entry {
+    display: flex;
+
+    & .avatar {
+        width: $catchat-avatar-size;
+        height: $catchat-avatar-size;
+
+        & img {
+            width: 100%;
+            height: 100%;
+            border-radius: 100%;
+        }
+
+        margin-right: 3px;
+    }
+
+    & .user {
+        font-weight: bold;
+    }
+}
