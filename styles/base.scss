@@ -12,3 +12,8 @@ body {
     padding-left: 12pt;
     padding-right: 12pt;
 }
+
+// We don't want to display the katex alt-text.
+.katex-html {
+    display: none;
+}
