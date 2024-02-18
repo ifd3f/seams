@@ -10,8 +10,8 @@ slug:
   ordinal: 0
   name: qr-tattoo
 date:
-  created: '2021-09-21 22:56:00-07:00'
-  published: '2021-09-21 22:56:00-07:00'
+  created: 2021-09-21 22:56:00-07:00
+  published: 2021-09-21 22:56:00-07:00
 
 ---
 

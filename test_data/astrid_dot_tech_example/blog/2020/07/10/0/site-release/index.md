@@ -9,8 +9,8 @@ slug:
   ordinal: 0
   name: site-release
 date:
-  created: '2020-07-10 11:48:00-07:00'
-  published: '2020-07-10 11:48:00-07:00'
+  created: 2020-07-10 11:48:00-07:00
+  published: 2020-07-10 11:48:00-07:00
 
 ---
 

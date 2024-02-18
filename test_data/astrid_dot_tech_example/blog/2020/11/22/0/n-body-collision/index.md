@@ -12,8 +12,8 @@ slug:
   ordinal: 0
   name: n-body-collision
 date:
-  created: '2020-11-22 00:00:00-08:00'
-  published: '2020-11-22 00:00:00-08:00'
+  created: 2020-11-22 00:00:00-08:00
+  published: 2020-11-22 00:00:00-08:00
 
 ---
 

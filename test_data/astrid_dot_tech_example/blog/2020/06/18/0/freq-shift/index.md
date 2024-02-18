@@ -17,8 +17,8 @@ slug:
   ordinal: 0
   name: freq-shift
 date:
-  created: '2020-06-18 00:00:00-07:00'
-  published: '2020-06-18 00:00:00-07:00'
+  created: 2020-06-18 00:00:00-07:00
+  published: 2020-06-18 00:00:00-07:00
 
 ---
 

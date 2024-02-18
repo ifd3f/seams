@@ -11,8 +11,8 @@ slug:
   ordinal: 0
   name: two-disk-encrypted-zfs
 date:
-  created: '2021-12-16 18:31:27-08:00'
-  published: '2021-12-16 18:31:27-08:00'
+  created: 2021-12-16 18:31:27-08:00
+  published: 2021-12-16 18:31:27-08:00
 
 ---
 

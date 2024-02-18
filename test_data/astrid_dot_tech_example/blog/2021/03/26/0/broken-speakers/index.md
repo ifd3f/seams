@@ -9,8 +9,8 @@ slug:
   ordinal: 0
   name: broken-speakers
 date:
-  created: '2021-03-26 12:33:50-08:00'
-  published: '2021-03-26 12:33:50-08:00'
+  created: 2021-03-26 12:33:50-08:00
+  published: 2021-03-26 12:33:50-08:00
 
 ---
 

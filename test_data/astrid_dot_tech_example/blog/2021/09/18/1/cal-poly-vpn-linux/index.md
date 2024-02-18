@@ -9,8 +9,8 @@ slug:
   ordinal: 0
   name: cal-poly-vpn-linux
 date:
-  created: '2021-09-18 23:56:03-07:00'
-  published: '2021-09-18 23:56:03-07:00'
+  created: 2021-09-18 23:56:03-07:00
+  published: 2021-09-18 23:56:03-07:00
 
 ---
 

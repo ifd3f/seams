@@ -14,8 +14,8 @@ slug:
   ordinal: 0
   name: facebook-internship
 date:
-  created: '2021-04-08 12:48:35-07:00'
-  published: '2021-04-08 12:48:35-07:00'
+  created: 2021-04-08 12:48:35-07:00
+  published: 2021-04-08 12:48:35-07:00
 
 ---
 

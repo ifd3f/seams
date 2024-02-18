@@ -9,8 +9,8 @@ slug:
   ordinal: 0
   name: nixos-sp6
 date:
-  created: '2022-03-05 14:04:23-08:00'
-  published: '2022-03-05 14:04:23-08:00'
+  created: 2022-03-05 14:04:23-08:00
+  published: 2022-03-05 14:04:23-08:00
 
 ---
 

@@ -14,8 +14,8 @@ slug:
   ordinal: 0
   name: blink-mini-dumping
 date:
-  created: '2022-07-12 17:47:14-07:00'
-  published: '2022-07-12 17:47:14-07:00'
+  created: 2022-07-12 17:47:14-07:00
+  published: 2022-07-12 17:47:14-07:00
 
 ---
 

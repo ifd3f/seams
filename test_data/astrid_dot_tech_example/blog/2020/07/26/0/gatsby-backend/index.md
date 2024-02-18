@@ -10,8 +10,8 @@ slug:
   ordinal: 0
   name: gatsby-backend
 date:
-  created: '2020-07-26 01:07:00-07:00'
-  published: '2020-07-26 01:07:00-07:00'
+  created: 2020-07-26 01:07:00-07:00
+  published: 2020-07-26 01:07:00-07:00
 
 ---
 

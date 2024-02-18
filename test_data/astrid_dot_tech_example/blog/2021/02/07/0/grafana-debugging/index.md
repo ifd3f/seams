@@ -12,8 +12,8 @@ slug:
   ordinal: 0
   name: grafana-debugging
 date:
-  created: '2021-02-07 02:37:00-08:00'
-  published: '2021-02-07 02:37:00-08:00'
+  created: 2021-02-07 02:37:00-08:00
+  published: 2021-02-07 02:37:00-08:00
 
 ---
 

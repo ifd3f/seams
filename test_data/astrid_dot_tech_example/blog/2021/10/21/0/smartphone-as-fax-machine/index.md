@@ -10,8 +10,8 @@ slug:
   ordinal: 0
   name: smartphone-as-fax-machine
 date:
-  created: '2021-10-21 22:51:53-07:00'
-  published: '2021-10-21 22:51:53-07:00'
+  created: 2021-10-21 22:51:53-07:00
+  published: 2021-10-21 22:51:53-07:00
 
 ---
 

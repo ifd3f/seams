@@ -11,8 +11,8 @@ slug:
   ordinal: 0
   name: horrible-bootloader-workaround
 date:
-  created: '2021-10-18 19:20:01-07:00'
-  published: '2021-10-18 19:20:01-07:00'
+  created: 2021-10-18 19:20:01-07:00
+  published: 2021-10-18 19:20:01-07:00
 
 ---
 

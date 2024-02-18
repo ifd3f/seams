@@ -8,8 +8,8 @@ slug:
   ordinal: 0
   name: aprs-ride
 date:
-  created: '2021-11-21 09:21:16-08:00'
-  published: '2021-11-21 09:21:16-08:00'
+  created: 2021-11-21 09:21:16-08:00
+  published: 2021-11-21 09:21:16-08:00
 
 ---
 

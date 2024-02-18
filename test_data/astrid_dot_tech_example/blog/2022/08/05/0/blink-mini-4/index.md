@@ -13,8 +13,8 @@ slug:
   ordinal: 0
   name: blink-mini-4
 date:
-  created: '2022-08-05 19:08:09-07:00'
-  published: '2022-08-05 19:08:09-07:00'
+  created: 2022-08-05 19:08:09-07:00
+  published: 2022-08-05 19:08:09-07:00
 
 ---
 

@@ -9,8 +9,8 @@ slug:
   ordinal: 0
   name: pi-tft
 date:
-  created: '2021-11-07 01:34:30-07:00'
-  published: '2021-11-07 01:34:30-07:00'
+  created: 2021-11-07 01:34:30-07:00
+  published: 2021-11-07 01:34:30-07:00
 
 ---
 

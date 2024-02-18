@@ -9,8 +9,8 @@ slug:
   ordinal: 0
   name: linux-multi-monitor-tablet
 date:
-  created: '2021-09-23 21:07:16-07:00'
-  published: '2021-09-23 21:07:16-07:00'
+  created: 2021-09-23 21:07:16-07:00
+  published: 2021-09-23 21:07:16-07:00
 
 ---
 

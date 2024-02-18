@@ -13,8 +13,8 @@ slug:
   ordinal: 0
   name: vibrator
 date:
-  created: '2021-11-04 23:37:33-07:00'
-  published: '2021-11-04 23:37:33-07:00'
+  created: 2021-11-04 23:37:33-07:00
+  published: 2021-11-04 23:37:33-07:00
 
 ---
 

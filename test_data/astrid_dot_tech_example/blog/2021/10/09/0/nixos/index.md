@@ -8,8 +8,8 @@ slug:
   ordinal: 0
   name: nixos
 date:
-  created: '2021-10-09 14:44:58-07:00'
-  published: '2021-10-09 14:44:58-07:00'
+  created: 2021-10-09 14:44:58-07:00
+  published: 2021-10-09 14:44:58-07:00
 
 ---
 

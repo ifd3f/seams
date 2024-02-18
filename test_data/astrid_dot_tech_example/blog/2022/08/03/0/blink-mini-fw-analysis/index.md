@@ -13,8 +13,8 @@ slug:
   ordinal: 0
   name: blink-mini-fw-analysis
 date:
-  created: '2022-08-03 10:01:19-07:00'
-  published: '2022-08-03 10:01:19-07:00'
+  created: 2022-08-03 10:01:19-07:00
+  published: 2022-08-03 10:01:19-07:00
 
 ---
 

@@ -10,8 +10,8 @@ slug:
   ordinal: 0
   name: k8s-freeipa-dns
 date:
-  created: '2021-04-18 12:35:45-08:00'
-  published: '2021-04-18 12:35:45-08:00'
+  created: 2021-04-18 12:35:45-08:00
+  published: 2021-04-18 12:35:45-08:00
 
 ---
 

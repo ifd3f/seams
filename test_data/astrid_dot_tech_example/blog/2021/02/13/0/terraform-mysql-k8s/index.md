@@ -14,8 +14,8 @@ slug:
   ordinal: 0
   name: terraform-mysql-k8s
 date:
-  created: '2021-02-13 12:10:50-08:00'
-  published: '2021-02-13 12:10:50-08:00'
+  created: 2021-02-13 12:10:50-08:00
+  published: 2021-02-13 12:10:50-08:00
 
 ---
 

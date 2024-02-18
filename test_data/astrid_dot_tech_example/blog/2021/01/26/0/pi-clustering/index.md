@@ -11,8 +11,8 @@ slug:
   ordinal: 0
   name: pi-clustering
 date:
-  created: '2021-01-26 22:29:00-08:00'
-  published: '2021-01-26 22:29:00-08:00'
+  created: 2021-01-26 22:29:00-08:00
+  published: 2021-01-26 22:29:00-08:00
 
 ---
 

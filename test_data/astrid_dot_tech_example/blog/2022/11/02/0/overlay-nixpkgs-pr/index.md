@@ -9,8 +9,8 @@ slug:
   ordinal: 0
   name: overlay-nixpkgs-pr
 date:
-  created: '2022-11-02 18:44:56-07:00'
-  published: '2022-11-02 18:44:56-07:00'
+  created: 2022-11-02 18:44:56-07:00
+  published: 2022-11-02 18:44:56-07:00
 
 ---
 

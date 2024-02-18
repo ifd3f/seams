@@ -8,8 +8,8 @@ slug:
   ordinal: 0
   name: belated-anniversary
 date:
-  created: '2021-10-14 00:27:33-07:00'
-  published: '2021-10-14 00:27:33-07:00'
+  created: 2021-10-14 00:27:33-07:00
+  published: 2021-10-14 00:27:33-07:00
 
 ---
 

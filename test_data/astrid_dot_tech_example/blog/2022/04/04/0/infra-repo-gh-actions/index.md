@@ -12,8 +12,8 @@ slug:
   ordinal: 0
   name: infra-repo-gh-actions
 date:
-  created: '2022-04-04 17:37:04-07:00'
-  published: '2022-04-04 17:37:04-07:00'
+  created: 2022-04-04 17:37:04-07:00
+  published: 2022-04-04 17:37:04-07:00
 
 ---
 

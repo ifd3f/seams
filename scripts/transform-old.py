@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from copy import copy
 import re
 from datetime import datetime, timezone, tzinfo
 from pathlib import Path
@@ -86,8 +87,8 @@ def transform_post(post_file: Path, outdir: Path):
             "name": slug,
         },
         "date": {
-            "created": str(date),
-            "published": str(date),
+            "created": copy(date),
+            "published": copy(date),
         },
     }
 

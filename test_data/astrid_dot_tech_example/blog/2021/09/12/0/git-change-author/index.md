@@ -8,8 +8,8 @@ slug:
   ordinal: 0
   name: git-change-author
 date:
-  created: '2021-09-12 02:35:23-07:00'
-  published: '2021-09-12 02:35:23-07:00'
+  created: 2021-09-12 02:35:23-07:00
+  published: 2021-09-12 02:35:23-07:00
 
 ---
 

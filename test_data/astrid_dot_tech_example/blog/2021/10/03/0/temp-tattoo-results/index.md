@@ -7,8 +7,8 @@ slug:
   ordinal: 0
   name: temp-tattoo-results
 date:
-  created: '2021-10-03 00:28:21-07:00'
-  published: '2021-10-03 00:28:21-07:00'
+  created: 2021-10-03 00:28:21-07:00
+  published: 2021-10-03 00:28:21-07:00
 
 ---
 

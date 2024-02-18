@@ -12,8 +12,8 @@ slug:
   ordinal: 0
   name: acs-spring-2022
 date:
-  created: '2022-03-24 14:34:12-07:00'
-  published: '2022-03-24 14:34:12-07:00'
+  created: 2022-03-24 14:34:12-07:00
+  published: 2022-03-24 14:34:12-07:00
 
 ---
 

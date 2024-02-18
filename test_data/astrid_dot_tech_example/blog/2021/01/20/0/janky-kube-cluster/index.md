@@ -14,8 +14,8 @@ slug:
   ordinal: 0
   name: janky-kube-cluster
 date:
-  created: '2021-01-20 22:14:00-08:00'
-  published: '2021-01-20 22:14:00-08:00'
+  created: 2021-01-20 22:14:00-08:00
+  published: 2021-01-20 22:14:00-08:00
 
 ---
 

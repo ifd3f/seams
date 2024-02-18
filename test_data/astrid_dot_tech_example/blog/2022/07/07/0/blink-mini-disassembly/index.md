@@ -14,8 +14,8 @@ slug:
   ordinal: 0
   name: blink-mini-disassembly
 date:
-  created: '2022-07-07 14:38:11-07:00'
-  published: '2022-07-07 14:38:11-07:00'
+  created: 2022-07-07 14:38:11-07:00
+  published: 2022-07-07 14:38:11-07:00
 
 ---
 

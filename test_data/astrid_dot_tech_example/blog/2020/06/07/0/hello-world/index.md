@@ -10,8 +10,8 @@ slug:
   ordinal: 0
   name: hello-world
 date:
-  created: '2020-06-07 10:23:00-07:00'
-  published: '2020-06-07 10:23:00-07:00'
+  created: 2020-06-07 10:23:00-07:00
+  published: 2020-06-07 10:23:00-07:00
 
 ---
 
