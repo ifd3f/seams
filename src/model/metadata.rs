@@ -7,6 +7,8 @@ use crate::{
     random_coloring::{ColorProfileExt, PASTEL},
 };
 
+use super::tag::Taggable;
+
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Post {
     /// Title of the post.
@@ -57,6 +59,12 @@ impl Post {
 
     pub fn css_color(&self) -> String {
         extract_color(self.color.clone(), &self.slug.name)
+    }
+}
+
+impl Taggable for Post {
+    fn tags(&self) -> impl Iterator<Item = &str> {
+        self.tags.iter().map(|s| s.as_str())
     }
 }
 
@@ -137,6 +145,12 @@ impl Project {
 
     pub fn css_color(&self) -> String {
         extract_color(self.color.clone(), &self.slug)
+    }
+}
+
+impl Taggable for Project {
+    fn tags(&self) -> impl Iterator<Item = &str> {
+        self.tags.iter().map(|s| s.as_str())
     }
 }
 

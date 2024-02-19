@@ -5,6 +5,7 @@ use crate::{
     model::{
         metadata::{Post, PostDates},
         site_data::{SiteData, SiteIndex, TagMap},
+        tag::TaggableExt,
     },
     templates::util::{format_dt_html, tag_list},
 };
@@ -57,7 +58,7 @@ impl<'a> RenderPost<'a> {
         let meta = self.post.meta();
 
         html! {
-            div .post-row {
+            div .post-row .nsfw[meta.has_tag("nsfw")] {
                 div .datepane {
                     p .date { a href=(meta.href()) { (self.date()) } }
                 }
@@ -81,7 +82,12 @@ impl<'a> RenderPost<'a> {
         let meta = self.post.meta();
 
         html! {
-            nav .tile style=(format!("background-color: {}", meta.css_color())) {
+            nav
+                .tile
+                .nsfw[meta.has_tag("nsfw")]
+                style=(format!("background-color: {}", meta.css_color()))
+            {
+
                 header {
                     h2 { (self.linked_title()) }
                     (self.tagline())

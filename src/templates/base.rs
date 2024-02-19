@@ -16,6 +16,7 @@ impl BaseRenderer<'_> {
         let navbar = Navbar {
             highlighted: page_meta.navbar_highlighted,
         };
+
         html! {
             (DOCTYPE)
             html {
@@ -30,6 +31,14 @@ impl BaseRenderer<'_> {
                     div #script-templates style="display: none" {
                         @for st in &self.script_templates {
                             (PreEscaped(st))
+                        }
+                    }
+                    footer {
+                        div {
+                            input #nsfw-switch type="checkbox";
+                            label for="nsfw-switch" {
+                                "I am over 18 and am willing to see Not Safe for Work (NSFW) content."
+                            }
                         }
                     }
                 }

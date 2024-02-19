@@ -1,0 +1,7 @@
+.nsfw {
+    display: none;
+}
+
+.show-nsfw .nsfw {
+    display: unset;
+}

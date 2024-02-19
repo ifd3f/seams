@@ -142,3 +142,17 @@ impl Monoid for TagSettingsSheet {
         Default::default()
     }
 }
+
+pub trait Taggable {
+    fn tags(&self) -> impl Iterator<Item = &str>;
+}
+
+pub trait TaggableExt {
+    fn has_tag(&self, tag: &str) -> bool;
+}
+
+impl<T: Taggable> TaggableExt for T {
+    fn has_tag(&self, tag: &str) -> bool {
+        self.tags().any(|t| t == tag)
+    }
+}

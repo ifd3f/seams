@@ -5,6 +5,7 @@ use crate::{
     model::{
         metadata::{Project, ProjectDates},
         site_data::{SiteData, SiteIndex, TagMap},
+        tag::TaggableExt,
     },
     templates::util::tag_list,
 };
@@ -54,14 +55,20 @@ pub struct RenderProject<'a> {
 
 impl<'a> RenderProject<'a> {
     pub fn tile(&self, tags: &TagMap) -> Markup {
+        let meta = self.project.meta();
+
         html! {
-            nav .tile style=(format!("background-color: {}", self.project.meta().css_color())) {
+            nav
+                .tile
+                .nsfw[meta.has_tag("nsfw")]
+                style=(format!("background-color: {}", meta.css_color()))
+            {
                 header {
                     h2 .title {
-                        a href=(self.project.meta().href()) { (self.project.meta().title) }
+                        a href=(meta.href()) { (meta.title) }
                     }
                     (self.tagline())
-                    (tag_list(tags, &self.project.meta().tags))
+                    (tag_list(tags, &meta.tags))
                     p .date { (self.date()) }
                 }
             }
