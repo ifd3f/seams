@@ -59,7 +59,6 @@
                 nodejs-granular-v3 = {
                   buildScript = ''
                     rollup --config
-                    rm out-scripts/*.tsbuildinfo
                   '';
                 };
 
