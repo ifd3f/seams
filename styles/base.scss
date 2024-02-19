@@ -17,3 +17,22 @@ body {
 .katex-html {
     display: none;
 }
+
+.site-footer {
+    background-color: $footer-bg-color;
+    color: white;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+    padding-bottom: 4em;
+
+    & a {
+        color: lightblue;
+    }
+    & a:hover {
+        color: lightgoldenrodyellow;
+    }
+    & a:visited {
+        color: lightpink;
+    }
+}
