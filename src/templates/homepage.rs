@@ -67,7 +67,12 @@ fn news_box<'a>(items: impl IntoIterator<Item = &'a NewsItem>) -> Markup {
 fn buttons<'a>(buttons: impl IntoIterator<Item = &'a Button88x31>) -> Markup {
     fn button(b: &Button88x31) -> Markup {
         let img = html! {
-            img src=(b.img) alt=[&b.alt] title=[&b.title];
+            img
+                .clickable[b.onclick.is_some()]
+                src=(b.img)
+                alt=[&b.alt]
+                title=[&b.title]
+                onclick=[&b.onclick];
         };
         match &b.href {
             Some(href) => html! {

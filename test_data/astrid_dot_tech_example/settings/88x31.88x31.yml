@@ -38,3 +38,6 @@
 - img: https://s3.us-west-000.backblazeb2.com/nyaabucket/d699b94dbc9188dc79070fae5ef9eb46993e25fdd39f4d342aa4013c2b10a683/valid-bad.gif
 - img: https://s3.us-west-000.backblazeb2.com/nyaabucket/d03f1eb3fc140df2417442a5cc04e24a68df77cf3f7907756f0943820ceafcac/valid-html5.gif
 - img: https://s3.us-west-000.backblazeb2.com/nyaabucket/d60a9b327a20f1dd09a58ae9d459e75bacf257c5c68e0b7e09792aef225cde53/wikipedia2.gif
+
+- img: https://s3.us-west-000.backblazeb2.com/nyaabucket/1d19de8c307bd3cb0c724e43f528846ccfffd34fad3543293c89748be1035e4f/xp.gif
+  onclick: playRandomXPSound()

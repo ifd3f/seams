@@ -7,4 +7,5 @@ pub struct Button88x31 {
     pub title: Option<String>,
     pub alt: Option<String>,
     pub href: Option<String>,
+    pub onclick: Option<String>,
 }
