@@ -1,4 +1,5 @@
-use maud::{html, Markup, PreEscaped};
+use itertools::Itertools;
+use maud::{html, Markup, PreEscaped, Render};
 
 use crate::{
     load::document::FullyLoadedDocument,
@@ -15,25 +16,19 @@ use super::{util::format_dt, BaseTemplatePage, NavbarItem, PageMeta};
 type DPost = FullyLoadedDocument<Post>;
 
 #[derive(Clone)]
-pub struct BlogIndexPage<'a> {
-    pub posts: Vec<&'a DPost>,
-    pub tags: &'a TagMap,
-}
+pub struct BlogIndexPage;
 
-impl BaseTemplatePage for BlogIndexPage<'_> {
-    fn render_page(&self, _sd: &SiteData, _si: &SiteIndex) -> (PageMeta, Markup) {
-        let mut posts = self.posts.clone();
+impl BaseTemplatePage for BlogIndexPage {
+    fn render_page(&self, sd: &SiteData, _si: &SiteIndex) -> (PageMeta, Markup) {
+        let mut posts = sd.posts.iter().collect_vec();
+        posts.sort_by_key(|p| p.meta().date.published);
         posts.reverse();
 
         let content = html! {
             main .container .blog-root {
                 h1 style="text-align: center;" { "Blog" }
 
-                div .posts-table {
-                    @for p in posts {
-                        (RenderPost::from(p).row(&self.tags))
-                    }
-                }
+                (PostsTable { posts, tags: &sd.tags })
             }
         };
 
@@ -44,6 +39,24 @@ impl BaseTemplatePage for BlogIndexPage<'_> {
             },
             content,
         )
+    }
+}
+
+#[derive(Clone)]
+pub struct PostsTable<'a> {
+    pub posts: Vec<&'a DPost>,
+    pub tags: &'a TagMap,
+}
+
+impl Render for PostsTable<'_> {
+    fn render(&self) -> Markup {
+        html! {
+            div .posts-table {
+                @for p in &self.posts {
+                    (RenderPost::from(*p).row(&self.tags))
+                }
+            }
+        }
     }
 }
 

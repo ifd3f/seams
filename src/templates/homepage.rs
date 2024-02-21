@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use maud::{html, Markup};
 
 use crate::{
@@ -9,10 +10,17 @@ use crate::{
     templates::*,
 };
 
+pub const MAX_POSTS_ON_FRONT_PAGE: usize = 5;
+
 pub struct Homepage;
 
 impl BaseTemplatePage for Homepage {
     fn render_page(&self, sd: &SiteData, _si: &SiteIndex) -> (PageMeta, Markup) {
+        let mut posts = sd.posts.iter().collect_vec();
+        posts.sort_by_key(|p| p.meta().date.published);
+        posts.reverse();
+        posts.truncate(MAX_POSTS_ON_FRONT_PAGE);
+
         let content = html! {
             main .homepage .container {
                 div style="text-align: center" {
@@ -24,6 +32,10 @@ impl BaseTemplatePage for Homepage {
                 h1 { "welcome to the site" }
                 p { "please enjoy the site" }
                 (news_box(&sd.news))
+                div .recent-posts-widget {
+                    h2 { "Recent blog posts" }
+                    (PostsTable { posts, tags: &sd.tags })
+                }
                 cat-chatbox { }
                 (buttons(&sd.buttons))
             }

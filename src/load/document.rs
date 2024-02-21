@@ -54,6 +54,7 @@ pub enum ContentSource {
 }
 
 /// Content that has been transformed into HTML.
+#[derive(Clone)]
 pub struct TransformedContent {
     /// The raw HTML.
     pub html: String,
@@ -181,6 +182,7 @@ pub async fn fully_load_docdir<M: DeserializeOwned>(
     Ok(futures.collect::<Vec<_>>().await)
 }
 
+#[derive(Clone)]
 pub struct FullyLoadedDocument<M> {
     pub document: Document<M>,
     pub content: Content,

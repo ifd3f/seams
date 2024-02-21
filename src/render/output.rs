@@ -77,10 +77,7 @@ pub fn write_static_site(
 
     write_markup(
         &outdir.join("blog")?,
-        renderer.render_page(BlogIndexPage {
-            posts: sd.posts.iter().collect(),
-            tags: &sd.tags,
-        }),
+        renderer.render_page(BlogIndexPage),
     )?;
     for p in &sd.posts {
         write_markup(
