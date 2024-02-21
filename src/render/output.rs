@@ -66,7 +66,7 @@ pub fn write_static_site(
     outdir.create_dir_all()?;
 
     write_file(
-        &outdir.join("feed.rss")?,
+        &outdir.join("feed.xml")?,
         make_rss("https://astrid.tech", &sd.posts)
             .to_string()
             .as_bytes(),

@@ -23,6 +23,12 @@ impl BaseRenderer<'_> {
                 head {
                     title { (page_meta.title) }
                     link rel="stylesheet" type="text/css" href="/styles.css";
+                    link
+                        rel="alternate"
+                        type="application/rss+xml"
+                        title="RSS Feed for astrid.tech"
+                        href="/feed.xml";
+
                     script type="text/javascript" src="/bundle.js" {}
                 }
                 body {
