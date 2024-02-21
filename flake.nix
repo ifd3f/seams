@@ -35,41 +35,7 @@
         js-build = dream2nix.lib.evalModules {
           packageSets.nixpkgs = pkgs;
           modules = [
-            ({ lib, config, dream2nix, ... }:
-              let
-                src = builtins.filterSource
-                  (path: _: # path is of the format /nix/store/hash-whatever/Cargo.toml
-                    let
-                      rootDirName =
-                        builtins.elemAt (lib.splitString "/" path) 4;
-                    in builtins.elem rootDirName [
-                      "js"
-                      "lock.json"
-                      "package-lock.json"
-                      "package.json"
-                      "rollup.config.mjs"
-                      "tsconfig.json"
-                    ]) ./.;
-              in {
-                imports = [
-                  dream2nix.modules.dream2nix.nodejs-package-json-v3
-                  dream2nix.modules.dream2nix.nodejs-granular-v3
-                ];
-
-                nodejs-granular-v3 = {
-                  buildScript = ''
-                    rollup --config
-                  '';
-                };
-
-                name = lib.mkForce "seams-js";
-                version = lib.mkForce "3.0.0";
-
-                mkDerivation = {
-                  #inherit src;
-                  src = lib.cleanSource ./.;
-                };
-              })
+            ./nix/js.nix
             {
               paths.projectRoot = ./.;
               # can be changed to ".git" or "flake.nix" to get rid of .project-root
