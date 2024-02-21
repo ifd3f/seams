@@ -10,3 +10,4 @@ out-html/
 node_modules
 out-scripts
 .rollup.cache
+*.tsbuildinfo
