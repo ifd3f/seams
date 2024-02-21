@@ -20,6 +20,11 @@ const you: User = {
 
 type Message = { user: User; text: string };
 
+/**
+ * A custom element that has a chatbox you can talk to.
+ *
+ * It is extremely smart.
+ */
 export class CatChatbox extends HTMLElement {
   constructor() {
     super();
@@ -28,12 +33,39 @@ export class CatChatbox extends HTMLElement {
   connectedCallback() {
     const box = new ActiveCatChatbox(this);
     box.queueMessage({
-      user: assistant,
-      text: "Hello! I'm your virtual assistant. Let me know if you need anything!",
+      message: {
+        user: assistant,
+        text: "Hello! I'm your virtual assistant. Let me know if you need anything!",
+      },
+      scrollToBottom: false,
     });
   }
 }
 
+type QueueMessageParams = {
+  /**
+   * The message to insert into the chatbox
+   */
+  message: Message;
+  /**
+   * Whether or not to scroll to the bottom of the chat log
+   */
+  scrollToBottom?: boolean;
+  /**
+   * Time in ms to wait before the "X is typing..." animation to start
+   */
+  timeToStartTyping?: number;
+  /**
+   * Time in ms after the "X is typing..." animation to wait before sending the message.
+   */
+  typingTime?: number;
+};
+
+/**
+ * The actual, active state of the chatbox.
+ *
+ * Only created after the element is connected to the DOM.
+ */
 class ActiveCatChatbox {
   chatTemplate: HTMLTemplateElement;
 
@@ -43,22 +75,22 @@ class ActiveCatChatbox {
 
   constructor(private root: HTMLElement) {
     const boxTemplate = document.getElementById(
-      "catchat-template"
+      "catchat-template",
     ) as HTMLTemplateElement;
     this.chatTemplate = document.getElementById(
-      "catchat-message-template"
+      "catchat-message-template",
     ) as HTMLTemplateElement;
 
     root.appendChild(boxTemplate.content.cloneNode(true));
 
     this.chatlog = root.getElementsByClassName(
-      "catchat-message-log"
+      "catchat-message-log",
     )[0] as HTMLElement;
     this.chatform = root.getElementsByClassName(
-      "catchat-form"
+      "catchat-form",
     )[0] as HTMLFormElement;
     this.ellipsis = root.getElementsByClassName(
-      "catchat-ellipsis"
+      "catchat-ellipsis",
     )[0] as HTMLElement;
 
     this.chatform.onsubmit = (ev) => {
@@ -73,7 +105,10 @@ class ActiveCatChatbox {
       this.addMessage({ user: you, text: message });
       this.chatform.reset();
       this.scrollToBottom();
-      this.queueMessage({ user: assistant, text: generateNya() });
+      this.queueMessage({
+        message: { user: assistant, text: generateNya() },
+        scrollToBottom: true,
+      });
     };
   }
 
@@ -95,16 +130,22 @@ class ActiveCatChatbox {
     this.chatlog.append(node);
   }
 
-  queueMessage(message: Message) {
+  queueMessage({
+    message,
+    scrollToBottom = true,
+    timeToStartTyping = 1000,
+    typingTime = 1000,
+  }: QueueMessageParams) {
     setTimeout(() => {
       this.setEllipsis(true);
-      this.scrollToBottom();
       setTimeout(() => {
         this.setEllipsis(false);
         this.addMessage(message);
-        this.scrollToBottom();
-      }, 1000);
-    }, 1000);
+        if (scrollToBottom) {
+          this.scrollToBottom();
+        }
+      }, typingTime);
+    }, timeToStartTyping);
   }
 
   setEllipsis(shown: boolean) {

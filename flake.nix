@@ -103,6 +103,7 @@
               python
               nodePackages.npm
               nodePackages.node2nix
+              nodePackages.prettier
               nodejs_21
             ] ++ rustDeps ++ runtimePrograms pkgs
               ++ lib.optional (system != "aarch64-darwin") [ backblaze-b2 ];
