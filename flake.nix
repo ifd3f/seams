@@ -90,6 +90,11 @@
           };
         };
 
+        checks = {
+          build-seams = self.packages.${system}.seams;
+          build-test-site = self.packages.${system}.astrid-dot-tech-test-site;
+        };
+
         devShells.default = with pkgs;
           mkShell {
             buildInputs = [
