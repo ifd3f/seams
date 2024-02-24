@@ -30,6 +30,8 @@ impl BaseRenderer<'_> {
                         href="/feed.xml";
 
                     script type="text/javascript" src="/bundle.js" {}
+                    meta property="og:site_name" content="astrid dot tech";
+                    (page_meta.extra_head)
                 }
                 body {
                     (navbar)
@@ -46,9 +48,11 @@ impl BaseRenderer<'_> {
     }
 }
 
+#[derive(Clone, Default, Debug)]
 pub struct PageMeta {
     pub title: String,
     pub navbar_highlighted: Option<NavbarItem>,
+    pub extra_head: Markup,
 }
 
 /// A page that uses the base template.

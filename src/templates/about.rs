@@ -23,6 +23,7 @@ impl BaseTemplatePage for AboutPage {
         let meta = PageMeta {
             title: "About".into(),
             navbar_highlighted: Some(NavbarItem::About),
+            ..Default::default()
         };
 
         (

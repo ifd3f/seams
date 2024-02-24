@@ -41,6 +41,13 @@ impl BaseTemplatePage for ProjectIndexPage<'_> {
         let meta = PageMeta {
             title: "Project".into(),
             navbar_highlighted: NavbarItem::Projects.into(),
+            extra_head: html! {
+                meta property="og:title" content="Projects";
+                meta property="og:description" content="Projects that I have done or am currently doing";
+                meta property="og:url" content="https://astrid.tech/projects";
+                meta property="og:type" content="website";
+            },
+            ..Default::default()
         };
 
         (meta, content)
@@ -152,6 +159,21 @@ impl BaseTemplatePage for RenderProject<'_> {
         let meta = PageMeta {
             title: self.project.meta().title.clone(),
             navbar_highlighted: NavbarItem::Projects.into(),
+            extra_head: html! {
+                meta property="og:title" content=(self.project.meta().title);
+                @if let Some(t) = &self.project.meta().tagline {
+                    meta property="og:description" content=(t);
+                }
+                meta property="og:type" content="article";
+                meta property="og:url" content=(format!("https://astrid.tech{}", self.project.meta().href()));
+                @if let Some(pd) = self.project.meta().date.published {
+                    meta property="article:published_time" content=(pd.to_rfc3339());
+                }
+                @for t in &self.project.meta().tags {
+                    meta property="article:tag" content=(t);
+                }
+            },
+            ..Default::default()
         };
 
         (meta, content)

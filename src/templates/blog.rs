@@ -32,13 +32,19 @@ impl BaseTemplatePage for BlogIndexPage {
             }
         };
 
-        (
-            PageMeta {
-                title: "Blog".into(),
-                navbar_highlighted: NavbarItem::Blog.into(),
+        let page_meta = PageMeta {
+            title: "Blog".into(),
+            navbar_highlighted: NavbarItem::Blog.into(),
+            extra_head: html! {
+                meta property="og:title" content="Blog";
+                meta property="og:description" content="List of blog articles";
+                meta property="og:url" content="https://astrid.tech/blog";
+                meta property="og:type" content="website";
             },
-            content,
-        )
+            ..Default::default()
+        };
+
+        (page_meta, content)
     }
 }
 
@@ -193,6 +199,19 @@ impl BaseTemplatePage for RenderPost<'_> {
         let meta = PageMeta {
             title: self.post.meta().title.clone(),
             navbar_highlighted: NavbarItem::Blog.into(),
+            extra_head: html! {
+                meta property="og:title" content=(self.post.meta().title);
+                @if let Some(t) = &self.post.meta().tagline {
+                    meta property="og:description" content=(t);
+                }
+                meta property="og:type" content="article";
+                meta property="og:url" content=(format!("https://astrid.tech{}", self.post.meta().href()));
+                meta property="article:published_time" content=(self.post.meta().date.published.to_rfc3339());
+                @for t in &self.post.meta().tags {
+                    meta property="article:tag" content=(t);
+                }
+            },
+            ..Default::default()
         };
         let content = html! {
             main .container .longform {
