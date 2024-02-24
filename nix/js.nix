@@ -19,7 +19,7 @@
       filter =
         path: _: # path is of the format /nix/store/hash-whatever/Cargo.toml
         let rootDirName = builtins.elemAt (lib.splitString "/" path) 4;
-        in builtins.elem (builtins.trace path rootDirName) [
+        in builtins.elem rootDirName [
           "js"
           "lock.json"
           "package-lock.json"
