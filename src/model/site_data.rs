@@ -18,6 +18,7 @@ use super::{
     metadata::{Post, Project},
     news::NewsItem,
     tag::{TagSettings, TagSettingsSheet},
+    webring::Webring,
 };
 
 pub type TagMap = HashMap<String, TagSettings>;
@@ -28,6 +29,7 @@ pub struct SiteData {
     pub tags: TagMap,
     pub news: Vec<NewsItem>,
     pub buttons: Vec<Button88x31>,
+    pub webrings: Vec<Webring>,
 }
 
 #[derive(Default, Clone)]
@@ -89,6 +91,11 @@ impl SiteData {
                 Ok(r) => (Some(r), None),
                 Err(e) => (None, Some(e)),
             };
+        let (webrings, webrings_failure) =
+            match load_settings_in_dir::<Vec<Webring>>(path.join("settings")?, "webring") {
+                Ok(r) => (Some(r), None),
+                Err(e) => (None, Some(e)),
+            };
 
         let mut load_errors: Errors<SiteDataUserError> = Default::default();
         load_errors.extend(post_failures);
@@ -106,6 +113,12 @@ impl SiteData {
             });
         }
         if let Some(e) = buttons_failure {
+            load_errors.push(SiteDataUserError {
+                path: path.join("settings")?,
+                error: LoadError::SettingsError(e),
+            });
+        }
+        if let Some(e) = webrings_failure {
             load_errors.push(SiteDataUserError {
                 path: path.join("settings")?,
                 error: LoadError::SettingsError(e),
@@ -130,6 +143,7 @@ impl SiteData {
         news.sort();
         news.reverse();
         let buttons = buttons.unwrap();
+        let webrings = webrings.unwrap();
 
         trace!(?tags, "finished loading");
 
@@ -139,6 +153,7 @@ impl SiteData {
             tags,
             news,
             buttons,
+            webrings,
         })
     }
 

@@ -36,3 +36,18 @@ body {
         color: lightpink;
     }
 }
+
+.webrings {
+    text-align: center;
+
+    & h2 {
+        font-size: medium;
+        margin-top: 0.2em;
+        margin-bottom: 0.2em;
+    }
+}
+
+.webring {
+    margin-top: 0.2em;
+    margin-bottom: 0.2em;
+}

@@ -1,6 +1,12 @@
 use maud::{html, Markup, PreEscaped, Render, DOCTYPE};
 
-use crate::model::site_data::{SiteData, SiteIndex};
+use crate::{
+    model::{
+        site_data::{SiteData, SiteIndex},
+        webring::Webring,
+    },
+    templates::util::RenderWebring,
+};
 
 /// Renders pages using the base template
 #[derive(Clone)]
@@ -41,7 +47,7 @@ impl BaseRenderer<'_> {
                             (PreEscaped(st))
                         }
                     }
-                    (footer())
+                    (footer(self.site_data))
                 }
             }
         }
@@ -136,10 +142,17 @@ impl Render for NavbarItem {
     }
 }
 
-fn footer() -> Markup {
+fn footer(sd: &SiteData) -> Markup {
     html! {
         footer .site-footer {
-            div {
+            @if sd.webrings.len() > 0 {
+                section .webrings {
+                    h2 { "Webrings" }
+                    (webrings(sd.webrings.iter()))
+                }
+            }
+            hr;
+            div .copyright {
                 p {
                     "© 2019-2024 Astrid Yu. Some rights reserved."
                 }
@@ -162,6 +175,14 @@ fn footer() -> Markup {
                     "I am over 18 and am willing to see Not Safe for Work (NSFW) content."
                 }
             }
+        }
+    }
+}
+
+fn webrings<'a>(wrs: impl IntoIterator<Item = &'a Webring>) -> Markup {
+    html! {
+        @for wr in wrs {
+            (RenderWebring::from(wr))
         }
     }
 }
