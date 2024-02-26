@@ -4,8 +4,6 @@ $news-item-separator-color: lightgray;
 .newsbox {
     border: 1px solid $newsbox-outer-border-color;
     background-color: lightgoldenrodyellow;
-    height: 300px;
-    overflow: scroll;
 
     & p {
         margin-top: 0;
@@ -15,6 +13,8 @@ $news-item-separator-color: lightgray;
     & .items {
         padding-left: 10px;
         padding-right: 10px;
+        overflow: scroll;
+        height: 300px;
     }
 
     & > header {
