@@ -6,11 +6,13 @@ export default {
   input: "js/index.ts",
   output: {
     file: "out-scripts/bundle.js",
-    format: "cjs",
+    format: "iife",
     sourcemap: true,
   },
   plugins: [
-    nodeResolve(),
+    nodeResolve({
+      browser: true,
+    }),
     typescript(),
     commonjs({
       transformMixedEsModules: true,

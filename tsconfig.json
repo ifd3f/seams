@@ -7,9 +7,9 @@
     "lib": ["ES5", "ES6", "DOM"],
     "noEmit": true,
     "allowImportingTsExtensions": true,
-    "esModuleInterop": true, 
-    "forceConsistentCasingInFileNames": true, 
-    "strict": true,                   
-    "skipLibCheck": true              
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true
   }
 }
