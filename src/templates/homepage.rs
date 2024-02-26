@@ -31,7 +31,7 @@ impl BaseTemplatePage for Homepage {
                 }
                 h1 { "welcome to the site" }
                 p { "please enjoy the site" }
-                (news_box(&sd.news))
+                (news_box(sd.news.iter().collect()))
                 div .recent-posts-widget {
                     h2 { "Recent blog posts" }
                     (PostsTable { posts, tags: &sd.tags })
@@ -56,7 +56,7 @@ impl BaseTemplatePage for Homepage {
     }
 }
 
-fn news_box<'a>(items: impl IntoIterator<Item = &'a NewsItem>) -> Markup {
+fn news_box<'a>(mut items: Vec<&'a NewsItem>) -> Markup {
     fn news_item(item: &NewsItem) -> Markup {
         let content = comrak::markdown_to_html(&item.content, &comrak::Options::default());
 
@@ -70,6 +70,9 @@ fn news_box<'a>(items: impl IntoIterator<Item = &'a NewsItem>) -> Markup {
             }
         }
     }
+
+    items.sort_by_key(|i| i.time);
+    items.reverse();
 
     html! {
         div .newsbox {
