@@ -89,6 +89,8 @@ fn buttons<'a>(buttons: impl IntoIterator<Item = &'a Button88x31>) -> Markup {
             img
                 .clickable[b.onclick.is_some()]
                 src=(b.img)
+                width="88"
+                height="31"
                 alt=[&b.alt]
                 title=[&b.title]
                 onclick=[&b.onclick];

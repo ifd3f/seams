@@ -10,6 +10,10 @@
 - img: https://s3.us-west-000.backblazeb2.com/nyaabucket/ec5eef56bf713a6d1e468b6103b8e867e82ab3a88df72571836be80a63d76f64/made-with-css.gif
   title: This website uses CSS
 
+- img: https://s3.us-west-000.backblazeb2.com/nyaabucket/dfd9ff93565bf88f42187af7eb02e4dafc391afa6bdce67ba9d3d675e2506245/lisp_alien_drew.gif
+  alt: green alien associated with lisp having five eyes waves a triangular flag that reads Drew
+  href: https://drewsh.com
+
 - img: https://s3.us-west-000.backblazeb2.com/nyaabucket/2ca2995b84198b4fbed4aacf73411f0b9e24ebee8f01dc053c390900e1fca50d/css.jpg
   title: CSS is awesome
 
