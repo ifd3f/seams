@@ -67,30 +67,23 @@ type QueueMessageParams = {
  * Only created after the element is connected to the DOM.
  */
 class ActiveCatChatbox {
-  chatTemplate: HTMLTemplateElement;
-
   chatlog: HTMLElement;
   chatform: HTMLFormElement;
   ellipsis: HTMLElement;
 
   constructor(private root: HTMLElement) {
-    const boxTemplate = document.getElementById(
-      "catchat-template",
-    ) as HTMLTemplateElement;
-    this.chatTemplate = document.getElementById(
-      "catchat-message-template",
-    ) as HTMLTemplateElement;
+    const templates = getTemplates();
 
-    root.appendChild(boxTemplate.content.cloneNode(true));
+    root.appendChild(templates.chatBox.content.cloneNode(true));
 
     this.chatlog = root.getElementsByClassName(
-      "catchat-message-log",
+      "catchat-message-log"
     )[0] as HTMLElement;
     this.chatform = root.getElementsByClassName(
-      "catchat-form",
+      "catchat-form"
     )[0] as HTMLFormElement;
     this.ellipsis = root.getElementsByClassName(
-      "catchat-ellipsis",
+      "catchat-ellipsis"
     )[0] as HTMLElement;
 
     this.chatform.onsubmit = (ev) => {
@@ -113,7 +106,8 @@ class ActiveCatChatbox {
   }
 
   addMessage(message: Message) {
-    const node = this.chatTemplate.content.cloneNode(true) as HTMLElement;
+    const templates = getTemplates();
+    const node = templates.chatEntry.content.cloneNode(true) as HTMLElement;
 
     const userElement = node.querySelector(".user") as HTMLElement;
     userElement.style.color = message.user.color;
@@ -186,4 +180,44 @@ function generateNya() {
   }
 
   return sentence.join(", ") + ".";
+}
+
+type Templates = {
+  chatBox: HTMLTemplateElement;
+  chatEntry: HTMLTemplateElement;
+};
+
+var _templates: Templates | null = null;
+function getTemplates(): Templates {
+  if (_templates) {
+    return _templates;
+  }
+
+  const chatBox = document.createElement("template");
+  chatBox.innerHTML = `
+    <div class="catchat-container">
+      <div style="flex-grow: 1; overflow: scroll; border: 1px solid gray; margin-bottom: 3px; ">
+          <div class="catchat-message-log"></div>
+          <p class="catchat-ellipsis" hidden>Assistant is typing...</p>
+      </div>
+      <div>
+          <form class="catchat-form">
+              <input class="catchat-input" name="input">
+              <input type="submit" value="Send">
+          </form>
+      </div>
+  </div>`;
+
+  const chatEntry = document.createElement("template");
+  chatEntry.innerHTML = `
+  <div class="catchat-entry">
+      <div class="avatar" style="flex-shrink: 0"></div>
+      <div style="flex-grow: 1">
+          <p class="user"></p>
+          <p class="text"></p>
+      </div>
+  </div>`;
+
+  _templates = { chatBox, chatEntry };
+  return _templates;
 }
