@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use maud::{html, Markup};
+use maud::{html, Markup, PreEscaped};
 
 use crate::{
     model::{
@@ -58,13 +58,15 @@ impl BaseTemplatePage for Homepage {
 
 fn news_box<'a>(items: impl IntoIterator<Item = &'a NewsItem>) -> Markup {
     fn news_item(item: &NewsItem) -> Markup {
+        let content = comrak::markdown_to_html(&item.content, &comrak::Options::default());
+
         html! {
             div .item {
                 @if let Some(h) = &item.title {
                     h3 .title { (h) }
                 }
                 span .date { (util::format_dt(item.time)) }
-                (item.content)
+                (PreEscaped(content))
             }
         }
     }

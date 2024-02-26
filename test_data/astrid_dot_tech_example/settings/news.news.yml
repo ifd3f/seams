@@ -1,6 +1,6 @@
 - title: Some really really really long title Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eget ex quis lorem hendrerit sodales. Morbi elementum elit eu turpis tristique lacinia. Nunc dignissim ligula non tellus consectetur fermentum. Donec euismod eu nisl quis scelerisque. Suspendisse in mi at est gravida 
   time: 2024-02-18 00:53:16 -0800
-  content: another news item
+  content: another news item that has **markdown** and [links to websites](https://astrid.tech)
 
 - time: 2024-02-18 00:09:35 -0800
   content: another news item
