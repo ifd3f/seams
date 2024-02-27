@@ -1,7 +1,7 @@
 use std::{collections::HashMap, fmt::Display};
 
 use itertools::Itertools;
-use tracing::trace;
+use tracing::{trace, warn};
 use vfs::{VfsError, VfsPath};
 
 use crate::{
@@ -30,6 +30,7 @@ pub struct SiteData {
     pub news: Vec<NewsItem>,
     pub buttons: Vec<Button88x31>,
     pub webrings: Vec<Webring>,
+    pub extra_head: String,
 }
 
 #[derive(Default, Clone)]
@@ -125,6 +126,14 @@ impl SiteData {
             });
         }
 
+        let extra_head = match load_extra_head(&path) {
+            Ok(h) => h,
+            Err(e) => {
+                warn!("Failed to load settings/extra_head.html, will not inject extra data into the <head>: {e}.");
+                "".into()
+            }
+        };
+
         load_errors.into_result()?;
 
         let mut additional_tags: Vec<&str> = vec![];
@@ -139,9 +148,7 @@ impl SiteData {
             }
         }
         let tags = tags.unwrap().materialize(additional_tags);
-        let mut news = news.unwrap();
-        news.sort();
-        news.reverse();
+        let news = news.unwrap();
         let buttons = buttons.unwrap();
         let webrings = webrings.unwrap();
 
@@ -154,6 +161,7 @@ impl SiteData {
             news,
             buttons,
             webrings,
+            extra_head,
         })
     }
 
@@ -179,6 +187,14 @@ impl SiteData {
 
         out
     }
+}
+
+fn load_extra_head(path: &VfsPath) -> anyhow::Result<String> {
+    let mut buf = String::new();
+    path.join("settings/head.html")?
+        .open_file()?
+        .read_to_string(&mut buf)?;
+    Ok(buf)
 }
 
 #[cfg(test)]
