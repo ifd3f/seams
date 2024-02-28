@@ -36,6 +36,7 @@ impl BaseRenderer<'_> {
                         href="/feed.xml";
 
                     script type="text/javascript" src="/bundle.js" {}
+                    meta name="viewport" content="width=device-width, initial-scale=1.0";
                     meta property="og:site_name" content="astrid dot tech";
                     (PreEscaped(&self.site_data.extra_head))
                     (page_meta.extra_head)
