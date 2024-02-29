@@ -25,6 +25,7 @@ impl BaseTemplatePage for Homepage {
             main .homepage .container {
                 div style="text-align: center" {
                     img
+                        style="width: 100%"
                         src="https://s3.us-west-000.backblazeb2.com/nyaabucket/0aaa02e26cd9aee680f4ac3a2dc2f9c9e6792cdebcfc6d93255104e033de4654/under-construction.gif"
                         alt="under construction banner"
                         title="we are UNDER CONSTRUCTION!!!";
