@@ -11,6 +11,7 @@ use crate::{
         settings::load_settings_in_dir,
     },
     media::MediaRegistry,
+    transform::statistics::count_swears,
 };
 
 use super::{
@@ -37,6 +38,7 @@ pub struct SiteData {
 pub struct SiteIndex<'a> {
     pub tag_to_posts: HashMap<&'a str, Vec<&'a FullyLoadedDocument<Post>>>,
     pub tag_to_projects: HashMap<&'a str, Vec<&'a FullyLoadedDocument<Project>>>,
+    pub swear_count: HashMap<&'a str, usize>,
 }
 
 #[derive(Debug)]
@@ -177,11 +179,17 @@ impl SiteData {
             for t in &p.meta().tags {
                 out.tag_to_posts.entry(t.as_str()).or_default().push(p);
             }
+            for (s, c) in count_swears(p.html()) {
+                *out.swear_count.entry(s).or_default() += c;
+            }
         }
 
         for p in &self.projects {
             for t in &p.meta().tags {
                 out.tag_to_projects.entry(t.as_str()).or_default().push(p);
+            }
+            for (s, c) in count_swears(p.html()) {
+                *out.swear_count.entry(s).or_default() += c;
             }
         }
 

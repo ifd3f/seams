@@ -3,7 +3,8 @@ use maud::{html, Markup, PreEscaped, Render};
 
 use crate::model::{
     site_data::TagMap,
-    tag::{TagSettings, TagStyling}, webring::Webring,
+    tag::{TagSettings, TagStyling},
+    webring::Webring,
 };
 
 pub struct EmDash;
@@ -104,7 +105,7 @@ impl Render for TagR<'_> {
 
 #[derive(derive_more::From)]
 pub struct RenderWebring<'a> {
-    webring: &'a Webring
+    webring: &'a Webring,
 }
 
 impl Render for RenderWebring<'_> {

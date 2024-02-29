@@ -75,10 +75,7 @@ pub fn write_static_site(
     write_markup(&outdir, renderer.render_page(Homepage))?;
     write_markup(&outdir.join("about")?, renderer.render_page(AboutPage))?;
 
-    write_markup(
-        &outdir.join("blog")?,
-        renderer.render_page(BlogIndexPage),
-    )?;
+    write_markup(&outdir.join("blog")?, renderer.render_page(BlogIndexPage))?;
     for p in &sd.posts {
         write_markup(
             &outdir.join(&p.document.meta.href())?,

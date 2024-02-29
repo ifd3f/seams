@@ -15,7 +15,7 @@ pub const MAX_POSTS_ON_FRONT_PAGE: usize = 5;
 pub struct Homepage;
 
 impl BaseTemplatePage for Homepage {
-    fn render_page(&self, sd: &SiteData, _si: &SiteIndex) -> (PageMeta, Markup) {
+    fn render_page(&self, sd: &SiteData, si: &SiteIndex) -> (PageMeta, Markup) {
         let mut posts = sd.posts.iter().collect_vec();
         posts.sort_by_key(|p| p.meta().date.published);
         posts.reverse();
@@ -38,6 +38,7 @@ impl BaseTemplatePage for Homepage {
                     (PostsTable { posts, tags: &sd.tags })
                 }
                 cat-chatbox { }
+                (swear_counter(si))
                 (buttons(&sd.buttons))
             }
         };
@@ -113,6 +114,36 @@ fn buttons<'a>(buttons: impl IntoIterator<Item = &'a Button88x31>) -> Markup {
         div .buttons {
             @for b in buttons {
                 (button(b))
+            }
+        }
+    }
+}
+
+fn swear_counter<'a>(si: &'a SiteIndex) -> Markup {
+    let total: usize = si.swear_count.values().sum();
+    let mut breakdown = si
+        .swear_count
+        .iter()
+        .filter(|(_, c)| **c != 0)
+        .collect_vec();
+
+    breakdown.sort_by_key(|(_, c)| **c);
+    breakdown.reverse();
+
+    let breakdown = breakdown
+        .iter()
+        .map(|(s, c)| format!("{s}: {c}"))
+        .join("\n");
+
+    html! {
+        div .swear-count style="text-align: center" {
+            img
+                width="64"
+                height="64"
+                src="https://s3.us-west-000.backblazeb2.com/nyaabucket/a2585655402f1d3476373477591269e89b37f8634a8c61cfde7c8f3e90d4dd72/toilet.jpg";
+
+            p title=(breakdown) style="margin-top: 0px; margin-bottom: 8px" {
+                "Total swears: " (total.to_string())
             }
         }
     }
