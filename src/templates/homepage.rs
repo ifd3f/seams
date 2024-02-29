@@ -52,6 +52,7 @@ impl BaseTemplatePage for Homepage {
                 (buttons(&sd.buttons))
             }
         };
+
         let meta = PageMeta {
             title: "Homepage".into(),
             navbar_highlighted: None,
@@ -146,13 +147,14 @@ fn swear_counter<'a>(si: &'a SiteIndex) -> Markup {
         .join("\n");
 
     html! {
-        div .swear-count .widget style="text-align: center" {
+        div .swear-count .widget title=(breakdown) style="text-align: center" {
             img
                 width="64"
                 height="64"
+                alt="toilet"
                 src="https://s3.us-west-000.backblazeb2.com/nyaabucket/a2585655402f1d3476373477591269e89b37f8634a8c61cfde7c8f3e90d4dd72/toilet.jpg";
 
-            p title=(breakdown) style="margin-top: 0px; margin-bottom: 8px" {
+            p style="margin-top: 0px; margin-bottom: 8px" {
                 "Total swears: " (total.to_string())
             }
         }
