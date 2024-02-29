@@ -22,23 +22,33 @@ impl BaseTemplatePage for Homepage {
         posts.truncate(MAX_POSTS_ON_FRONT_PAGE);
 
         let content = html! {
-            main .homepage .container {
+            main .homepage {
                 div style="text-align: center" {
                     img
-                        style="width: 100%"
+                        style="width: 100%; max-height: 64px"
                         src="https://s3.us-west-000.backblazeb2.com/nyaabucket/0aaa02e26cd9aee680f4ac3a2dc2f9c9e6792cdebcfc6d93255104e033de4654/under-construction.gif"
                         alt="under construction banner"
                         title="we are UNDER CONSTRUCTION!!!";
                 }
-                h1 { "welcome to the site" }
-                p { "please enjoy the site" }
-                (news_box(sd.news.iter().collect()))
-                div .recent-posts-widget {
-                    h2 { "Recent blog posts" }
-                    (PostsTable { posts, tags: &sd.tags })
+
+                div {
+                    h1 { "welcome to the site" }
+                    p { "please enjoy the site" }
                 }
-                cat-chatbox { }
-                (swear_counter(si))
+
+                div .row {
+                    div .col .col-left {
+                        div .recent-posts .widget {
+                            h2 { "Recent blog posts" }
+                            (PostsTable { posts, tags: &sd.tags })
+                        }
+                    }
+                    div .col .col-right {
+                        (news_box(sd.news.iter().collect()))
+                        cat-chatbox { }
+                        (swear_counter(si))
+                    }
+                }
                 (buttons(&sd.buttons))
             }
         };
@@ -77,7 +87,7 @@ fn news_box<'a>(mut items: Vec<&'a NewsItem>) -> Markup {
     items.reverse();
 
     html! {
-        div .newsbox {
+        div .newsbox .widget {
             header {
                 h2 .title { "News" }
             }
@@ -111,7 +121,7 @@ fn buttons<'a>(buttons: impl IntoIterator<Item = &'a Button88x31>) -> Markup {
     }
 
     html! {
-        div .buttons {
+        div .buttons .widget {
             @for b in buttons {
                 (button(b))
             }
@@ -136,7 +146,7 @@ fn swear_counter<'a>(si: &'a SiteIndex) -> Markup {
         .join("\n");
 
     html! {
-        div .swear-count style="text-align: center" {
+        div .swear-count .widget style="text-align: center" {
             img
                 width="64"
                 height="64"

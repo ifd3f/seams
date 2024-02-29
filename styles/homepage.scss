@@ -1,7 +1,42 @@
+@import "./variables.scss";
+
+.homepage {
+    max-width: $lg;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .buttons {
     text-align: center;
 
     & .clickable:hover {
         cursor: pointer;
     }
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.col {
+    padding-left: 10px;
+    padding-right: 10px;
+    width: 100%;
+
+}
+
+@media only screen and (min-width: $md) { 
+    .row {
+        flex-wrap: nowrap;
+    }
+    .col {
+        width: 50%;
+    }
+}
+
+.widget {
+    margin-bottom: 10px;
 }
