@@ -179,7 +179,7 @@ mod test {
 
     #[tokio::test]
     pub async fn loads_example_content_dir_correctly() {
-        let content_path = VfsPath::new(PhysicalFS::new("test_data/contentdir_example"));
+        let content_path = VfsPath::new(PhysicalFS::new("test_data/astrid_dot_tech_example"));
         remove_dir_all("./out").ok();
         create_dir_all("./out").unwrap();
         let out = VfsPath::new(PhysicalFS::new("./out"));
