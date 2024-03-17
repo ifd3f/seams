@@ -10,12 +10,13 @@ use crate::{
     errors::Errors,
     load::util::split_extension,
     media::MediaRegistry,
-    model::site_data::SiteDataUserError,
     transform::{
         common::TransformContext,
         markdown::{transform_markdown, MarkdownError},
     },
 };
+
+use super::site_data::SiteDataUserError;
 
 /// A document that has metadata and a piece of content associated with it.
 #[derive(Clone, Debug)]
