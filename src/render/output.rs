@@ -10,8 +10,8 @@ use crate::{
     media::MediaRegistry,
     model::SiteData,
     templates::{
-        AboutPage, BaseRenderer, BlogIndexPage, Homepage, ProjectIndexPage, RenderPost,
-        RenderProject, TagPage,
+        AboutPage, ArbitraryPageRender, BaseRenderer, BlogIndexPage, Homepage, ProjectIndexPage,
+        RenderPost, RenderProject, TagPage,
     },
 };
 
@@ -107,6 +107,13 @@ pub fn write_static_site(
                 projects: index.tag_to_projects[slug.as_str()].clone(),
                 all_tags: &sd.tags,
             }),
+        )?;
+    }
+
+    for p in &sd.pages {
+        write_markup(
+            &outdir.join(&p.meta().slug)?,
+            renderer.render_page(ArbitraryPageRender::from(p)),
         )?;
     }
 

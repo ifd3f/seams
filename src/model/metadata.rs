@@ -121,18 +121,38 @@ pub struct ArbitraryPage {
     /// Title of the page.
     pub title: String,
 
+    /// Meta description of the page.
+    pub meta_description: Option<String>,
+
+    /// URL to thumbnail of the page.
+    pub thumbnail: Option<String>,
+
     /// Tags associated with the page.
     pub tags: Vec<String>,
 
     /// The URL path this page should have.
-    pub slug: Vec<String>,
+    pub slug: String,
 
-    /// Navbar ID path to highlight when this page is visited, or null
+    #[serde(default)]
+    pub format: ArbitraryPageFormat,
+
+    /// Navbar ID path to highlight when this page is visited, or empty
     /// to not highlight anything
-    pub navbar_path: Option<Vec<String>>,
+    #[serde(
+        default,
+        deserialize_with = "crate::model::util::permissive_vec::deserialize"
+    )]
+    pub navbar_path: Vec<String>,
 
     /// Accent color. If null, it will be randomly picked based on the slug.
     pub color: Option<Color>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub enum ArbitraryPageFormat {
+    /// Longform container (what blogs and projects have)
+    #[default]
+    Longform,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -207,7 +227,7 @@ impl ProjectDates {
 
 impl ArbitraryPage {
     pub fn css_color(&self) -> String {
-        extract_color(self.color.clone(), &self.slug.join("/"))
+        extract_color(self.color.clone(), &self.slug)
     }
 }
 

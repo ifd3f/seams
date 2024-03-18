@@ -9,3 +9,7 @@
 - href: /a/b/c
   id: testpage
   display: "The Cool Testpage"
+
+- href: /about
+  id: about
+  display: "About"
