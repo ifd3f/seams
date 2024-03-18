@@ -1,4 +1,3 @@
-mod about;
 mod arbitrary_page;
 mod base;
 mod blog;
@@ -8,7 +7,6 @@ mod project;
 mod tag_page;
 mod util;
 
-pub use about::*;
 pub use arbitrary_page::*;
 pub use base::*;
 pub use blog::*;

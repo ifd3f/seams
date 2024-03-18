@@ -10,7 +10,7 @@ use crate::{
     media::MediaRegistry,
     model::SiteData,
     templates::{
-        AboutPage, ArbitraryPageRender, BaseRenderer, BlogIndexPage, Homepage, ProjectIndexPage,
+        ArbitraryPageRender, BaseRenderer, BlogIndexPage, Homepage, ProjectIndexPage,
         RenderPost, RenderProject, TagPage,
     },
 };
@@ -73,7 +73,6 @@ pub fn write_static_site(
     )?;
 
     write_markup(&outdir, renderer.render_page(Homepage))?;
-    write_markup(&outdir.join("about")?, renderer.render_page(AboutPage))?;
 
     write_markup(&outdir.join("blog")?, renderer.render_page(BlogIndexPage))?;
     for p in &sd.posts {

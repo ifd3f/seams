@@ -4,7 +4,7 @@ serve: build
 build: styles scripts html 
 
 clean:
-    rm -rf out
+    rm -rf out out-html out-scripts
 
 styles:
     mkdir -p out/
