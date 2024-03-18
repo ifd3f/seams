@@ -1,5 +1,14 @@
 import Cookies from "js-cookie";
 
+class CookieCheckbox extends HTMLElement {
+  static observedAttributes = ["color", "size"];
+  constructor() {
+    super();
+  }
+
+  connectedCallback() {}
+}
+
 /**
  * Apply the nsfw status
  *

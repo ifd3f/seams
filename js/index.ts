@@ -1,6 +1,6 @@
 import { CatChatbox } from "./chatbox.ts";
 import { greet } from "./console.ts";
-import { initNsfw, setNsfw } from "./nsfw";
+import { initNsfw, setNsfw } from "./checkbox";
 import { playRandomXPSound } from "./xpsounds.ts";
 
 declare global {
