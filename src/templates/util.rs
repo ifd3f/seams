@@ -1,11 +1,7 @@
 use chrono::{Datelike, Month, Timelike};
 use maud::{html, Markup, PreEscaped, Render};
 
-use crate::model::{
-    site_data::TagMap,
-    tag::{TagSettings, TagStyling},
-    webring::Webring,
-};
+use crate::model::{TagMap, TagSettings, TagStyling, Webring};
 
 pub struct EmDash;
 

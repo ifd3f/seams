@@ -4,8 +4,7 @@ use crate::{
     load::document::FullyLoadedDocument,
     model::{
         metadata::{Project, ProjectDates},
-        site_data::{SiteData, SiteIndex, TagMap},
-        tag::TaggableExt,
+        SiteData, SiteIndex, TagMap, TaggableExt,
     },
     templates::util::tag_list,
 };

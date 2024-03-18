@@ -1,10 +1,7 @@
 use maud::{html, Markup, PreEscaped, Render, DOCTYPE};
 
 use crate::{
-    model::{
-        site_data::{SiteData, SiteIndex},
-        webring::Webring,
-    },
+    model::{SiteData, SiteIndex, Webring},
     templates::util::RenderWebring,
 };
 

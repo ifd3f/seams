@@ -5,8 +5,7 @@ use crate::{
     load::document::FullyLoadedDocument,
     model::{
         metadata::{Post, PostDates},
-        site_data::{SiteData, SiteIndex, TagMap},
-        tag::TaggableExt,
+        SiteData, SiteIndex, TagMap, TaggableExt,
     },
     templates::util::{format_dt_html, tag_list},
 };

@@ -2,11 +2,7 @@ use itertools::Itertools;
 use maud::{html, Markup, PreEscaped};
 
 use crate::{
-    model::{
-        button88x31::Button88x31,
-        news::NewsItem,
-        site_data::{SiteData, SiteIndex},
-    },
+    model::{Button88x31, NewsItem, SiteData, SiteIndex},
     templates::*,
 };
 

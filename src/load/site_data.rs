@@ -14,12 +14,8 @@ use crate::{
     },
     media::MediaRegistry,
     model::{
-        button88x31::Button88x31,
         metadata::{Post, Project},
-        news::NewsItem,
-        site_data::SiteData,
-        tag::TagSettingsSheet,
-        webring::Webring,
+        Button88x31, NewsItem, SiteData, TagSettingsSheet, Webring,
     },
 };
 

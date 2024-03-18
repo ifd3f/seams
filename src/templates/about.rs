@@ -1,6 +1,6 @@
 use maud::{html, Markup};
 
-use crate::model::site_data::{SiteData, SiteIndex};
+use crate::model::{SiteData, SiteIndex};
 
 use super::{BaseTemplatePage, NavbarItem, PageMeta};
 

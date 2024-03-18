@@ -12,11 +12,9 @@ use crate::{
 };
 
 use super::{
-    button88x31::Button88x31,
     metadata::{Post, Project},
-    news::NewsItem,
     tag::TagSettings,
-    webring::Webring,
+    Button88x31, NewsItem, Webring,
 };
 
 pub type TagMap = HashMap<String, TagSettings>;

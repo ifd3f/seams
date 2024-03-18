@@ -8,7 +8,7 @@ use walkdir::WalkDir;
 
 use crate::{
     media::MediaRegistry,
-    model::site_data::SiteData,
+    model::SiteData,
     templates::{
         AboutPage, BaseRenderer, BlogIndexPage, Homepage, ProjectIndexPage, RenderPost,
         RenderProject, TagPage,

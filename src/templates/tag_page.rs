@@ -6,8 +6,7 @@ use crate::{
     load::document::FullyLoadedDocument,
     model::{
         metadata::{Post, Project},
-        site_data::{SiteData, SiteIndex, TagMap},
-        tag::TagSettings,
+        SiteData, SiteIndex, TagMap, TagSettings,
     },
     templates::util::TagR,
 };
