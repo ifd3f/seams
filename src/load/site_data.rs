@@ -1,7 +1,9 @@
 use std::fmt::Display;
 
+use frunk::Monoid;
 use itertools::Itertools;
-use tracing::{trace, warn};
+use serde::de::DeserializeOwned;
+use tracing::warn;
 use vfs::{VfsError, VfsPath};
 
 use crate::{
@@ -24,6 +26,7 @@ use crate::{
 pub struct SiteDataLoader<'a> {
     path: VfsPath,
     media: &'a MediaRegistry,
+    errors: tokio::sync::Mutex<Errors<SiteDataUserError>>,
 }
 
 #[derive(thiserror::Error, Debug)]
@@ -49,85 +52,39 @@ impl Display for SiteDataUserError {
 
 impl<'a> SiteDataLoader<'a> {
     pub fn new(path: VfsPath, media: &'a MediaRegistry) -> Self {
-        Self { path, media }
+        Self {
+            path,
+            media,
+            errors: Errors::new().into(),
+        }
     }
 
     pub async fn load(self) -> Result<SiteData, SiteDataLoadError> {
-        let Self { path, media } = self;
-
-        let (posts, projects) = tokio::join!(
-            fully_load_docdir(media, path.join("blog")?),
-            fully_load_docdir(media, path.join("projects")?)
-        );
-
-        let (mut posts, post_failures): (Vec<FullyLoadedDocument<Post>>, Vec<_>) =
-            posts?.into_iter().partition_result();
-        let (mut projects, project_failures): (Vec<FullyLoadedDocument<Project>>, Vec<_>) =
-            projects?.into_iter().partition_result();
-
-        posts.sort_by_key(|p| p.meta().date.published);
-        projects.sort_by_key(|p| p.meta().date.sort_key());
-
-        // this prevents move errors, albeit jankily.
-        // TODO: get rid of this jank
-        let (tags, tag_failure) =
-            match load_settings_in_dir::<TagSettingsSheet>(path.join("settings")?, "tag") {
-                Ok(r) => (Some(r), None),
-                Err(e) => (None, Some(e)),
-            };
-        let (news, news_failure) =
-            match load_settings_in_dir::<Vec<NewsItem>>(path.join("settings")?, "news") {
-                Ok(r) => (Some(r), None),
-                Err(e) => (None, Some(e)),
-            };
-        let (buttons, buttons_failure) =
-            match load_settings_in_dir::<Vec<Button88x31>>(path.join("settings")?, "88x31") {
-                Ok(r) => (Some(r), None),
-                Err(e) => (None, Some(e)),
-            };
-        let (webrings, webrings_failure) =
-            match load_settings_in_dir::<Vec<Webring>>(path.join("settings")?, "webring") {
-                Ok(r) => (Some(r), None),
-                Err(e) => (None, Some(e)),
-            };
-
-        let mut load_errors: Errors<SiteDataUserError> = Default::default();
-        load_errors.extend(post_failures);
-        load_errors.extend(project_failures);
-        if let Some(e) = tag_failure {
-            load_errors.push(SiteDataUserError {
-                path: path.join("settings")?,
-                error: LoadError::SettingsError(e),
-            });
-        }
-        if let Some(e) = news_failure {
-            load_errors.push(SiteDataUserError {
-                path: path.join("settings")?,
-                error: LoadError::SettingsError(e),
-            });
-        }
-        if let Some(e) = buttons_failure {
-            load_errors.push(SiteDataUserError {
-                path: path.join("settings")?,
-                error: LoadError::SettingsError(e),
-            });
-        }
-        if let Some(e) = webrings_failure {
-            load_errors.push(SiteDataUserError {
-                path: path.join("settings")?,
-                error: LoadError::SettingsError(e),
-            });
+        macro_rules! parallel_run_and_unwrap {
+            ($(let $var:ident = $e:expr;)*) => {
+                let ($($var, )*) = tokio::join!($($e, )*);
+                let errors = self.errors;
+                errors.into_inner().into_result()?;
+                let ($($var, )*) = ($($var?.unwrap(), )*);
+            }
         }
 
-        let extra_head = match load_extra_head(&path) {
+        parallel_run_and_unwrap! {
+            let posts = self.load_docdir::<Post>("blog");
+            let projects = self.load_docdir::<Project>("projects");
+            let tags = self.load_settings::<TagSettingsSheet>("tag");
+            let news = self.load_settings::<Vec<NewsItem>>("news");
+            let buttons = self.load_settings::<Vec<Button88x31>>("88x31");
+            let webrings = self.load_settings::<Vec<Webring>>("webring");
+        };
+
+        let extra_head = match load_extra_head(&self.path) {
             Ok(h) => h,
             Err(e) => {
                 warn!("Failed to load settings/extra_head.html, will not inject extra data into the <head>: {e}.");
                 "".into()
             }
         };
-
-        load_errors.into_result()?;
 
         let mut additional_tags: Vec<&str> = vec![];
         for p in &posts {
@@ -140,12 +97,7 @@ impl<'a> SiteDataLoader<'a> {
                 additional_tags.push(t)
             }
         }
-        let tags = tags.unwrap().materialize(additional_tags);
-        let news = news.unwrap();
-        let buttons = buttons.unwrap();
-        let webrings = webrings.unwrap();
-
-        trace!(?tags, "finished loading");
+        let tags = tags.materialize(additional_tags);
 
         Ok(SiteData {
             posts,
@@ -155,6 +107,38 @@ impl<'a> SiteDataLoader<'a> {
             buttons,
             webrings,
             extra_head,
+        })
+    }
+
+    async fn load_docdir<M: DeserializeOwned>(
+        &self,
+        dir: &str,
+    ) -> Result<Option<Vec<FullyLoadedDocument<M>>>, SiteDataLoadError> {
+        let path = self.path.join(dir)?;
+        let (rs, errs): (Vec<FullyLoadedDocument<M>>, Vec<_>) =
+            fully_load_docdir::<M>(self.media, path)
+                .await?
+                .into_iter()
+                .partition_result();
+
+        self.errors.lock().await.extend(errs);
+        Ok(Some(rs))
+    }
+
+    async fn load_settings<T: DeserializeOwned + Monoid>(
+        &self,
+        ext: &str,
+    ) -> Result<Option<T>, SiteDataLoadError> {
+        let path = self.path.join("settings")?;
+        Ok(match load_settings_in_dir::<T>(path.clone(), ext) {
+            Ok(r) => Some(r),
+            Err(e) => {
+                self.errors.lock().await.push(SiteDataUserError {
+                    path,
+                    error: LoadError::SettingsError(e, ext.to_string()),
+                });
+                None
+            }
         })
     }
 }
