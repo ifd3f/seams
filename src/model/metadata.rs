@@ -121,11 +121,15 @@ pub struct ArbitraryPage {
     /// Title of the page.
     pub title: String,
 
-    /// The path this page should have.
-    pub slug: Vec<String>,
-
     /// Tags associated with the page.
     pub tags: Vec<String>,
+
+    /// The URL path this page should have.
+    pub slug: Vec<String>,
+
+    /// Navbar ID path to highlight when this page is visited, or null
+    /// to not highlight anything
+    pub navbar_path: Option<Vec<String>>,
 
     /// Accent color. If null, it will be randomly picked based on the slug.
     pub color: Option<Color>,
