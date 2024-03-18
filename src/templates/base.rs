@@ -43,7 +43,7 @@ impl BaseRenderer<'_> {
                 body {
                     div .site-container {
                         (navbar)
-                        (rendered)
+                        div { (rendered) }
                         div #script-templates style="display: none" {
                             @for st in &self.script_templates {
                                 (PreEscaped(st))

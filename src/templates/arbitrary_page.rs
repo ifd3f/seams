@@ -2,7 +2,10 @@ use maud::{html, Markup, PreEscaped};
 
 use crate::{
     load::document::FullyLoadedDocument,
-    model::{metadata::ArbitraryPage, SiteData, SiteIndex},
+    model::{
+        metadata::{ArbitraryPage, ArbitraryPageFormat},
+        SiteData, SiteIndex,
+    },
 };
 
 use super::{BaseTemplatePage, PageMeta};
@@ -31,11 +34,15 @@ impl<'a> BaseTemplatePage for ArbitraryPageRender<'a> {
             },
             ..Default::default()
         };
-        let content = html! {
-            main .container-md {
-                (PreEscaped(self.page.html()))
-            }
+
+        let content = match self.page.meta().format {
+            ArbitraryPageFormat::Longform => html! {
+                main .container-md .longform {
+                    (PreEscaped(self.page.html()))
+                }
+            },
         };
+
         (meta, content)
     }
 }
