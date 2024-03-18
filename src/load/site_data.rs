@@ -14,7 +14,7 @@ use crate::{
     },
     media::MediaRegistry,
     model::{
-        metadata::{Post, Project},
+        metadata::{ArbitraryPage, Post, Project},
         Button88x31, NewsItem, SiteData, TagSettingsSheet, Webring,
     },
 };
@@ -68,6 +68,7 @@ impl<'a> SiteDataLoader<'a> {
         parallel_run_and_unwrap! {
             let posts = self.load_docdir::<Post>("blog");
             let projects = self.load_docdir::<Project>("projects");
+            let pages = self.load_docdir::<ArbitraryPage>("pages");
             let tags = self.load_settings::<TagSettingsSheet>("tag");
             let news = self.load_settings::<Vec<NewsItem>>("news");
             let buttons = self.load_settings::<Vec<Button88x31>>("88x31");
@@ -99,6 +100,7 @@ impl<'a> SiteDataLoader<'a> {
             posts,
             projects,
             tags,
+            pages,
             news,
             buttons,
             webrings,

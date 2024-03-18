@@ -115,6 +115,25 @@ pub struct Project {
     pub color: Option<Color>,
 }
 
+/// A generic page.
+#[derive(Serialize, Deserialize)]
+pub struct ArbitraryPage {
+    /// Title of the page.
+    pub title: String,
+
+    /// The path this page should have.
+    pub slug: Vec<String>,
+
+    /// Path this page should have in the navbar
+    pub navbar: Option<Vec<String>>,
+
+    /// Tags associated with the page.
+    pub tags: Vec<String>,
+
+    /// Accent color. If null, it will be randomly picked based on the slug.
+    pub color: Option<Color>,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct PostSlug {
     pub date: Option<NaiveDate>,
@@ -182,6 +201,12 @@ impl ProjectDates {
         };
 
         return DateSort::Now;
+    }
+}
+
+impl ArbitraryPage {
+    pub fn css_color(&self) -> String {
+        extract_color(self.color.clone(), &self.slug.join("/"))
     }
 }
 

@@ -12,7 +12,7 @@ use crate::{
 };
 
 use super::{
-    metadata::{Post, Project},
+    metadata::{ArbitraryPage, Post, Project},
     tag::TagSettings,
     Button88x31, NewsItem, Webring,
 };
@@ -23,6 +23,7 @@ pub type TagMap = HashMap<String, TagSettings>;
 pub struct SiteData {
     pub posts: Vec<FullyLoadedDocument<Post>>,
     pub projects: Vec<FullyLoadedDocument<Project>>,
+    pub pages: Vec<FullyLoadedDocument<ArbitraryPage>>,
     pub tags: TagMap,
     pub news: Vec<NewsItem>,
     pub buttons: Vec<Button88x31>,
