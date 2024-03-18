@@ -14,7 +14,7 @@ use crate::{
 use super::{
     metadata::{ArbitraryPage, Post, Project},
     tag::TagSettings,
-    Button88x31, NewsItem, Webring,
+    Button88x31, NavbarItem, NewsItem, Webring,
 };
 
 pub type TagMap = HashMap<String, TagSettings>;
@@ -26,6 +26,7 @@ pub struct SiteData {
     pub pages: Vec<FullyLoadedDocument<ArbitraryPage>>,
     pub tags: TagMap,
     pub news: Vec<NewsItem>,
+    pub navbar: Vec<NavbarItem>,
     pub buttons: Vec<Button88x31>,
     pub webrings: Vec<Webring>,
     pub extra_head: String,

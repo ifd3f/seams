@@ -124,9 +124,6 @@ pub struct ArbitraryPage {
     /// The path this page should have.
     pub slug: Vec<String>,
 
-    /// Path this page should have in the navbar
-    pub navbar: Option<Vec<String>>,
-
     /// Tags associated with the page.
     pub tags: Vec<String>,
 

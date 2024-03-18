@@ -1,7 +1,6 @@
 ---
 title: Testpage
 tags: []
-navbar: [Testpage]
 slug: [a, b, c]
 ---
 

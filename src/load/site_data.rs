@@ -15,7 +15,7 @@ use crate::{
     media::MediaRegistry,
     model::{
         metadata::{ArbitraryPage, Post, Project},
-        Button88x31, NewsItem, SiteData, TagSettingsSheet, Webring,
+        Button88x31, NavbarItem, NewsItem, SiteData, TagSettingsSheet, Webring,
     },
 };
 
@@ -73,6 +73,7 @@ impl<'a> SiteDataLoader<'a> {
             let news = self.load_settings::<Vec<NewsItem>>("news");
             let buttons = self.load_settings::<Vec<Button88x31>>("88x31");
             let webrings = self.load_settings::<Vec<Webring>>("webring");
+            let navbar = self.load_settings::<Vec<NavbarItem>>("navbar");
         };
 
         let extra_head = match load_extra_head(&self.path) {
@@ -102,6 +103,7 @@ impl<'a> SiteDataLoader<'a> {
             tags,
             pages,
             news,
+            navbar,
             buttons,
             webrings,
             extra_head,

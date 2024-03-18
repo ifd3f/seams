@@ -20,6 +20,17 @@ pub struct Webring {
     pub pending: bool,
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct NavbarItem {
+    pub name: String,
+    pub href: Option<String>,
+    #[serde(
+        default,
+        deserialize_with = "crate::model::util::permissive_vec::deserialize"
+    )]
+    pub children: Vec<NavbarItem>,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct NewsItem {
     pub title: Option<String>,
