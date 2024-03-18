@@ -26,7 +26,7 @@ impl BaseTemplatePage for ProjectIndexPage<'_> {
         projects.reverse();
 
         let content = html! {
-            header .container {
+            header .container-md {
                 h1 style="text-align: center" { "Projects" }
             }
 
@@ -151,7 +151,7 @@ impl<'a> RenderProject<'a> {
 impl BaseTemplatePage for RenderProject<'_> {
     fn render_page(&self, sd: &SiteData, _si: &SiteIndex<'_>) -> (PageMeta, Markup) {
         let content = html! {
-            main .container .longform {
+            main .container-md .longform {
                 (self.page_content(&sd.tags))
             }
         };

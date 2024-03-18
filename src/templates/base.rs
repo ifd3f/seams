@@ -41,14 +41,16 @@ impl BaseRenderer<'_> {
                     (page_meta.extra_head)
                 }
                 body {
-                    (navbar)
-                    (rendered)
-                    div #script-templates style="display: none" {
-                        @for st in &self.script_templates {
-                            (PreEscaped(st))
+                    div .site-container {
+                        (navbar)
+                        (rendered)
+                        div #script-templates style="display: none" {
+                            @for st in &self.script_templates {
+                                (PreEscaped(st))
+                            }
                         }
+                        (footer(self.site_data))
                     }
-                    (footer(self.site_data))
                 }
             }
         }

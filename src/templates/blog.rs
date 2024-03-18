@@ -24,7 +24,7 @@ impl BaseTemplatePage for BlogIndexPage {
         posts.reverse();
 
         let content = html! {
-            main .container .blog-root {
+            main .container-md .blog-root {
                 h1 style="text-align: center;" { "Blog" }
 
                 (PostsTable { posts, tags: &sd.tags })
@@ -215,7 +215,7 @@ impl BaseTemplatePage for RenderPost<'_> {
             ..Default::default()
         };
         let content = html! {
-            main .container .longform {
+            main .container-md .longform {
                 (self.page_content(&sd.tags))
             }
         };

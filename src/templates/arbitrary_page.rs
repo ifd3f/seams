@@ -32,7 +32,7 @@ impl<'a> BaseTemplatePage for ArbitraryPageRender<'a> {
             ..Default::default()
         };
         let content = html! {
-            main .container {
+            main .container-md {
                 (PreEscaped(self.page.html()))
             }
         };

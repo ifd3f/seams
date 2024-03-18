@@ -30,7 +30,7 @@ impl BaseTemplatePage for AboutPage {
         (
             meta,
             html! {
-                main .container {
+                main .container-md {
                     (about)
                 }
             },

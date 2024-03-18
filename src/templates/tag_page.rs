@@ -44,7 +44,7 @@ impl BaseTemplatePage for TagPage<'_> {
         let items = self.items();
 
         let content = html! {
-            header .container {
+            header .container-md {
                 h1 { "Tag " (TagR::new(self.settings).with_link(false)) }
             }
 

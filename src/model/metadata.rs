@@ -225,12 +225,6 @@ impl ProjectDates {
     }
 }
 
-impl ArbitraryPage {
-    pub fn css_color(&self) -> String {
-        extract_color(self.color.clone(), &self.slug)
-    }
-}
-
 fn extract_color(color: Option<Color>, slug: &str) -> String {
     if let Some(c) = color {
         return c.to_hex_string();
