@@ -23,7 +23,7 @@ pub struct Webring {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct NavbarItem {
     /// The HTML that should show up in the li where this item goes.
-    pub html: String,
+    pub display: String,
 
     /// ID to refer to this node in the tree, for highlighting
     pub id: String,

@@ -10,7 +10,7 @@ use crate::{
     templates::util::{format_dt_html, tag_list},
 };
 
-use super::{util::format_dt, BaseTemplatePage, NavbarItem, PageMeta};
+use super::{util::format_dt, BaseTemplatePage, PageMeta};
 
 type DPost = FullyLoadedDocument<Post>;
 
@@ -33,7 +33,8 @@ impl BaseTemplatePage for BlogIndexPage {
 
         let page_meta = PageMeta {
             title: "Blog".into(),
-            navbar_highlighted: NavbarItem::Blog.into(),
+            href: "/blog".into(),
+            navbar_path: vec!["blog".into()],
             extra_head: html! {
                 meta property="og:title" content="Blog";
                 meta property="og:description" content="List of blog articles";
@@ -197,7 +198,8 @@ impl BaseTemplatePage for RenderPost<'_> {
     fn render_page(&self, sd: &SiteData, _si: &SiteIndex<'_>) -> (PageMeta, Markup) {
         let meta = PageMeta {
             title: self.post.meta().title.clone(),
-            navbar_highlighted: NavbarItem::Blog.into(),
+            href: "/blog".into(),
+            navbar_path: vec!["blog".into()],
             extra_head: html! {
                 meta property="og:title" content=(self.post.meta().title);
                 @if let Some(t) = &self.post.meta().tagline {

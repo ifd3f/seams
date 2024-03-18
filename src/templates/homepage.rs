@@ -51,7 +51,7 @@ impl BaseTemplatePage for Homepage {
 
         let meta = PageMeta {
             title: "Homepage".into(),
-            navbar_highlighted: None,
+            href: "/".into(),
             extra_head: html! {
                 meta property="og:title" content="astrid dot tech";
                 meta property="og:description" content="Astrid's personal website";

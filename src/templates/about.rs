@@ -2,7 +2,7 @@ use maud::{html, Markup};
 
 use crate::model::{SiteData, SiteIndex};
 
-use super::{BaseTemplatePage, NavbarItem, PageMeta};
+use super::{BaseTemplatePage, PageMeta};
 
 pub struct AboutPage;
 
@@ -22,7 +22,8 @@ impl BaseTemplatePage for AboutPage {
 
         let meta = PageMeta {
             title: "About".into(),
-            navbar_highlighted: Some(NavbarItem::About),
+            href: "/about".into(),
+            navbar_path: vec!["about".into()],
             ..Default::default()
         };
 

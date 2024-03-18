@@ -1,2 +1,11 @@
-- slug: /a/b/c
-  name: "The Cool Testpage"
+- href: /blog
+  id: blog
+  display: Blog
+
+- href: /projects
+  id: projects
+  display: Projects
+
+- href: /a/b/c
+  id: testpage
+  display: "The Cool Testpage"

@@ -57,7 +57,7 @@ impl BaseTemplatePage for TagPage<'_> {
 
         let meta = PageMeta {
             title: format!("Tag {}", self.settings.title),
-            navbar_highlighted: None,
+            href: "/t".into(),
             ..Default::default()
         };
         (meta, content)

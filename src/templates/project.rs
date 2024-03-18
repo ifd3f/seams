@@ -9,7 +9,7 @@ use crate::{
     templates::util::tag_list,
 };
 
-use super::{util::format_project_date, BaseTemplatePage, NavbarItem, PageMeta};
+use super::{util::format_project_date, BaseTemplatePage, PageMeta};
 
 type DProject = FullyLoadedDocument<Project>;
 
@@ -39,7 +39,8 @@ impl BaseTemplatePage for ProjectIndexPage<'_> {
 
         let meta = PageMeta {
             title: "Project".into(),
-            navbar_highlighted: NavbarItem::Projects.into(),
+            href: "/projects".into(),
+            navbar_path: vec!["projects".into()],
             extra_head: html! {
                 meta property="og:title" content="Projects";
                 meta property="og:description" content="Projects that I have done or am currently doing";
@@ -157,7 +158,8 @@ impl BaseTemplatePage for RenderProject<'_> {
 
         let meta = PageMeta {
             title: self.project.meta().title.clone(),
-            navbar_highlighted: NavbarItem::Projects.into(),
+            href: self.project.meta().href(),
+            navbar_path: vec!["projects".into()],
             extra_head: html! {
                 meta property="og:title" content=(self.project.meta().title);
                 @if let Some(t) = &self.project.meta().tagline {

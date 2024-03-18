@@ -5,6 +5,7 @@ mod homepage;
 mod project;
 mod tag_page;
 mod util;
+mod navbar;
 
 pub use about::*;
 pub use base::*;
