@@ -109,7 +109,7 @@
               nodePackages.npm
               nodePackages.node2nix
               nodePackages.prettier
-              nodejs_21
+              nodejs
             ] ++ rustDeps ++ runtimePrograms pkgs
               ++ lib.optional (system != "aarch64-darwin") [ backblaze-b2 ];
             RUST_SRC_PATH = rustPlatform.rustLibSrc;
