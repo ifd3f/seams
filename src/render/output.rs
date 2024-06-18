@@ -10,8 +10,8 @@ use crate::{
     media::MediaRegistry,
     model::SiteData,
     templates::{
-        ArbitraryPageRender, BaseRenderer, BlogIndexPage, Homepage, ProjectIndexPage,
-        RenderPost, RenderProject, TagPage,
+        ArbitraryPageRender, BaseRenderer, BlogIndexPage, Homepage, ProjectIndexPage, RenderPost,
+        RenderProject, TagPage,
     },
 };
 

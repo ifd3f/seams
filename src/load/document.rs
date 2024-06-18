@@ -101,8 +101,8 @@ pub enum DocumentLoadError {
     #[error("Failed to parse object: {0}")]
     ParseObjectError(#[from] serde_json::Error),
 
-    #[error("Failed to parse YAML: {0}")]
-    ParseYamlError(#[from] serde_yaml::Error),
+    #[error("Failed to parse YAML: {0:#}")]
+    ParseYamlError(#[from] serde_path_to_error::Error<serde_yaml::Error>),
 
     #[error("Failed to parse TOML: {0}")]
     ParseTomlError(#[from] toml::de::Error),
@@ -241,7 +241,9 @@ where
 
             "yml" | "yaml" => Ok(Self {
                 path,
-                meta: serde_yaml::from_str(&file_content)?,
+                meta: serde_path_to_error::deserialize(serde_yaml::Deserializer::from_str(
+                    &file_content,
+                ))?,
                 content: ContentSource::FileRef(noext),
             }),
 
