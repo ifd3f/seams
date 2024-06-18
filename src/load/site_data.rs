@@ -14,6 +14,7 @@ use crate::{
     },
     media::MediaRegistry,
     model::{
+        computers::Computer,
         metadata::{ArbitraryPage, Post, Project},
         Button88x31, NavbarItem, NewsItem, SiteData, TagSettingsSheet, Webring,
     },
@@ -42,7 +43,7 @@ pub struct SiteDataUserError {
 
 impl Display for SiteDataUserError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "In file {}:\n  {}", self.path.as_str(), self.error)
+        writeln!(f, "In file {}:\n  {:#}", self.path.as_str(), self.error)
     }
 }
 
@@ -69,6 +70,7 @@ impl<'a> SiteDataLoader<'a> {
             let posts = self.load_docdir::<Post>("blog");
             let projects = self.load_docdir::<Project>("projects");
             let pages = self.load_docdir::<ArbitraryPage>("pages");
+            let computers = self.load_docdir::<Computer>("computers");
             let tags = self.load_settings::<TagSettingsSheet>("tag");
             let news = self.load_settings::<Vec<NewsItem>>("news");
             let buttons = self.load_settings::<Vec<Button88x31>>("88x31");
@@ -103,6 +105,7 @@ impl<'a> SiteDataLoader<'a> {
             tags,
             pages,
             news,
+            computers,
             navbar,
             buttons,
             webrings,

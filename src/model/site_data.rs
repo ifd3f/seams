@@ -12,6 +12,7 @@ use crate::{
 };
 
 use super::{
+    computers::Computer,
     metadata::{ArbitraryPage, Post, Project},
     tag::TagSettings,
     Button88x31, NavbarItem, NewsItem, Webring,
@@ -24,6 +25,7 @@ pub struct SiteData {
     pub posts: Vec<FullyLoadedDocument<Post>>,
     pub projects: Vec<FullyLoadedDocument<Project>>,
     pub pages: Vec<FullyLoadedDocument<ArbitraryPage>>,
+    pub computers: Vec<FullyLoadedDocument<Computer>>,
     pub tags: TagMap,
     pub news: Vec<NewsItem>,
     pub navbar: Vec<NavbarItem>,
