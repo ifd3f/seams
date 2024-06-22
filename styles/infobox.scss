@@ -1,0 +1,38 @@
+.infobox {
+    width: 100%;
+    text-align: center;
+    border: 1px dotted grey;
+    padding: 10px;
+
+    table {
+        width: 100%;
+    }
+
+    th {
+        text-align: left;
+        padding-right: 5px;
+    }
+
+    td {
+        text-align: left;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-size: 12pt;
+        margin-top: 2pt;
+        margin-bottom: 2pt;
+    }
+
+    h1 {
+        font-size: 16pt;
+    }
+
+    hr {
+        border: 1px dotted lightgrey;
+    }
+
+    @media only screen and (min-width: $sm) {
+        width: 300px;
+        float: right;
+    }
+}

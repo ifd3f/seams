@@ -53,7 +53,7 @@ pub struct ComputersTable<'a> {
 impl Render for ComputersTable<'_> {
     fn render(&self) -> Markup {
         html! {
-            table .computer-index-table {
+            table .computer-index-table style="width: 100%" {
                 thead {
                     th { "Acquired" }
                     th { "Decommissioned" }
@@ -157,18 +157,34 @@ fn computer_stat_table(c: &Computer) -> impl Render {
     let s = &c.specs;
 
     html! {
-        table .computer-stat-table {
-            tbody {
-                @if let Some(n) = &c.hostname {
-                    (row("Hostname", n))
+        section .infobox {
+            h1 { (c.name) }
+            hr;
+
+            table {
+                tbody {
+                    @if let Some(n) = &c.hostname {
+                        (row("Hostname", n))
+                    }
+                    (row("Status", c.status.to_string()))
+                    (row("Type", s.r#type.to_string()))
+                    (row("Acquired", c.date.acquired.to_string()))
+                    @if let Some(d) = &c.date.decomissioned {
+                        (row("Decommissioned", d.to_string()))
+                    }
                 }
-                (row("Model", &s.model))
-                (row("CPU", &s.cpu))
-                (row("RAM", &s.ram.size))
-                (row("Status", c.status.to_string()))
-                (row("Acquired", c.date.acquired.to_string()))
-                @if let Some(d) = &c.date.decomissioned {
-                    (row("Decommissioned", d.to_string()))
+            }
+            hr;
+
+            h2 { "Stats" }
+            table {
+                tbody {
+                    (row("Model", &s.model))
+                    (row("CPU", &s.cpu))
+                    @if let Some(g) = &s.gpu {
+                        (row("GPU", g))
+                    }
+                    (row("RAM", &s.ram.size))
                 }
             }
         }
