@@ -13,3 +13,7 @@
 - href: /about
   id: about
   display: "About"
+
+- href: /computers
+  id: computers
+  display: "Computers"

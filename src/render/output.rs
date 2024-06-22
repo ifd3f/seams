@@ -10,8 +10,8 @@ use crate::{
     media::MediaRegistry,
     model::SiteData,
     templates::{
-        ArbitraryPageRender, BaseRenderer, BlogIndexPage, Homepage, ProjectIndexPage, RenderPost,
-        RenderProject, TagPage,
+        ArbitraryPageRender, BaseRenderer, BlogIndexPage, ComputerIndexPage, Homepage,
+        ProjectIndexPage, RenderComputer, RenderPost, RenderProject, TagPage,
     },
 };
 
@@ -79,6 +79,17 @@ pub fn write_static_site(
         write_markup(
             &outdir.join(&p.document.meta.href())?,
             renderer.render_page(RenderPost::from(p)),
+        )?;
+    }
+
+    write_markup(
+        &outdir.join("computers")?,
+        renderer.render_page(ComputerIndexPage),
+    )?;
+    for p in &sd.computers {
+        write_markup(
+            &outdir.join(&p.document.meta.href())?,
+            renderer.render_page(RenderComputer::from(p)),
         )?;
     }
 
