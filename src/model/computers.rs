@@ -42,6 +42,10 @@ pub enum Status {
     Decomissioning,
     #[serde(rename = "decomissioned")]
     Decomissioned,
+    #[serde(rename = "donated")]
+    Donated,
+    #[serde(rename = "sold")]
+    Sold,
 }
 
 impl Display for Status {
@@ -50,6 +54,8 @@ impl Display for Status {
             Status::InUse => write!(f, "In use"),
             Status::Decomissioning => write!(f, "Decomissioning"),
             Status::Decomissioned => write!(f, "Decomissioned"),
+            Status::Donated => write!(f, "Donated"),
+            Status::Sold => write!(f, "Sold"),
         }
     }
 }
