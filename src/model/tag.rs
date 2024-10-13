@@ -131,7 +131,12 @@ impl TagSettingsSheet {
 impl Semigroup for TagSettingsSheet {
     fn combine(&self, other: &Self) -> Self {
         Self {
-            titles: self.titles.combine(&other.titles),
+            titles: self
+                .titles
+                .iter()
+                .chain(other.titles.iter())
+                .map(|(a, b)| (a.clone(), b.clone()))
+                .collect(),
             styles: self.styles.combine(&other.styles),
         }
     }
