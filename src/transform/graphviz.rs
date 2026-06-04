@@ -32,7 +32,7 @@ pub async fn transform_graphviz(source: &str) -> Result<String, GraphvizError> {
     let mut proc = cmd.spawn()?;
     trace!(%source, "writing source code");
     let mut stdin = proc.stdin.take().unwrap();
-    stdin.write(source.as_bytes()).await?;
+    stdin.write_all(source.as_bytes()).await?;
     drop(stdin);
 
     let result = proc.wait_with_output().await?;

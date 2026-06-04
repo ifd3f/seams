@@ -1,4 +1,10 @@
-{ lib, config, dream2nix, ... }: {
+{
+  lib,
+  config,
+  dream2nix,
+  ...
+}:
+{
   imports = [
     dream2nix.modules.dream2nix.nodejs-package-json-v3
     dream2nix.modules.dream2nix.nodejs-granular-v3
@@ -18,8 +24,10 @@
       src = ../.;
       filter =
         path: _: # path is of the format /nix/store/hash-whatever/Cargo.toml
-        let rootDirName = builtins.elemAt (lib.splitString "/" path) 4;
-        in builtins.elem rootDirName [
+        let
+          rootDirName = builtins.elemAt (lib.splitString "/" path) 4;
+        in
+        builtins.elem rootDirName [
           "js"
           "lock.json"
           "package-lock.json"

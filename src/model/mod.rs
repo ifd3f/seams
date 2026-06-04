@@ -1,5 +1,5 @@
-pub mod metadata;
 pub mod computers;
+pub mod metadata;
 mod miscdata;
 mod site_data;
 mod tag;

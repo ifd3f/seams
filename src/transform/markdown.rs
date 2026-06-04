@@ -1,9 +1,11 @@
 use comrak::{
     format_html_with_plugins,
     nodes::{AstNode, LineColumn, NodeHtmlBlock, NodeLink, NodeValue, Sourcepos},
+    options::Plugins,
+    options::RenderPlugins,
     parse_document,
     plugins::syntect::SyntectAdapter,
-    Arena, PluginsBuilder, RenderPluginsBuilder,
+    Arena,
 };
 use futures::TryFutureExt;
 
@@ -24,7 +26,7 @@ use super::{
     katex_md::apply_katex,
 };
 
-pub fn make_md_options() -> comrak::Options {
+pub fn make_md_options() -> comrak::Options<'static> {
     let mut md_options = comrak::Options::default();
     md_options.extension.strikethrough = true;
     md_options.extension.table = true;
@@ -32,11 +34,11 @@ pub fn make_md_options() -> comrak::Options {
     md_options.extension.tasklist = true;
     md_options.extension.superscript = true;
     md_options.extension.footnotes = true;
-    md_options.extension.header_ids = Some("header-".into());
+    md_options.extension.header_id_prefix = Some("header-".into());
     md_options.parse.smart = true;
     md_options.render.github_pre_lang = true;
     md_options.render.width = 80;
-    md_options.render.unsafe_ = true;
+    md_options.render.r#unsafe = true;
     md_options.render.escape = false;
     md_options
 }
@@ -54,15 +56,13 @@ pub async fn transform_markdown<'a>(
     let md_options = make_md_options();
 
     let syntect = SyntectAdapter::new(Some("base16-ocean.dark"));
-    let plugins = PluginsBuilder::default()
+    let plugins = Plugins::builder()
         .render(
-            RenderPluginsBuilder::default()
-                .codefence_syntax_highlighter(Some(&syntect))
-                .build()
-                .unwrap(),
+            RenderPlugins::builder()
+                .codefence_syntax_highlighter(&syntect)
+                .build(),
         )
-        .build()
-        .unwrap();
+        .build();
 
     let root = parse_document(&arena, raw, &md_options);
 
@@ -90,9 +90,9 @@ pub async fn transform_markdown<'a>(
 
     transform_image_to_picture(root);
 
-    let mut bw = Vec::new();
+    let mut bw = String::new();
     format_html_with_plugins(root, &md_options, &mut bw, &plugins).unwrap();
-    Ok(String::from_utf8(bw).unwrap())
+    Ok(bw)
 }
 
 /// Transform links in images into what they should be, and upload them.
@@ -160,13 +160,13 @@ pub async fn apply_graphviz<'a>(
                     body: result.into_bytes(),
                 })
                 .unwrap();
-            let ast = NodeValue::Image(NodeLink {
+            let ast = NodeValue::Image(Box::new(NodeLink {
                 url: link,
                 title: match info {
                     GraphvizInfo::Untitled => "Graphviz image".into(),
                     GraphvizInfo::Titled(title) => title,
                 },
-            });
+            }));
             cell.borrow_mut().value = ast;
             Ok::<(), GraphvizError>(())
         }
@@ -297,9 +297,8 @@ mod tests {
         transform_image_to_picture(root);
         eprintln!("AFTER TRANFORM: {root:#?}");
 
-        let mut html = vec![];
+        let mut html = String::new();
         format_html_with_plugins(root, &options, &mut html, &comrak::Plugins::default()).unwrap();
-        let html = String::from_utf8_lossy(&html);
 
         // root.descendants().contains(|n| match n)
         assert!(

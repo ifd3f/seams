@@ -6,25 +6,48 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils, naersk, dream2nix, ... }:
-    let runtimePrograms = pkgs: with pkgs; [ graphviz nodePackages.katex ];
-    in {
-      lib.makeSite = { pkgs, name, content
-        , seams ? self.packages.${pkgs.system}.seams
-        , styles ? self.packages.${pkgs.system}.styles
-        , js ? self.packages.${pkgs.system}.js }:
-        pkgs.runCommand name {
-          buildInputs = [ seams ] ++ runtimePrograms pkgs;
-        } ''
-          shopt -s dotglob
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+      naersk,
+      dream2nix,
+      ...
+    }:
+    let
+      runtimePrograms =
+        pkgs: with pkgs; [
+          graphviz
+          katex
+        ];
+    in
+    {
+      lib.makeSite =
+        {
+          pkgs,
+          name,
+          content,
+          seams ? self.packages.${pkgs.system}.seams,
+          styles ? self.packages.${pkgs.system}.styles,
+          js ? self.packages.${pkgs.system}.js,
+        }:
+        pkgs.runCommand name
+          {
+            buildInputs = [ seams ] ++ runtimePrograms pkgs;
+          }
+          ''
+            shopt -s dotglob
 
-          mkdir -p $out
-          seams build ${content} -o $out --script-assets ${./js}
-          cp -r ${styles}/* $out/
-          cp -r ${js}/* $out/
-        '';
+            mkdir -p $out
+            seams build ${content} -o $out --script-assets ${./js}
+            cp -r ${styles}/* $out/
+            cp -r ${js}/* $out/
+          '';
 
-    } // flake-utils.lib.eachDefaultSystem (system:
+    }
+    // flake-utils.lib.eachDefaultSystem (
+      system:
       let
         lib = pkgs.lib;
         pkgs = import nixpkgs { inherit system; };
@@ -50,31 +73,44 @@
           cp -r ${js-build}/lib/node_modules/seams-js/out-scripts/* $out
         '';
 
-        rustDeps = with pkgs;
-          [ openssl pkg-config iconv ]
-          ++ lib.optional (system == "aarch64-darwin")
-          [ darwin.apple_sdk.frameworks.SystemConfiguration ];
+        rustDeps =
+          with pkgs;
+          [
+            openssl
+            pkg-config
+            iconv
+          ]
+          ++ lib.optional (system == "aarch64-darwin") [ darwin.apple_sdk.frameworks.SystemConfiguration ];
 
         seams = naersk-lib.buildPackage {
-          src = builtins.filterSource
-            (path: _: # path is of the format /nix/store/hash-whatever/Cargo.toml
-              let rootDirName = builtins.elemAt (lib.splitString "/" path) 4;
-              in builtins.elem rootDirName [
-                ".cargo"
-                "native"
-                "src"
-                "test_data"
+          src = builtins.filterSource (
+            path: _: # path is of the format /nix/store/hash-whatever/Cargo.toml
+            let
+              rootDirName = builtins.elemAt (lib.splitString "/" path) 4;
+            in
+            builtins.elem rootDirName [
+              ".cargo"
+              "native"
+              "src"
+              "test_data"
 
-                "build.rs"
-                "Cargo.lock"
-                "Cargo.toml"
-              ]) ./.;
+              "build.rs"
+              "Cargo.lock"
+              "Cargo.toml"
+            ]
+          ) ./.;
           buildInputs = rustDeps;
         };
 
-        python = pkgs.python3.withPackages (ps: with ps; [ pyyaml click ]);
+        python = pkgs.python3.withPackages (
+          ps: with ps; [
+            pyyaml
+            click
+          ]
+        );
 
-      in {
+      in
+      {
         packages = rec {
           inherit js styles seams;
           default = seams;
@@ -95,8 +131,13 @@
           build-test-site = self.packages.${system}.astrid-dot-tech-test-site;
         };
 
-        devShells.default = with pkgs;
-          mkShell {
+        devShells.default =
+          with pkgs;
+          mkShell.override{
+            stdenv = gcc14Stdenv;
+
+          } {
+
             buildInputs = [
               cargo
               rustc
@@ -106,13 +147,15 @@
               sass
               just
               python
-              nodePackages.npm
-              nodePackages.node2nix
-              nodePackages.prettier
+
+              prettier
               nodejs
-            ] ++ rustDeps ++ runtimePrograms pkgs
-              ++ lib.optional (system != "aarch64-darwin") [ backblaze-b2 ];
+            ]
+            ++ rustDeps
+            ++ runtimePrograms pkgs
+            ++ lib.optionals (system != "aarch64-darwin") [ backblaze-b2 ];
             RUST_SRC_PATH = rustPlatform.rustLibSrc;
           };
-      });
+      }
+    );
 }

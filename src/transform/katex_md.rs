@@ -47,7 +47,7 @@ async fn apply_inline_katex<'a>(node: &'a AstNode<'a>) -> Result<(), Errors<Kate
         let mut katex = String::new();
         for n in &between {
             katex.push_str(match &n.data.borrow().value {
-                NodeValue::Text(s) => s.as_str(),
+                NodeValue::Text(s) => s,
                 NodeValue::SoftBreak => "\n",
                 _ => " ",
             })
@@ -182,9 +182,14 @@ at 8:";
         apply_katex(root).await.unwrap();
         eprintln!("AFTER TRANFORM: {root:#?}");
 
-        let mut html = vec![];
-        format_html_with_plugins(root, &options, &mut html, &comrak::Plugins::default()).unwrap();
-        let html = String::from_utf8_lossy(&html);
+        let mut html = String::new();
+        format_html_with_plugins(
+            root,
+            &options,
+            &mut html,
+            &comrak::options::Plugins::default(),
+        )
+        .unwrap();
 
         // root.descendants().contains(|n| match n)
         assert!(
